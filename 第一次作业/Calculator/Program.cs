@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace Calculator
 {
     internal class Program
-    {
+    { 
         static void Main(string[] args)
         {
             Console.WriteLine("请输入第一个数字：");
