@@ -1,0 +1,8 @@
+D:\develop\CSProgram\MyWorks\b2\b2\bin\Debug\b2.exe.config
+D:\develop\CSProgram\MyWorks\b2\b2\bin\Debug\b2.exe
+D:\develop\CSProgram\MyWorks\b2\b2\bin\Debug\b2.pdb
+D:\develop\CSProgram\MyWorks\b2\b2\obj\Debug\b2.csproj.AssemblyReference.cache
+D:\develop\CSProgram\MyWorks\b2\b2\obj\Debug\b2.csproj.SuggestedBindingRedirects.cache
+D:\develop\CSProgram\MyWorks\b2\b2\obj\Debug\b2.csproj.CoreCompileInputs.cache
+D:\develop\CSProgram\MyWorks\b2\b2\obj\Debug\b2.exe
+D:\develop\CSProgram\MyWorks\b2\b2\obj\Debug\b2.pdb

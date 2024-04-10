@@ -1,0 +1,8 @@
+D:\develop\CSProgram\MyWorks\sum\sum\bin\Debug\sum.exe.config
+D:\develop\CSProgram\MyWorks\sum\sum\bin\Debug\sum.exe
+D:\develop\CSProgram\MyWorks\sum\sum\bin\Debug\sum.pdb
+D:\develop\CSProgram\MyWorks\sum\sum\obj\Debug\Method.csproj.AssemblyReference.cache
+D:\develop\CSProgram\MyWorks\sum\sum\obj\Debug\Method.csproj.SuggestedBindingRedirects.cache
+D:\develop\CSProgram\MyWorks\sum\sum\obj\Debug\Method.csproj.CoreCompileInputs.cache
+D:\develop\CSProgram\MyWorks\sum\sum\obj\Debug\sum.exe
+D:\develop\CSProgram\MyWorks\sum\sum\obj\Debug\sum.pdb
