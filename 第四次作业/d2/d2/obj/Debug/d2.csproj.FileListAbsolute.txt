@@ -1,8 +1,0 @@
-D:\develop\CSProgram\MyWorks\d2\d2\bin\Debug\d2.exe.config
-D:\develop\CSProgram\MyWorks\d2\d2\bin\Debug\d2.exe
-D:\develop\CSProgram\MyWorks\d2\d2\bin\Debug\d2.pdb
-D:\develop\CSProgram\MyWorks\d2\d2\obj\Debug\d2.csproj.AssemblyReference.cache
-D:\develop\CSProgram\MyWorks\d2\d2\obj\Debug\d2.csproj.SuggestedBindingRedirects.cache
-D:\develop\CSProgram\MyWorks\d2\d2\obj\Debug\d2.csproj.CoreCompileInputs.cache
-D:\develop\CSProgram\MyWorks\d2\d2\obj\Debug\d2.exe
-D:\develop\CSProgram\MyWorks\d2\d2\obj\Debug\d2.pdb
