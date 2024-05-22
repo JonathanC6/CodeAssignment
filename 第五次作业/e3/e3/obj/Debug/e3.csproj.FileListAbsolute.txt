@@ -1,0 +1,10 @@
+D:\develop\CSProgram\MyWorks\e3\e3\bin\Debug\e3.exe.config
+D:\develop\CSProgram\MyWorks\e3\e3\bin\Debug\e3.exe
+D:\develop\CSProgram\MyWorks\e3\e3\bin\Debug\e3.pdb
+D:\develop\CSProgram\MyWorks\e3\e3\obj\Debug\e3.csproj.AssemblyReference.cache
+D:\develop\CSProgram\MyWorks\e3\e3\obj\Debug\e3.csproj.SuggestedBindingRedirects.cache
+D:\develop\CSProgram\MyWorks\e3\e3\obj\Debug\e3.Properties.Resources.resources
+D:\develop\CSProgram\MyWorks\e3\e3\obj\Debug\e3.csproj.GenerateResource.cache
+D:\develop\CSProgram\MyWorks\e3\e3\obj\Debug\e3.csproj.CoreCompileInputs.cache
+D:\develop\CSProgram\MyWorks\e3\e3\obj\Debug\e3.exe
+D:\develop\CSProgram\MyWorks\e3\e3\obj\Debug\e3.pdb
