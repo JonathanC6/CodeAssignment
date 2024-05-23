@@ -1,0 +1,10 @@
+D:\develop\CSProgram\MyWorks\f1\f1\bin\Debug\f1.exe.config
+D:\develop\CSProgram\MyWorks\f1\f1\bin\Debug\f1.exe
+D:\develop\CSProgram\MyWorks\f1\f1\bin\Debug\f1.pdb
+D:\develop\CSProgram\MyWorks\f1\f1\obj\Debug\f1.csproj.AssemblyReference.cache
+D:\develop\CSProgram\MyWorks\f1\f1\obj\Debug\f1.csproj.SuggestedBindingRedirects.cache
+D:\develop\CSProgram\MyWorks\f1\f1\obj\Debug\f1.Properties.Resources.resources
+D:\develop\CSProgram\MyWorks\f1\f1\obj\Debug\f1.csproj.GenerateResource.cache
+D:\develop\CSProgram\MyWorks\f1\f1\obj\Debug\f1.csproj.CoreCompileInputs.cache
+D:\develop\CSProgram\MyWorks\f1\f1\obj\Debug\f1.exe
+D:\develop\CSProgram\MyWorks\f1\f1\obj\Debug\f1.pdb
