@@ -1,0 +1,8 @@
+D:\develop\CSProgram\MyWorks\Crawler\Crawler\bin\Debug\Crawler.exe.config
+D:\develop\CSProgram\MyWorks\Crawler\Crawler\bin\Debug\Crawler.exe
+D:\develop\CSProgram\MyWorks\Crawler\Crawler\bin\Debug\Crawler.pdb
+D:\develop\CSProgram\MyWorks\Crawler\Crawler\obj\Debug\Crawler.csproj.AssemblyReference.cache
+D:\develop\CSProgram\MyWorks\Crawler\Crawler\obj\Debug\Crawler.csproj.SuggestedBindingRedirects.cache
+D:\develop\CSProgram\MyWorks\Crawler\Crawler\obj\Debug\Crawler.csproj.CoreCompileInputs.cache
+D:\develop\CSProgram\MyWorks\Crawler\Crawler\obj\Debug\Crawler.exe
+D:\develop\CSProgram\MyWorks\Crawler\Crawler\obj\Debug\Crawler.pdb
