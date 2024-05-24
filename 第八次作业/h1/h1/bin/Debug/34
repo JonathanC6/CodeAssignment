@@ -1,0 +1,633 @@
+﻿<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="referrer" content="never" />
+    <meta name="description" content="你好呀，我是歪歪。 这篇文章带大家盘一个读者遇到的面试题哈。 根据读者转述，面试官的原问题就是：一个 SpringBoot 项目能同时处理多少请求？ 不知道你听到这个问题之后的第一反应是什么。 我大概知道他要问的是哪个方向，但是对于这种只有一句话的面试题，我的第一反应是：会不会有坑？ 所以并不会贸然" />
+    <meta property="og:description" content="你好呀，我是歪歪。 这篇文章带大家盘一个读者遇到的面试题哈。 根据读者转述，面试官的原问题就是：一个 SpringBoot 项目能同时处理多少请求？ 不知道你听到这个问题之后的第一反应是什么。 我大概知道他要问的是哪个方向，但是对于这种只有一句话的面试题，我的第一反应是：会不会有坑？ 所以并不会贸然" />
+    <meta http-equiv="Cache-Control" content="no-transform" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>面试官：一个 SpringBoot 项目能处理多少请求？（小心有坑） - why技术 - 博客园</title>
+    <link rel="canonical" href="https://www.cnblogs.com/thisiswhy/p/17559808.html" />
+    <link rel="shortcut icon" id="favicon" href="//assets.cnblogs.com/favicon.svg?v=2" type="image/svg+xml" />
+    
+    <link rel="stylesheet" href="/css/blog-common.min.css?v=JnYHs5HAUCOVmwbxBNuH-ED7ggVDfqtff-pdhyndpr8" />
+    
+
+    <link id="MainCss" rel="stylesheet" href="/skins/thinkinside/bundle-thinkinside.min.css?v=Nm2Ml12ubXJAdcm3180h4L-mMTjPAyv-IjhJ2LC5-6U" />
+        <link id="highlighter-theme-cnblogs" type="text/css" rel="stylesheet" href="/css/hljs/cnblogs.css?v=5J1NDtbnnIr2Rc2SdhEMlMxD4l9Eydj88B31E7_NhS4" />
+    <link type="text/css" rel="stylesheet" href="https://www.cnblogs.com/thisiswhy/custom.css?v=LNWbleRqrUhv8R/7EqjcfN42wdo=" />
+    
+    <link id="mobile-style" media="only screen and (max-width: 767px)" type="text/css" rel="stylesheet" href="/skins/thinkinside/bundle-thinkinside-mobile.min.css?v=AqRX98oAJ_vVJSg2_pxRXDzopam2iJ4FYq5xqHqmP58" />
+    
+    <link type="application/rss+xml" rel="alternate" href="https://www.cnblogs.com/thisiswhy/rss" />
+    <link type="application/rsd+xml" rel="EditURI" href="https://www.cnblogs.com/thisiswhy/rsd.xml" />
+    <link type="application/wlwmanifest+xml" rel="wlwmanifest" href="https://www.cnblogs.com/thisiswhy/wlwmanifest.xml" />
+    <script>
+        var currentBlogId = 567091;
+        var currentBlogApp = 'thisiswhy';
+        var isLogined = false;
+        var isBlogOwner = false;
+        var skinName = 'ThinkInside';
+        var visitorUserId = '';
+        var hasCustomScript = false;
+        window.cb_enable_mathjax = false;
+        window.mathEngine = 0;
+        window.codeHighlightEngine = 1;
+        window.enableCodeLineNumber = false;
+        window.codeHighlightTheme = 'cnblogs';
+        window.darkModeCodeHighlightTheme = 'vs2015';
+        window.isDarkCodeHighlightTheme = false;
+        window.isDarkModeCodeHighlightThemeDark = true;
+        window.isDisableCodeHighlighter = false;
+        window.enableCodeThemeTypeFollowSystem = false;
+        window.enableMacStyleCodeBlock = false;
+    </script>
+        <script>
+            window.currentPostId = 17559808;
+            window.currentPostDateAdded = '2023-07-17 13:02';
+        </script>
+    <script src="https://assets.cnblogs.com/scripts/jquery-3.3.1.min.js"></script>
+    <script src="https://cdn-www.cnblogs.com/js/blog-common.min.js?v=e7iDdKE0ie8Fi0lKgiYt7eXqsQNrVeJmcEHX6zqQWKc"></script>
+    
+</head>
+<body class="skin-thinkinside no-navbar">
+    <a name="top"></a>
+    <div id="top_nav" class="navbar forpc navbar-custom">
+        <nav id="nav_main" class="navbar-main">
+            <ul id="nav_left" class="navbar-list navbar-left">
+                <li class="navbar-branding">
+                    <a href="https://www.cnblogs.com/" title="开发者的网上家园" role="banner">
+                        <img src="//assets.cnblogs.com/logo.svg" alt="博客园Logo" />
+                    </a>
+                </li>
+                <li><a href="https://cnblogs.vip/">会员</a></li>
+                <li><a href="https://cnblogs.vip/store">周边</a></li>
+                <li>
+                    <a href="https://news.cnblogs.com/" onclick="countClicks('nav', 'skin-navbar-news')">新闻</a>
+                </li>
+                <li>
+                    <a href="https://q.cnblogs.com/" onclick="countClicks('nav', 'skin-navbar-q')">博问</a>
+                </li>
+                    <li>
+                        <a href="https://www.cnblogs.com/cmt/p/18172236" target="_blank">融资</a>
+                    </li>
+                <li><a href="https://market.cnblogs.com" target="_blank">云市场</a></li>
+            </ul>
+            <ul id="nav_right" class="navbar-list navbar-right">
+                <li>
+                    <form id="zzk_search" class="navbar-search dropdown" action="https://zzk.cnblogs.com/s" method="get" role="search">
+                        <input name="w" id="zzk_search_input" placeholder="代码改变世界" type="search" tabindex="3" autocomplete="off" />
+                        <button id="zzk_search_button" onclick="window.navbarSearchManager.triggerActiveOption()">
+                            <img id="search_icon" class="focus-hidden" src="//assets.cnblogs.com/icons/search.svg" alt="搜索" />
+                            <img class="hidden focus-visible" src="//assets.cnblogs.com/icons/enter.svg" alt="搜索" />
+                        </button>
+                        <ul id="navbar_search_options" class="dropdown-menu quick-search-menu">
+                            <li tabindex="0" class="active" onclick="zzkSearch(event, document.getElementById('zzk_search_input').value)">
+                                <div class="keyword-wrapper">
+                                    <img src="//assets.cnblogs.com/icons/search.svg" alt="搜索" />
+                                    <div class="keyword"></div>
+                                </div>
+                                <span class="search-area">所有博客</span>
+                            </li>
+                                    <li tabindex="1" onclick="zzkBlogSearch(event, 'thisiswhy', document.getElementById('zzk_search_input').value)">
+                                        <div class="keyword-wrapper">
+                                            <img src="//assets.cnblogs.com/icons/search.svg" alt="搜索" />
+                                            <div class="keyword"></div>
+                                        </div>
+                                        <span class="search-area">当前博客</span>
+                                    </li>
+                        </ul>
+                    </form>
+                </li>
+                <li id="navbar_login_status" class="navbar-list">
+                    <a class="navbar-user-info navbar-blog" href="https://i.cnblogs.com/EditPosts.aspx?opt=1" alt="写随笔" title="写随笔">
+                        <img id="new_post_icon" class="navbar-icon" src="//assets.cnblogs.com/icons/newpost.svg" alt="写随笔" />
+                    </a>
+                    <a id="navblog-myblog-icon" class="navbar-user-info navbar-blog" href="https://passport.cnblogs.com/GetBlogApplyStatus.aspx" alt="我的博客" title="我的博客">
+                        <img id="myblog_icon" class="navbar-icon" src="//assets.cnblogs.com/icons/myblog.svg" alt="我的博客" />
+                    </a>
+                    <a class="navbar-user-info navbar-message navbar-icon-wrapper" href="https://msg.cnblogs.com/" alt="短消息" title="短消息">
+                        <img id="msg_icon" class="navbar-icon" src="//assets.cnblogs.com/icons/message.svg" alt="短消息" />
+                        <span id="msg_count" style="display: none"></span>
+                    </a>
+                    <a id="navbar_lite_mode_indicator" data-current-page="blog" style="display: none" href="javascript:void(0)" alt="简洁模式" title="简洁模式启用，您在访问他人博客时会使用简洁款皮肤展示">
+                        <img class="navbar-icon" src="//assets.cnblogs.com/icons/lite-mode-on.svg" alt="简洁模式" />
+                    </a>
+                    <div id="user_info" class="navbar-user-info dropdown">
+                        <a class="dropdown-button" href="https://home.cnblogs.com/">
+                            <img id="user_icon" class="navbar-avatar" src="//assets.cnblogs.com/icons/avatar-default.svg" alt="用户头像" />
+                        </a>
+                        <div class="dropdown-menu">
+                            <a id="navblog-myblog-text" href="https://passport.cnblogs.com/GetBlogApplyStatus.aspx">我的博客</a>
+                            <a href="https://home.cnblogs.com/">我的园子</a>
+                            <a href="https://account.cnblogs.com/settings/account">账号设置</a>
+                            <a href="javascript:void(0)" id="navbar_lite_mode_toggle" title="简洁模式会使用简洁款皮肤显示所有博客">
+    简洁模式 <img id="navbar_lite_mode_on" src="/images/lite-mode-check.svg" class="hide" /><span id="navbar_lite_mode_spinner" class="hide">...</span>
+</a>
+                            <a href="javascript:void(0)" onclick="account.logout();">退出登录</a>
+                        </div>
+                    </div>
+                    <a class="navbar-anonymous" href="https://account.cnblogs.com/signup">注册</a>
+                    <a class="navbar-anonymous" href="javascript:void(0);" onclick="account.login()">登录</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    <div id="page_begin_html">
+        <link href="https://fonts.googleapis.com/css?family=Ubuntu" rel="stylesheet">
+    </div>
+
+    <!--done-->
+<div id="home">
+<div id="header">
+	<div id="blogTitle">
+        <a id="lnkBlogLogo" href="https://www.cnblogs.com/thisiswhy/"><img id="blogLogo" src="/skins/custom/images/logo.gif" alt="返回主页" /></a>		
+		
+<!--done-->
+<h1><a id="Header1_HeaderTitle" class="headermaintitle HeaderMainTitle" href="https://www.cnblogs.com/thisiswhy">why技术</a>
+</h1>
+<h2></h2>
+
+
+
+
+		
+	</div><!--end: blogTitle 博客的标题和副标题 -->
+	<div id="navigator">
+		
+<ul id="navList">
+<li><a id="blog_nav_sitehome" class="menu" href="https://www.cnblogs.com/">
+博客园</a>
+</li>
+<li>
+<a id="blog_nav_myhome" class="menu" href="https://www.cnblogs.com/thisiswhy/">
+首页</a>
+</li>
+<li>
+
+<a id="blog_nav_newpost" class="menu" href="https://i.cnblogs.com/EditPosts.aspx?opt=1">
+新随笔</a>
+</li>
+<li>
+</li>
+<li>
+<a id="blog_nav_rss" class="menu" href="javascript:void(0)" data-rss="https://www.cnblogs.com/thisiswhy/rss/">
+订阅</a>
+<!--<partial name="./Shared/_XmlLink.cshtml" model="Model" /></li>--></li>
+<li>
+<a id="blog_nav_admin" class="menu" href="https://i.cnblogs.com/">
+管理</a>
+</li>
+</ul>
+
+
+		<div class="blogStats">
+			<div id="blog_stats_place_holder"><script>loadBlogStats();</script></div>
+		</div><!--end: blogStats -->
+	</div><!--end: navigator 博客导航栏 -->
+</div><!--end: header 头部 -->
+<div id="main">
+	<div id="mainContent">
+	<div class="forFlow">
+		<div id="post_detail">
+    <!--done-->
+    <div id="topics">
+        <div class="post">
+            <h1 class = "postTitle">
+                <a id="cb_post_title_url" class="postTitle2 vertical-middle" href="https://www.cnblogs.com/thisiswhy/p/17559808.html" title="发布于 2023-07-17 13:02">
+    <span role="heading" aria-level="2">面试官：一个 SpringBoot 项目能处理多少请求？（小心有坑）</span>
+    
+
+</a>
+
+            </h1>
+            <div class="clear"></div>
+            <div class="postBody">
+                <div id="cnblogs_post_body" class="blogpost-body cnblogs-markdown">
+<section id="nice" data-tool="mdnice编辑器" data-website="https://www.mdnice.com" style="font-size: 16px; color: rgba(0, 0, 0, 1); padding: 0 10px; line-height: 1.6; word-spacing: 0; letter-spacing: 0; word-wrap: break-word; text-align: left; font-family: Optima-Regular, Optima, PingFangSC-light, PingFangTC-light, &quot;PingFang SC&quot;, Cambria, Cochin, Georgia, Times, &quot;Times New Roman&quot;, serif"><p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">你好呀，我是歪歪。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">这篇文章带大家盘一个读者遇到的面试题哈。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">根据读者转述，面试官的原问题就是：一个 SpringBoot 项目能同时处理多少请求？</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">不知道你听到这个问题之后的第一反应是什么。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">我大概知道他要问的是哪个方向，但是对于这种只有一句话的面试题，我的第一反应是：会不会有坑？</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">所以并不会贸然答题，先追问一些消息，比如：这个项目具体是干什么的？项目大概进行了哪些参数配置？使用的 web 容器是什么？部署的服务器配置如何？有哪些接口？接口响应平均时间大概是多少？</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">这样，在几个问题的拉扯之后，至少在面试题考察的方向方面能基本和面试官达成了一致。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">比如前面的面试问题，经过几次拉扯之后，面试官可能会修改为：</p>
+<blockquote class="multiquote-1" data-tool="mdnice编辑器" style="border-top: none; border-right: none; border-bottom: none; border-left: 3px solid rgba(239, 112, 96, 1); display: block; font-size: 0.9em; overflow: auto; overflow-scrolling: touch; color: rgba(106, 115, 125, 1); padding: 10px 10px 10px 20px; margin-bottom: 20px; margin-top: 20px; background: rgba(255, 249, 249, 1)">
+<p style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; color: rgba(0, 0, 0, 1); line-height: 26px">一个 SpringBoot 项目，未进行任何特殊配置，全部采用默认设置，这个项目同一时刻，最多能同时处理多少请求？</p>
+</blockquote>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">能处理多少呢？</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">我也不知道，但是当问题变成上面这样之后，我找到了探索答案的角度。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">既然“未进行任何特殊配置”，那我自己搞个 Demo 出来，压一把不就完事了吗？</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">坐稳扶好，准备发车。</p>
+<figure data-tool="mdnice编辑器" style="margin: 10px 0; display: flex; flex-direction: column; justify-content: center; align-items: center"><img src="https://why-image-1300252878.cos.ap-chengdu.myqcloud.com/img/79/20230716173852.png" alt="" style="display: block; margin: 0 auto; max-width: 100%"></figure>
+<h2 data-tool="mdnice编辑器" style="margin-top: 30px; margin-bottom: 15px; padding: 0; font-weight: bold; color: rgba(0, 0, 0, 1); border-bottom: 2px solid rgba(239, 112, 96, 1); font-size: 1.3em"><span class="prefix" style="display: none"></span><span class="content" style="display: inline-block; font-weight: bold; background: rgba(239, 112, 96, 1); color: rgba(255, 255, 255, 1); padding: 3px 10px 1px; border-top-right-radius: 3px; border-top-left-radius: 3px; margin-right: 3px">Demo</span><span class="suffix"></span><span style="display: inline-block; vertical-align: bottom; border-bottom: 36px solid rgba(239, 235, 233, 1); border-right: 20px solid rgba(0, 0, 0, 0)"> </span></h2>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">小手一抖，先搞个 Demo 出来。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">这个 Demo 非常的简单，就是通过 idea 创建一个全新的 SpringBoot 项目就行。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)"><strong style="font-weight: bold; color: rgba(0, 0, 0, 1)">我的 SpringBoot 版本使用的是 2.7.13。</strong></p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">整个项目只有这两个依赖：</p>
+<figure data-tool="mdnice编辑器" style="margin: 10px 0; display: flex; flex-direction: column; justify-content: center; align-items: center"><img src="https://why-image-1300252878.cos.ap-chengdu.myqcloud.com/img/79/20230716105209.png" alt="" style="display: block; margin: 0 auto; max-width: 100%"></figure>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">整个项目也只有两个类，要得就是一个空空如也，一清二白。</p>
+<figure data-tool="mdnice编辑器" style="margin: 10px 0; display: flex; flex-direction: column; justify-content: center; align-items: center"><img src="https://why-image-1300252878.cos.ap-chengdu.myqcloud.com/img/79/20230716104148.png" alt="" style="display: block; margin: 0 auto; max-width: 100%"></figure>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">项目中的 TestController，里面只有一个 getTest 方法，用来测试，方法里面接受到请求之后直接 sleep 一小时。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">目的就是直接把当前请求线程占着，这样我们才能知道项目中一共有多少个线程可以使用：</p>
+<pre class="custom" data-tool="mdnice编辑器" style="margin-top: 10px; margin-bottom: 10px; border-radius: 5px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.55)"><span style="display: block; background: url(&quot;https://files.mdnice.com/user/3441/876cad08-0422-409d-bb5a-08afec5da8ee.svg&quot;) 10px 10px / 40px no-repeat rgba(248, 248, 248, 1); height: 30px; width: 100%; margin-bottom: -7px; border-radius: 5px"></span><code class="hljs" style="overflow-x: auto; padding: 15px 16px 16px; color: rgba(51, 51, 51, 1); font-family: Operator Mono, Consolas, Monaco, Menlo, monospace; font-size: 12px; -webkit-overflow-scrolling: touch; background: rgba(248, 248, 248, 1); border-radius: 5px">@Slf4j<br>@RestController<br>public&nbsp;class&nbsp;TestController&nbsp;{<br><br>&nbsp;&nbsp;&nbsp;&nbsp;@GetMapping(<span class="hljs-string" style="color: rgba(221, 17, 68, 1); line-height: 26px">"/getTest"</span>)<br>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;void&nbsp;getTest(int&nbsp;num)&nbsp;throws&nbsp;Exception&nbsp;{<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;log.info(<span class="hljs-string" style="color: rgba(221, 17, 68, 1); line-height: 26px">"{}&nbsp;接受到请求:num={}"</span>,&nbsp;Thread.currentThread().getName(),&nbsp;num);<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TimeUnit.HOURS.sleep(1);<br>&nbsp;&nbsp;&nbsp;&nbsp;}<br>}<br></code></pre>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">项目中的 application.properties 文件也是空的：</p>
+<figure data-tool="mdnice编辑器" style="margin: 10px 0; display: flex; flex-direction: column; justify-content: center; align-items: center"><img src="https://why-image-1300252878.cos.ap-chengdu.myqcloud.com/img/79/20230716104407.png" alt="" style="display: block; margin: 0 auto; max-width: 100%"></figure>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">这样，一个“未进行任何特殊配置”的 SpringBoot 不就有了吗？</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">基于这个 Demo，前面的面试题就要变成了：我短时间内不断的调用这个 Demo 的 getTest 方法，最多能调用多少次？</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">问题是不是又变得更加简单了一点？</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">那么前面这个“短时间内不断的调用”，用代码怎么表示呢？</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">很简单，就是在循环中不断的进行接口调用就行了。</p>
+<pre class="custom" data-tool="mdnice编辑器" style="margin-top: 10px; margin-bottom: 10px; border-radius: 5px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.55)"><span style="display: block; background: url(&quot;https://files.mdnice.com/user/3441/876cad08-0422-409d-bb5a-08afec5da8ee.svg&quot;) 10px 10px / 40px no-repeat rgba(248, 248, 248, 1); height: 30px; width: 100%; margin-bottom: -7px; border-radius: 5px"></span><code class="hljs" style="overflow-x: auto; padding: 15px 16px 16px; color: rgba(51, 51, 51, 1); font-family: Operator Mono, Consolas, Monaco, Menlo, monospace; font-size: 12px; -webkit-overflow-scrolling: touch; background: rgba(248, 248, 248, 1); border-radius: 5px">public&nbsp;class&nbsp;MainTest&nbsp;{<br>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;static&nbsp;void&nbsp;main(String[]&nbsp;args)&nbsp;{<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="hljs-keyword" style="color: rgba(51, 51, 51, 1); font-weight: bold; line-height: 26px">for</span>&nbsp;(int&nbsp;i&nbsp;=&nbsp;0;&nbsp;i&nbsp;&lt;&nbsp;1000;&nbsp;i++)&nbsp;{<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;int&nbsp;finalI&nbsp;=&nbsp;i;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;new&nbsp;Thread(()&nbsp;-&gt;&nbsp;{<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;HttpUtil.get(<span class="hljs-string" style="color: rgba(221, 17, 68, 1); line-height: 26px">"127.0.0.1:8080/getTest?num="</span>&nbsp;+&nbsp;finalI);<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}).start();<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//阻塞主线程<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Thread.yield();<br>&nbsp;&nbsp;&nbsp;&nbsp;}<br>}<br></code></pre>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">当然了，这个地方你用一些压测工具，比如 jmeter 啥的，会显得逼格更高，更专业。我这里就偷个懒，直接上代码了。</p>
+<h2 data-tool="mdnice编辑器" style="margin-top: 30px; margin-bottom: 15px; padding: 0; font-weight: bold; color: rgba(0, 0, 0, 1); border-bottom: 2px solid rgba(239, 112, 96, 1); font-size: 1.3em"><span class="prefix" style="display: none"></span><span class="content" style="display: inline-block; font-weight: bold; background: rgba(239, 112, 96, 1); color: rgba(255, 255, 255, 1); padding: 3px 10px 1px; border-top-right-radius: 3px; border-top-left-radius: 3px; margin-right: 3px">答案</span><span class="suffix"></span><span style="display: inline-block; vertical-align: bottom; border-bottom: 36px solid rgba(239, 235, 233, 1); border-right: 20px solid rgba(0, 0, 0, 0)"> </span></h2>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">经过前面的准备工作，Demo 和测试代码都就绪了。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">接下来就是先把 Demo 跑起来：</p>
+<figure data-tool="mdnice编辑器" style="margin: 10px 0; display: flex; flex-direction: column; justify-content: center; align-items: center"><img src="https://why-image-1300252878.cos.ap-chengdu.myqcloud.com/img/79/20230716111627.png" alt="" style="display: block; margin: 0 auto; max-width: 100%"></figure>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">然后跑一把 MainTest。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">当 MainTest 跑起来之后，Demo 这边就会快速的、大量的输出这样的日志：</p>
+<figure data-tool="mdnice编辑器" style="margin: 10px 0; display: flex; flex-direction: column; justify-content: center; align-items: center"><img src="https://why-image-1300252878.cos.ap-chengdu.myqcloud.com/img/79/20230716111730.png" alt="" style="display: block; margin: 0 auto; max-width: 100%"></figure>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">也就是我前面 getTest 方法中写的日志：</p>
+<figure data-tool="mdnice编辑器" style="margin: 10px 0; display: flex; flex-direction: column; justify-content: center; align-items: center"><img src="https://why-image-1300252878.cos.ap-chengdu.myqcloud.com/img/79/20230716111854.png" alt="" style="display: block; margin: 0 auto; max-width: 100%"></figure>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">好，现在我们回到这个问题：</p>
+<blockquote class="multiquote-1" data-tool="mdnice编辑器" style="border-top: none; border-right: none; border-bottom: none; border-left: 3px solid rgba(239, 112, 96, 1); display: block; font-size: 0.9em; overflow: auto; overflow-scrolling: touch; color: rgba(106, 115, 125, 1); padding: 10px 10px 10px 20px; margin-bottom: 20px; margin-top: 20px; background: rgba(255, 249, 249, 1)">
+<p style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; color: rgba(0, 0, 0, 1); line-height: 26px">我短时间内不断的调用这个 Demo 的 getTest 方法，最多能调用多少次？</p>
+</blockquote>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">来，请你告诉我怎么得到这个问题的答案？</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">我这里就是一个大力出奇迹，直接统计“接受到请求”关键字在日志中出现的次数就行了：</p>
+<figure data-tool="mdnice编辑器" style="margin: 10px 0; display: flex; flex-direction: column; justify-content: center; align-items: center"><img src="https://why-image-1300252878.cos.ap-chengdu.myqcloud.com/img/79/20230716112140.png" alt="" style="display: block; margin: 0 auto; max-width: 100%"></figure>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">很显然，答案就是：</p>
+<figure data-tool="mdnice编辑器" style="margin: 10px 0; display: flex; flex-direction: column; justify-content: center; align-items: center"><img src="https://why-image-1300252878.cos.ap-chengdu.myqcloud.com/img/79/20230716174117.png" alt="" style="display: block; margin: 0 auto; max-width: 100%"></figure>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">所以，当面试官问你：一个 SpringBoot 项目能同时处理多少请求？</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">你装作仔细思考之后，笃定的说：200 次。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">面试官微微点头，并等着你继续说下去。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">你也暗自欢喜，幸好看了歪歪歪师傅的文章，背了个答案。然后等着面试官继续问其他问题。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">气氛突然就尴尬了起来。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">接着，你就回家等通知了。</p>
+<figure data-tool="mdnice编辑器" style="margin: 10px 0; display: flex; flex-direction: column; justify-content: center; align-items: center"><img src="https://why-image-1300252878.cos.ap-chengdu.myqcloud.com/img/79/20230716174231.png" alt="" style="display: block; margin: 0 auto; max-width: 100%"></figure>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">200 次，这个回答是对的，但是你只说 200 次，这个回答就显得有点尬了。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">重要的是，这个值是怎么来的？</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">所以，下面这一部分，你也要背下来。</p>
+<h2 data-tool="mdnice编辑器" style="margin-top: 30px; margin-bottom: 15px; padding: 0; font-weight: bold; color: rgba(0, 0, 0, 1); border-bottom: 2px solid rgba(239, 112, 96, 1); font-size: 1.3em"><span class="prefix" style="display: none"></span><span class="content" style="display: inline-block; font-weight: bold; background: rgba(239, 112, 96, 1); color: rgba(255, 255, 255, 1); padding: 3px 10px 1px; border-top-right-radius: 3px; border-top-left-radius: 3px; margin-right: 3px">怎么来的？</span><span class="suffix"></span><span style="display: inline-block; vertical-align: bottom; border-bottom: 36px solid rgba(239, 235, 233, 1); border-right: 20px solid rgba(0, 0, 0, 0)"> </span></h2>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">在开始探索怎么来的之前，我先问你一个问题，这个 200 个线程，是谁的线程，或者说是谁在管理这个线程？</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">是 SpringBoot 吗？</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">肯定不是，SpringBoot 并不是一个 web 容器。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">应该是 Tomcat 在管理这 200 个线程。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">这一点，我们通过线程 Dump 也能进行验证：</p>
+<figure data-tool="mdnice编辑器" style="margin: 10px 0; display: flex; flex-direction: column; justify-content: center; align-items: center"><img src="https://why-image-1300252878.cos.ap-chengdu.myqcloud.com/img/79/20230716113207.png" alt="" style="display: block; margin: 0 auto; max-width: 100%"></figure>
+<figure data-tool="mdnice编辑器" style="margin: 10px 0; display: flex; flex-direction: column; justify-content: center; align-items: center"><img src="https://why-image-1300252878.cos.ap-chengdu.myqcloud.com/img/79/20230716113346.png" alt="" style="display: block; margin: 0 auto; max-width: 100%"></figure>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">通过线程 Dump 文件，我们可以知道，大量的线程都在 sleep 状态。而点击这些线程，查看其堆栈消息，可以看到 Tomcat、threads、ThreadPoolExecutor 等关键字：</p>
+<pre class="custom" data-tool="mdnice编辑器" style="margin-top: 10px; margin-bottom: 10px; border-radius: 5px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.55)"><span style="display: block; background: url(&quot;https://files.mdnice.com/user/3441/876cad08-0422-409d-bb5a-08afec5da8ee.svg&quot;) 10px 10px / 40px no-repeat rgba(248, 248, 248, 1); height: 30px; width: 100%; margin-bottom: -7px; border-radius: 5px"></span><code class="hljs" style="overflow-x: auto; padding: 15px 16px 16px; color: rgba(51, 51, 51, 1); font-family: Operator Mono, Consolas, Monaco, Menlo, monospace; font-size: 12px; -webkit-overflow-scrolling: touch; background: rgba(248, 248, 248, 1); border-radius: 5px">at&nbsp;org.apache.Tomcat.util.net.NioEndpoint<span class="hljs-variable" style="color: rgba(0, 128, 128, 1); line-height: 26px">$SocketProcessor</span>.doRun(NioEndpoint.java:1791)<br>at&nbsp;org.apache.Tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52)<br>at&nbsp;org.apache.Tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1191)<br>at&nbsp;org.apache.Tomcat.util.threads.ThreadPoolExecutor<span class="hljs-variable" style="color: rgba(0, 128, 128, 1); line-height: 26px">$Worker</span>.run(ThreadPoolExecutor.java:659)<br>at&nbsp;org.apache.Tomcat.util.threads.TaskThread<span class="hljs-variable" style="color: rgba(0, 128, 128, 1); line-height: 26px">$WrappingRunnable</span>.run(TaskThread.java:61)<br></code></pre>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">基于“短时间内有 200 个请求被立马处理的”这个现象，结合你背的滚瓜烂熟的、非常扎实的线程池知识，你先大胆的猜一个：Tomcat 默认核心线程数是 200。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">接下来，我们就是要去源码里面验证这个猜测是否正确了。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">我之前分享过阅读源码的方式，<a href="https://mp.weixin.qq.com/s/HZt0eT2e1T4hwNGdZMfxow" style="text-decoration: none; word-wrap: break-word; font-weight: bold; color: rgba(239, 112, 96, 1); border-bottom: 1px solid rgba(239, 112, 96, 1)" rel="noopener">《我试图通过这篇文章，教会你一种阅读源码的方式。》</a>，其中最重要的一条就是打一个有效的断点，然后基于断点处的调用栈去定位源码。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">这里我再教你一个不用打断点也能获取到调用栈的方法。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">在前面已经展示过了，就是线程 Dump。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">右边就是一个线程完整的调用栈：</p>
+<figure data-tool="mdnice编辑器" style="margin: 10px 0; display: flex; flex-direction: column; justify-content: center; align-items: center"><img src="https://why-image-1300252878.cos.ap-chengdu.myqcloud.com/img/79/20230716113346.png" alt="" style="display: block; margin: 0 auto; max-width: 100%"></figure>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">从这个调用栈中，由于我们要找的是 Tomcat 线程池相关的源码，所以第一次出现相关关键字的地方就是这一行：</p>
+<blockquote class="multiquote-1" data-tool="mdnice编辑器" style="border-top: none; border-right: none; border-bottom: none; border-left: 3px solid rgba(239, 112, 96, 1); display: block; font-size: 0.9em; overflow: auto; overflow-scrolling: touch; color: rgba(106, 115, 125, 1); padding: 10px 10px 10px 20px; margin-bottom: 20px; margin-top: 20px; background: rgba(255, 249, 249, 1)">
+<p style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; color: rgba(0, 0, 0, 1); line-height: 26px">org.apache.Tomcat.util.threads.ThreadPoolExecutor.Worker#run</p>
+</blockquote>
+<figure data-tool="mdnice编辑器" style="margin: 10px 0; display: flex; flex-direction: column; justify-content: center; align-items: center"><img src="https://why-image-1300252878.cos.ap-chengdu.myqcloud.com/img/79/20230716120846.png" alt="" style="display: block; margin: 0 auto; max-width: 100%"></figure>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">然后我们在这一行打上断点。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">重启项目，开始调试。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">进入 runWorker 之后，这部分代码看起来就非常眼熟了：</p>
+<figure data-tool="mdnice编辑器" style="margin: 10px 0; display: flex; flex-direction: column; justify-content: center; align-items: center"><img src="https://why-image-1300252878.cos.ap-chengdu.myqcloud.com/img/79/20230716132249.png" alt="" style="display: block; margin: 0 auto; max-width: 100%"></figure>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">简直和 JDK 里面的线程池源码一模一样。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">如果你熟悉 JDK 线程池源码的话，调试 Tomcat 的线程池，那个感觉，就像是回家一样。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">如果你不熟悉的话，我建议你尽快去熟悉熟悉。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">随着断点往下走，在 getTask 方法里面，可以看到关于线程池的几个关键参数：</p>
+<blockquote class="multiquote-1" data-tool="mdnice编辑器" style="border-top: none; border-right: none; border-bottom: none; border-left: 3px solid rgba(239, 112, 96, 1); display: block; font-size: 0.9em; overflow: auto; overflow-scrolling: touch; color: rgba(106, 115, 125, 1); padding: 10px 10px 10px 20px; margin-bottom: 20px; margin-top: 20px; background: rgba(255, 249, 249, 1)">
+<p style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; color: rgba(0, 0, 0, 1); line-height: 26px">org.apache.Tomcat.util.threads.ThreadPoolExecutor#getTask</p>
+</blockquote>
+<figure data-tool="mdnice编辑器" style="margin: 10px 0; display: flex; flex-direction: column; justify-content: center; align-items: center"><img src="https://why-image-1300252878.cos.ap-chengdu.myqcloud.com/img/79/20230716132830.png" alt="" style="display: block; margin: 0 auto; max-width: 100%"></figure>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">corePoolSize，核心线程数，值为 10。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">maximumPoolSize，最大线程数，值为 200。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">而且基于 maximumPoolSize 这个参数，你往前翻代码，会发现这个默认值就是 200：</p>
+<figure data-tool="mdnice编辑器" style="margin: 10px 0; display: flex; flex-direction: column; justify-content: center; align-items: center"><img src="https://why-image-1300252878.cos.ap-chengdu.myqcloud.com/img/79/20230716164409.png" alt="" style="display: block; margin: 0 auto; max-width: 100%"></figure>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">好，到这里，你发现你之前猜测的“Tomcat 默认核心线程数是 200”是不对的。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">但是你一点也不慌，再次结合你背的滚瓜烂熟的、非常扎实的线程池知识。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">并在心里又默念了一次：当线程池接受到任务之后，先启用核心线程数，再使用队列长度，最后启用最大线程数。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">因为我们前面验证了，Tomcat 可以同时间处理 200 个请求，而它的线程池核心线程数只有 10，最大线程数是 200。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">这说明，我前面这个测试用例，把队列给塞满了，从而导致 Tomcat 线程池启用了最大线程数：</p>
+<figure data-tool="mdnice编辑器" style="margin: 10px 0; display: flex; flex-direction: column; justify-content: center; align-items: center"><img src="https://why-image-1300252878.cos.ap-chengdu.myqcloud.com/img/79/20230716134005.png" alt="" style="display: block; margin: 0 auto; max-width: 100%"></figure>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">嗯，一定是这样的！</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">那么，现在的关键问题就是：Tomcat 线程池默认的队列长度是多少呢？</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">在当前的这个 Debug 模式下，队列长度可以通过 Alt+F8 进行查看：</p>
+<figure data-tool="mdnice编辑器" style="margin: 10px 0; display: flex; flex-direction: column; justify-content: center; align-items: center"><img src="https://why-image-1300252878.cos.ap-chengdu.myqcloud.com/img/79/20230716133352.png" alt="" style="display: block; margin: 0 auto; max-width: 100%"></figure>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">wc，这个值是 Integer.MAX_VALUE，这么大？</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">我一共也才 1000 个任务，不可能被占满啊？</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">一个线程池：</p>
+<ul data-tool="mdnice编辑器" style="margin-top: 8px; margin-bottom: 8px; padding-left: 25px; color: rgba(0, 0, 0, 1); list-style-type: disc">
+<li><section style="margin-top: 5px; margin-bottom: 5px; line-height: 26px; text-align: left; color: rgba(1, 1, 1, 1); font-weight: 500">核心线程数，值为 10。</section></li><li><section style="margin-top: 5px; margin-bottom: 5px; line-height: 26px; text-align: left; color: rgba(1, 1, 1, 1); font-weight: 500">最大线程数，值为 200。</section></li><li><section style="margin-top: 5px; margin-bottom: 5px; line-height: 26px; text-align: left; color: rgba(1, 1, 1, 1); font-weight: 500">队列长度，值为 Integer.MAX_VALUE。</section></li></ul>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">1000 个比较耗时的任务过来之后，应该是只有 10 个线程在工作，然后剩下的 990 个进队列才对啊？</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">难道我八股文背错了？</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">这个时候不要慌，嗦根辣条冷静一下。</p>
+<figure data-tool="mdnice编辑器" style="margin: 10px 0; display: flex; flex-direction: column; justify-content: center; align-items: center"><img src="https://why-image-1300252878.cos.ap-chengdu.myqcloud.com/img/79/20230716174538.png" alt="" style="display: block; margin: 0 auto; max-width: 100%"></figure>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">目前已知的是核心线程数，值为 10。这 10 个线程的工作流程是符合我们认知的。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">但是第 11 个任务过来的时候，本应该进入队列去排队。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">现在看起来，是直接启用最大线程数了。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">所以，我们先把测试用例修改一下：</p>
+<figure data-tool="mdnice编辑器" style="margin: 10px 0; display: flex; flex-direction: column; justify-content: center; align-items: center"><img src="https://why-image-1300252878.cos.ap-chengdu.myqcloud.com/img/79/20230716140504.png" alt="" style="display: block; margin: 0 auto; max-width: 100%"></figure>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">那么问题就来了：最后一个请求到底是怎么提交到线程池里面的？</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">前面说了，Tomcat 的线程池源码和 JDK 的基本一样。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">往线程池里面提交任务的时候，会执行 execute 这个方法：</p>
+<blockquote class="multiquote-1" data-tool="mdnice编辑器" style="border-top: none; border-right: none; border-bottom: none; border-left: 3px solid rgba(239, 112, 96, 1); display: block; font-size: 0.9em; overflow: auto; overflow-scrolling: touch; color: rgba(106, 115, 125, 1); padding: 10px 10px 10px 20px; margin-bottom: 20px; margin-top: 20px; background: rgba(255, 249, 249, 1)">
+<p style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; color: rgba(0, 0, 0, 1); line-height: 26px">org.apache.Tomcat.util.threads.ThreadPoolExecutor#execute(java.lang.Runnable)</p>
+</blockquote>
+<figure data-tool="mdnice编辑器" style="margin: 10px 0; display: flex; flex-direction: column; justify-content: center; align-items: center"><img src="https://why-image-1300252878.cos.ap-chengdu.myqcloud.com/img/79/20230716141941.png" alt="" style="display: block; margin: 0 auto; max-width: 100%"></figure>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">对于 Tomcat 它会调用到 executeInternal 这个方法：</p>
+<blockquote class="multiquote-1" data-tool="mdnice编辑器" style="border-top: none; border-right: none; border-bottom: none; border-left: 3px solid rgba(239, 112, 96, 1); display: block; font-size: 0.9em; overflow: auto; overflow-scrolling: touch; color: rgba(106, 115, 125, 1); padding: 10px 10px 10px 20px; margin-bottom: 20px; margin-top: 20px; background: rgba(255, 249, 249, 1)">
+<p style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; color: rgba(0, 0, 0, 1); line-height: 26px">org.apache.Tomcat.util.threads.ThreadPoolExecutor#executeInternal</p>
+</blockquote>
+<figure data-tool="mdnice编辑器" style="margin: 10px 0; display: flex; flex-direction: column; justify-content: center; align-items: center"><img src="https://why-image-1300252878.cos.ap-chengdu.myqcloud.com/img/79/20230716141541.png" alt="" style="display: block; margin: 0 auto; max-width: 100%"></figure>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">这个方法里面，标号为 ① 的地方，就是判断当前工作线程数是否小于核心线程数，小于则直接调用 addWorker 方法，创建线程。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">标号为 ② 的地方主要是调用了 offer 方法，看看队列里面是否还能继续添加任务。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">如果不能继续添加，说明队列满了，则来到标号为 ③ 的地方，看看是否能执行 addWorker 方法，创建非核心线程，即启用最大线程数。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">把这个逻辑捋顺之后，接下来我们应该去看哪部分的代码，就很清晰了。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">主要就是去看 workQueue.offer(command) 这个逻辑。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">如果返回 true 则表示加入到队列，返回 false 则表示启用最大线程数嘛。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">这个 workQueue 是 TaskQueue，看起来一点也不眼熟：</p>
+<figure data-tool="mdnice编辑器" style="margin: 10px 0; display: flex; flex-direction: column; justify-content: center; align-items: center"><img src="https://why-image-1300252878.cos.ap-chengdu.myqcloud.com/img/79/20230716142645.png" alt="" style="display: block; margin: 0 auto; max-width: 100%"></figure>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">当然不眼熟了，因为这个是 Tomcat 自己基于 LinkedBlockingQueue 搞的一个队列。</p>
+<figure data-tool="mdnice编辑器" style="margin: 10px 0; display: flex; flex-direction: column; justify-content: center; align-items: center"><img src="https://why-image-1300252878.cos.ap-chengdu.myqcloud.com/img/79/20230716142935.png" alt="" style="display: block; margin: 0 auto; max-width: 100%"></figure>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">问题的答案就藏在 TaskQueue 的 offer 方法里面。</p>
+<figure data-tool="mdnice编辑器" style="margin: 10px 0; display: flex; flex-direction: column; justify-content: center; align-items: center"><img src="https://why-image-1300252878.cos.ap-chengdu.myqcloud.com/img/79/20230716174728.png" alt="" style="display: block; margin: 0 auto; max-width: 100%"></figure>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">所以我重点带你盘一下这个 offer 方法：</p>
+<blockquote class="multiquote-1" data-tool="mdnice编辑器" style="border-top: none; border-right: none; border-bottom: none; border-left: 3px solid rgba(239, 112, 96, 1); display: block; font-size: 0.9em; overflow: auto; overflow-scrolling: touch; color: rgba(106, 115, 125, 1); padding: 10px 10px 10px 20px; margin-bottom: 20px; margin-top: 20px; background: rgba(255, 249, 249, 1)">
+<p style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; color: rgba(0, 0, 0, 1); line-height: 26px">org.apache.Tomcat.util.threads.TaskQueue#offer</p>
+</blockquote>
+<figure data-tool="mdnice编辑器" style="margin: 10px 0; display: flex; flex-direction: column; justify-content: center; align-items: center"><img src="https://why-image-1300252878.cos.ap-chengdu.myqcloud.com/img/79/20230716143324.png" alt="" style="display: block; margin: 0 auto; max-width: 100%"></figure>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">标号为 ① 的地方，判断了 parent 是否为 null，如果是则直接调用父类的 offer 方法。说明要启用这个逻辑，我们的 parent 不能为 null。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">那么这个 parent 是什么玩意，从哪里来的呢？</p>
+<figure data-tool="mdnice编辑器" style="margin: 10px 0; display: flex; flex-direction: column; justify-content: center; align-items: center"><img src="https://why-image-1300252878.cos.ap-chengdu.myqcloud.com/img/79/20230716143607.png" alt="" style="display: block; margin: 0 auto; max-width: 100%"></figure>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">parent 就是 Tomcat 线程池，通过其 set 方法可以知道，是在线程池完成初始化之后，进行了赋值。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">也就是说，你可以理解为，在 Tomcat 的场景下，parent 不会为空。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">标号为 ② 的地方，调用了 getPoolSizeNoLock 方法：</p>
+<figure data-tool="mdnice编辑器" style="margin: 10px 0; display: flex; flex-direction: column; justify-content: center; align-items: center"><img src="https://why-image-1300252878.cos.ap-chengdu.myqcloud.com/img/79/20230716144049.png" alt="" style="display: block; margin: 0 auto; max-width: 100%"></figure>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">这个方法是获取当前线程池中有多个线程。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">所以如果这个表达式为 true：</p>
+<blockquote class="multiquote-1" data-tool="mdnice编辑器" style="border-top: none; border-right: none; border-bottom: none; border-left: 3px solid rgba(239, 112, 96, 1); display: block; font-size: 0.9em; overflow: auto; overflow-scrolling: touch; color: rgba(106, 115, 125, 1); padding: 10px 10px 10px 20px; margin-bottom: 20px; margin-top: 20px; background: rgba(255, 249, 249, 1)">
+<p style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; color: rgba(0, 0, 0, 1); line-height: 26px">parent.getPoolSizeNoLock() == parent.getMaximumPoolSize()</p>
+</blockquote>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">就表明当前线程池的线程数已经是配置的最大线程数了，那就调用 offer 方法，把当前请求放到到队列里面去。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">标号为 ③ 的地方，是判断已经提交到线程池里面待执行或者正在执行的任务个数，是否比当前线程池的线程数还少。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">如果是，则说明当前线程池有空闲线程可以执行任务，则把任务放到队列里面去，就会被空闲线程给取走执行。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">然后，关键的来了，标号为 ④ 的地方。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">如果当前线程池的线程数比线程池配置的最大线程数还少，则返回 false。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">前面说了，offer 方法返回 false，会出现什么情况？</p>
+<figure data-tool="mdnice编辑器" style="margin: 10px 0; display: flex; flex-direction: column; justify-content: center; align-items: center"><img src="https://why-image-1300252878.cos.ap-chengdu.myqcloud.com/img/79/20230716141541.png" alt="" style="display: block; margin: 0 auto; max-width: 100%"></figure>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">是不是直接开始到上图中标号为 ③ 的地方，去尝试添加非核心线程了？</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">也就是启用最大线程数这个配置了。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">所以，朋友们，这个是什么情况？</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">这个情况确实就和我们背的线程池的八股文不一样了啊。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">JDK 的线程池，是先使用核心线程数配置，接着使用队列长度，最后再使用最大线程配置。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">Tomcat 的线程池，就是先使用核心线程数配置，再使用最大线程配置，最后才使用队列长度。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">所以，以后当面试官给你说：我们聊聊线程池的工作机制吧？</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">你就先追问一句：你是说的 JDK 的线程池呢还是 Tomcat 的线程池呢，因为这两个在运行机制上有一点差异。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">然后，你就看他的表情。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">如果透露出一丝丝迟疑，然后轻描淡写的说一句：那就对比着说一下吧。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">那么恭喜你，在这个题目上开始掌握了一点主动权。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">最后，为了让你更加深刻的理解到 Tomcat 线程池和 JDK 线程池的不一样，我给你搞一个直接复制过去就能运行的代码。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">当你把 taskqueue.setParent(executor) 这行代码注释掉的时候，它的运行机制就是 JDK 的线程池。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">当存在这行代码的时候，它的运行机制就变成了 Tomcat 的线程池。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">玩去吧。</p>
+<pre class="custom" data-tool="mdnice编辑器" style="margin-top: 10px; margin-bottom: 10px; border-radius: 5px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.55)"><span style="display: block; background: url(&quot;https://files.mdnice.com/user/3441/876cad08-0422-409d-bb5a-08afec5da8ee.svg&quot;) 10px 10px / 40px no-repeat rgba(248, 248, 248, 1); height: 30px; width: 100%; margin-bottom: -7px; border-radius: 5px"></span><code class="hljs" style="overflow-x: auto; padding: 15px 16px 16px; color: rgba(51, 51, 51, 1); font-family: Operator Mono, Consolas, Monaco, Menlo, monospace; font-size: 12px; -webkit-overflow-scrolling: touch; background: rgba(248, 248, 248, 1); border-radius: 5px">import&nbsp;org.apache.tomcat.util.threads.TaskQueue;<br>import&nbsp;org.apache.tomcat.util.threads.TaskThreadFactory;<br>import&nbsp;org.apache.tomcat.util.threads.ThreadPoolExecutor;<br><br>import&nbsp;java.util.concurrent.TimeUnit;<br><br>public&nbsp;class&nbsp;TomcatThreadPoolExecutorTest&nbsp;{<br><br>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;static&nbsp;void&nbsp;main(String[]&nbsp;args)&nbsp;throws&nbsp;InterruptedException&nbsp;{<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;String&nbsp;namePrefix&nbsp;=&nbsp;<span class="hljs-string" style="color: rgba(221, 17, 68, 1); line-height: 26px">"歪歪歪-exec-"</span>;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;boolean&nbsp;daemon&nbsp;=&nbsp;<span class="hljs-literal" style="color: rgba(0, 128, 128, 1); line-height: 26px">true</span>;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TaskQueue&nbsp;taskqueue&nbsp;=&nbsp;new&nbsp;TaskQueue(300);<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TaskThreadFactory&nbsp;tf&nbsp;=&nbsp;new&nbsp;TaskThreadFactory(namePrefix,&nbsp;daemon,&nbsp;Thread.NORM_PRIORITY);<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ThreadPoolExecutor&nbsp;executor&nbsp;=&nbsp;new&nbsp;ThreadPoolExecutor(5,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;150,&nbsp;60000,&nbsp;TimeUnit.MILLISECONDS,&nbsp;taskqueue,&nbsp;tf);<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;taskqueue.setParent(executor);<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="hljs-keyword" style="color: rgba(51, 51, 51, 1); font-weight: bold; line-height: 26px">for</span>&nbsp;(int&nbsp;i&nbsp;=&nbsp;0;&nbsp;i&nbsp;&lt;&nbsp;300;&nbsp;i++)&nbsp;{<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;try&nbsp;{<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;executor.execute(()&nbsp;-&gt;&nbsp;{<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;logStatus(executor,&nbsp;<span class="hljs-string" style="color: rgba(221, 17, 68, 1); line-height: 26px">"创建任务"</span>);<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;try&nbsp;{<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TimeUnit.SECONDS.sleep(2);<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;catch&nbsp;(InterruptedException&nbsp;e)&nbsp;{<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;e.printStackTrace();<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;});<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;catch&nbsp;(Exception&nbsp;e)&nbsp;{<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;e.printStackTrace();<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Thread.currentThread().join();<br>&nbsp;&nbsp;&nbsp;&nbsp;}<br><br>&nbsp;&nbsp;&nbsp;&nbsp;private&nbsp;static&nbsp;void&nbsp;logStatus(ThreadPoolExecutor&nbsp;executor,&nbsp;String&nbsp;name)&nbsp;{<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TaskQueue&nbsp;queue&nbsp;=&nbsp;(TaskQueue)&nbsp;executor.getQueue();<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;System.out.println(Thread.currentThread().getName()&nbsp;+&nbsp;<span class="hljs-string" style="color: rgba(221, 17, 68, 1); line-height: 26px">"-"</span>&nbsp;+&nbsp;name&nbsp;+&nbsp;<span class="hljs-string" style="color: rgba(221, 17, 68, 1); line-height: 26px">"-:"</span>&nbsp;+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="hljs-string" style="color: rgba(221, 17, 68, 1); line-height: 26px">"核心线程数:"</span>&nbsp;+&nbsp;executor.getCorePoolSize()&nbsp;+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="hljs-string" style="color: rgba(221, 17, 68, 1); line-height: 26px">"\t活动线程数:"</span>&nbsp;+&nbsp;executor.getActiveCount()&nbsp;+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="hljs-string" style="color: rgba(221, 17, 68, 1); line-height: 26px">"\t最大线程数:"</span>&nbsp;+&nbsp;executor.getMaximumPoolSize()&nbsp;+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="hljs-string" style="color: rgba(221, 17, 68, 1); line-height: 26px">"\t总任务数:"</span>&nbsp;+&nbsp;executor.getTaskCount()&nbsp;+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="hljs-string" style="color: rgba(221, 17, 68, 1); line-height: 26px">"\t当前排队线程数:"</span>&nbsp;+&nbsp;queue.size()&nbsp;+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="hljs-string" style="color: rgba(221, 17, 68, 1); line-height: 26px">"\t队列剩余大小:"</span>&nbsp;+&nbsp;queue.remainingCapacity());<br>&nbsp;&nbsp;&nbsp;&nbsp;}<br>}<br></code></pre>
+<h2 data-tool="mdnice编辑器" style="margin-top: 30px; margin-bottom: 15px; padding: 0; font-weight: bold; color: rgba(0, 0, 0, 1); border-bottom: 2px solid rgba(239, 112, 96, 1); font-size: 1.3em"><span class="prefix" style="display: none"></span><span class="content" style="display: inline-block; font-weight: bold; background: rgba(239, 112, 96, 1); color: rgba(255, 255, 255, 1); padding: 3px 10px 1px; border-top-right-radius: 3px; border-top-left-radius: 3px; margin-right: 3px">等等</span><span class="suffix"></span><span style="display: inline-block; vertical-align: bottom; border-bottom: 36px solid rgba(239, 235, 233, 1); border-right: 20px solid rgba(0, 0, 0, 0)"> </span></h2>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">如果你之前确实没了解过 Tomcat 线程池的工作机制，那么看到这里的时候也许你会觉得确实是有一点点收获。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">但是，注意我要说但是了。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">还记得最开始的时候面试官的问题吗？</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">面试官的原问题就是：一个 SpringBoot 项目能同时处理多少请求？</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">那么请问，前面我讲了这么大一坨 Tomcat 线程池运行原理，这个回答，和这个问题匹配吗？</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">是的，除了最开始提出的 200 这个数值之外，并不匹配，甚至在面试官的眼里完全是答非所问了。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">所以，为了把这两个“并不匹配”的东西比较顺畅的链接起来，你必须要先回答面试官的问题，然后再开始扩展。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">比如这样答：一个未进行任何特殊配置，全部采用默认设置的 SpringBoot 项目，这个项目同一时刻最多能同时处理多少请求，取决于我们使用的 web 容器，而 SpringBoot 默认使用的是 Tomcat。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">Tomcat 的默认核心线程数是 10，最大线程数 200，队列长度是无限长。但是由于其运行机制和 JDK 线程池不一样，在核心线程数满了之后，会直接启用最大线程数。所以，在默认的配置下，同一时刻，可以处理 200 个请求。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">在实际使用过程中，应该基于服务实际情况和服务器配置等相关消息，对该参数进行评估设置。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">这个回答就算是差不多了。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">但是，如果很不幸，如果你遇到了我，为了验证你是真的自己去摸索过，还是仅仅只是看了几篇文章，我可能还会追问一下：</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">那么其他什么都不动，如果我仅仅加入 server.tomcat.max-connections=10 这个配置呢，那么这个时候最多能处理多少个请求？</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">你可能就要猜了：10 个。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">是的，我重新提交 1000 个任务过来，在控制台输出的确实是 10 个，</p>
+<figure data-tool="mdnice编辑器" style="margin: 10px 0; display: flex; flex-direction: column; justify-content: center; align-items: center"><img src="https://why-image-1300252878.cos.ap-chengdu.myqcloud.com/img/79/20230716154330.png" alt="" style="display: block; margin: 0 auto; max-width: 100%"></figure>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">那么 max-connections 这个参数它怎么也能控制请求个数呢？</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">为什么在前面的分析过程中我们并没有注意到这个参数呢？</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">首先我们看一下它的默认值：</p>
+<figure data-tool="mdnice编辑器" style="margin: 10px 0; display: flex; flex-direction: column; justify-content: center; align-items: center"><img src="https://why-image-1300252878.cos.ap-chengdu.myqcloud.com/img/79/20230716160608.png" alt="" style="display: block; margin: 0 auto; max-width: 100%"></figure>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">因为它的默认值是 8192，比最大线程数 200 大，这个参数并没有限制到我们，所以我们没有关注到它。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">当我们把它调整为 10 的时候，小于最大线程数 200，它就开始变成限制项了。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">那么 max-connections 这个参数到底是干啥的呢？</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">你先自己去摸索摸索吧。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">同时，还有这样的一个参数，默认是 100：</p>
+<blockquote class="multiquote-1" data-tool="mdnice编辑器" style="border-top: none; border-right: none; border-bottom: none; border-left: 3px solid rgba(239, 112, 96, 1); display: block; font-size: 0.9em; overflow: auto; overflow-scrolling: touch; color: rgba(106, 115, 125, 1); padding: 10px 10px 10px 20px; margin-bottom: 20px; margin-top: 20px; background: rgba(255, 249, 249, 1)">
+<p style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; color: rgba(0, 0, 0, 1); line-height: 26px">server.tomcat.accept-count=100</p>
+</blockquote>
+<figure data-tool="mdnice编辑器" style="margin: 10px 0; display: flex; flex-direction: column; justify-content: center; align-items: center"><img src="https://why-image-1300252878.cos.ap-chengdu.myqcloud.com/img/79/20230716161005.png" alt="" style="display: block; margin: 0 auto; max-width: 100%"></figure>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">它又是干什么的呢？</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">“和连接数有关”，我只能提示到这里了，自己去摸索吧。</p>
+<figure data-tool="mdnice编辑器" style="margin: 10px 0; display: flex; flex-direction: column; justify-content: center; align-items: center"><img src="https://why-image-1300252878.cos.ap-chengdu.myqcloud.com/img/79/20230716180537.png" alt="" style="display: block; margin: 0 auto; max-width: 100%"></figure>
+<h2 data-tool="mdnice编辑器" style="margin-top: 30px; margin-bottom: 15px; padding: 0; font-weight: bold; color: rgba(0, 0, 0, 1); border-bottom: 2px solid rgba(239, 112, 96, 1); font-size: 1.3em"><span class="prefix" style="display: none"></span><span class="content" style="display: inline-block; font-weight: bold; background: rgba(239, 112, 96, 1); color: rgba(255, 255, 255, 1); padding: 3px 10px 1px; border-top-right-radius: 3px; border-top-left-radius: 3px; margin-right: 3px">再等等</span><span class="suffix"></span><span style="display: inline-block; vertical-align: bottom; border-bottom: 36px solid rgba(239, 235, 233, 1); border-right: 20px solid rgba(0, 0, 0, 0)"> </span></h2>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">通过前面的分析，我们知道了，要回答“一个 SpringBoot 项目默认能处理的任务数”，这个问题，得先明确其使用的 web 容器。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">那么问题又来了：SpringBoot 内置了哪些容器呢？</p>
+<blockquote class="multiquote-1" data-tool="mdnice编辑器" style="border-top: none; border-right: none; border-bottom: none; border-left: 3px solid rgba(239, 112, 96, 1); display: block; font-size: 0.9em; overflow: auto; overflow-scrolling: touch; color: rgba(106, 115, 125, 1); padding: 10px 10px 10px 20px; margin-bottom: 20px; margin-top: 20px; background: rgba(255, 249, 249, 1)">
+<p style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; color: rgba(0, 0, 0, 1); line-height: 26px">Tomcat、Jetty、Netty、Undertow</p>
+</blockquote>
+<figure data-tool="mdnice编辑器" style="margin: 10px 0; display: flex; flex-direction: column; justify-content: center; align-items: center"><img src="https://why-image-1300252878.cos.ap-chengdu.myqcloud.com/img/79/20230716163334.png" alt="" style="display: block; margin: 0 auto; max-width: 100%"></figure>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">前面我们都是基于 Tomcat 分析的，如果我们换一个容器呢？</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">比如换成 Undertow，这个玩意我只是听过，没有实际使用过，它对我来说就是一个黑盒。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">管它的，先换了再说。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">从 Tomcat 换成 Undertow，只需要修改 Maven 依赖即可，其他什么都不需要动：</p>
+<figure data-tool="mdnice编辑器" style="margin: 10px 0; display: flex; flex-direction: column; justify-content: center; align-items: center"><img src="https://why-image-1300252878.cos.ap-chengdu.myqcloud.com/img/79/20230716163620.png" alt="" style="display: block; margin: 0 auto; max-width: 100%"></figure>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">再次启动项目，从日志可以发现已经修改为了 Undertow 容器：</p>
+<figure data-tool="mdnice编辑器" style="margin: 10px 0; display: flex; flex-direction: column; justify-content: center; align-items: center"><img src="https://why-image-1300252878.cos.ap-chengdu.myqcloud.com/img/79/20230716163826.png" alt="" style="display: block; margin: 0 auto; max-width: 100%"></figure>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">此时我再次执行 MainTest 方法，还是提交 1000 个请求：</p>
+<figure data-tool="mdnice编辑器" style="margin: 10px 0; display: flex; flex-direction: column; justify-content: center; align-items: center"><img src="https://why-image-1300252878.cos.ap-chengdu.myqcloud.com/img/79/20230716164026.png" alt="" style="display: block; margin: 0 auto; max-width: 100%"></figure>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">从日志来看，发现只有 48 个请求被处理了。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">就很懵逼，48 是怎么回事儿，怎么都不是一个整数呢，这让强迫症很难受啊。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">这个时候你的想法是什么，是不是想要看看 48 这个数字到底是从哪里来的？</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">怎么看？</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">之前找 Tomcat 的 200 的时候不是才教了你的嘛，直接往 Undertow 上套就行了嘛。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">打线程 Dump，然后看堆栈消息：</p>
+<figure data-tool="mdnice编辑器" style="margin: 10px 0; display: flex; flex-direction: column; justify-content: center; align-items: center"><img src="https://why-image-1300252878.cos.ap-chengdu.myqcloud.com/img/79/20230716165004.png" alt="" style="display: block; margin: 0 auto; max-width: 100%"></figure>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">发现 EnhancedQueueExecutor 这个线程池，接着在这个类里面去找构建线程池时的参数。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">很容易就找到了这个构造方法：</p>
+<figure data-tool="mdnice编辑器" style="margin: 10px 0; display: flex; flex-direction: column; justify-content: center; align-items: center"><img src="https://why-image-1300252878.cos.ap-chengdu.myqcloud.com/img/79/20230716170419.png" alt="" style="display: block; margin: 0 auto; max-width: 100%"></figure>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">所以，在这里打上断点，重启项目。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">通过 Debug 可以知道，关键参数都是从 builder 里面来的。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">而 builder 里面，coreSize 和 maxSize 都是 48，队列长度是 Integer.MAX_VALUE。</p>
+<figure data-tool="mdnice编辑器" style="margin: 10px 0; display: flex; flex-direction: column; justify-content: center; align-items: center"><img src="https://why-image-1300252878.cos.ap-chengdu.myqcloud.com/img/79/20230716170701.png" alt="" style="display: block; margin: 0 auto; max-width: 100%"></figure>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">所以看一下 Builder 里面的 coreSize 是怎么来的。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">点过来发现 coreSize 的默认值是 16：</p>
+<figure data-tool="mdnice编辑器" style="margin: 10px 0; display: flex; flex-direction: column; justify-content: center; align-items: center"><img src="https://why-image-1300252878.cos.ap-chengdu.myqcloud.com/img/79/20230716170808.png" alt="" style="display: block; margin: 0 auto; max-width: 100%"></figure>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">不要慌，再打断点，再重启项目。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">然后你会在它的 setCorePoolSize 方法处停下来，而这个方法的入参就是我们要找的 48：</p>
+<figure data-tool="mdnice编辑器" style="margin: 10px 0; display: flex; flex-direction: column; justify-content: center; align-items: center"><img src="https://why-image-1300252878.cos.ap-chengdu.myqcloud.com/img/79/20230716170937.png" alt="" style="display: block; margin: 0 auto; max-width: 100%"></figure>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">顺藤摸瓜，重复几次打断点、重启的动作之后，你会找到 48 是一个名为 WORKER_TASK_CORE_THREADS 的变量，是从这里来的：</p>
+<figure data-tool="mdnice编辑器" style="margin: 10px 0; display: flex; flex-direction: column; justify-content: center; align-items: center"><img src="https://why-image-1300252878.cos.ap-chengdu.myqcloud.com/img/79/20230716171232.png" alt="" style="display: block; margin: 0 auto; max-width: 100%"></figure>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">而 WORKER_TASK_CORE_THREADS 这个变量设置的地方是这样的：</p>
+<blockquote class="multiquote-1" data-tool="mdnice编辑器" style="border-top: none; border-right: none; border-bottom: none; border-left: 3px solid rgba(239, 112, 96, 1); display: block; font-size: 0.9em; overflow: auto; overflow-scrolling: touch; color: rgba(106, 115, 125, 1); padding: 10px 10px 10px 20px; margin-bottom: 20px; margin-top: 20px; background: rgba(255, 249, 249, 1)">
+<p style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; color: rgba(0, 0, 0, 1); line-height: 26px">io.undertow.Undertow#start</p>
+</blockquote>
+<figure data-tool="mdnice编辑器" style="margin: 10px 0; display: flex; flex-direction: column; justify-content: center; align-items: center"><img src="https://why-image-1300252878.cos.ap-chengdu.myqcloud.com/img/79/20230716171424.png" alt="" style="display: block; margin: 0 auto; max-width: 100%"></figure>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">而这里的 workerThreads 取值是这样的：</p>
+<blockquote class="multiquote-1" data-tool="mdnice编辑器" style="border-top: none; border-right: none; border-bottom: none; border-left: 3px solid rgba(239, 112, 96, 1); display: block; font-size: 0.9em; overflow: auto; overflow-scrolling: touch; color: rgba(106, 115, 125, 1); padding: 10px 10px 10px 20px; margin-bottom: 20px; margin-top: 20px; background: rgba(255, 249, 249, 1)">
+<p style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; color: rgba(0, 0, 0, 1); line-height: 26px">io.undertow.Undertow.Builder#Builder</p>
+</blockquote>
+<figure data-tool="mdnice编辑器" style="margin: 10px 0; display: flex; flex-direction: column; justify-content: center; align-items: center"><img src="https://why-image-1300252878.cos.ap-chengdu.myqcloud.com/img/79/20230716171520.png" alt="" style="display: block; margin: 0 auto; max-width: 100%"></figure>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">取的是机器的 CPU 个数乘以 8。</p>
+<figure data-tool="mdnice编辑器" style="margin: 10px 0; display: flex; flex-direction: column; justify-content: center; align-items: center"><img src="https://why-image-1300252878.cos.ap-chengdu.myqcloud.com/img/79/20230716171629.png" alt="" style="display: block; margin: 0 auto; max-width: 100%"></figure>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">所以我这里是 6*8=48。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">哦，真相大白，原来 48 是这样来的。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">没意思。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">确实没意思，但是既然都已经替换为 Undertow 了，那么你去研究一下它的 NIO ByteBuffer、NIO Channel、BufferPool、XNIO Worker、IO 线程池、Worker 线程池...</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">然后再和 Tomcat 对比着学，</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">就开始有点意思了。</p>
+<figure data-tool="mdnice编辑器" style="margin: 10px 0; display: flex; flex-direction: column; justify-content: center; align-items: center"><img src="https://why-image-1300252878.cos.ap-chengdu.myqcloud.com/img/79/20230716180859.png" alt="" style="display: block; margin: 0 auto; max-width: 100%"></figure>
+<h2 data-tool="mdnice编辑器" style="margin-top: 30px; margin-bottom: 15px; padding: 0; font-weight: bold; color: rgba(0, 0, 0, 1); border-bottom: 2px solid rgba(239, 112, 96, 1); font-size: 1.3em"><span class="prefix" style="display: none"></span><span class="content" style="display: inline-block; font-weight: bold; background: rgba(239, 112, 96, 1); color: rgba(255, 255, 255, 1); padding: 3px 10px 1px; border-top-right-radius: 3px; border-top-left-radius: 3px; margin-right: 3px">最后再等等</span><span class="suffix"></span><span style="display: inline-block; vertical-align: bottom; border-bottom: 36px solid rgba(239, 235, 233, 1); border-right: 20px solid rgba(0, 0, 0, 0)"> </span></h2>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">这篇文章是基于“一个 SpringBoot 项目能同时处理多少请求？”这个面试题出发的。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">但是经过我们前面简单的分析，你也知道，这个问题如果在没有加一些特定的前提条件的情况下，答案是各不一样的。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">比如我再给你举一个例子，还是我们的 Demo，只是使用一下 @Async 注解，其他什么都不变：</p>
+<figure data-tool="mdnice编辑器" style="margin: 10px 0; display: flex; flex-direction: column; justify-content: center; align-items: center"><img src="https://why-image-1300252878.cos.ap-chengdu.myqcloud.com/img/20220716/20230716210625.png" alt="" style="display: block; margin: 0 auto; max-width: 100%"></figure>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">再次启动项目，发起访问，日志输出变成了这样：</p>
+<figure data-tool="mdnice编辑器" style="margin: 10px 0; display: flex; flex-direction: column; justify-content: center; align-items: center"><img src="https://why-image-1300252878.cos.ap-chengdu.myqcloud.com/img/20220716/20230716212906.png" alt="" style="display: block; margin: 0 auto; max-width: 100%"></figure>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">同时能处理的请求，直接从 Tomcat 的默认 200 个变成了 8 个？</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">因为 @Async 注解对应的线程池，默认的核心线程数是 8。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">之前写过这篇文章<a href="https://mp.weixin.qq.com/s/SdxnKw94H6V_UBD9oe6DGQ" style="text-decoration: none; word-wrap: break-word; font-weight: bold; color: rgba(239, 112, 96, 1); border-bottom: 1px solid rgba(239, 112, 96, 1)" rel="noopener">《别问了，我真的不喜欢@Async这个注解！》</a>分析过这个注解。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">所以你看，稍微一变化，答案看起来又不一样了，同时这个请求在内部流转的过程也不一样了，又是一个可以铺开谈的点。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">在面试过程中也是这样的，不要急于答题，当你觉得面试官问题描述的不清楚的地方，你可以先试探性的问一下，看看能不能挖掘出一点他没有说出来的默认条件。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">当“默认条件”挖掘的越多，你的回答就会更容易被面试官接受。而这个挖掘的过程，也是面试过程中一个重要的表现环节。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">而且，有时候，面试官就喜欢给出这样的“模糊”的问题，因为问题越模糊，坑就越多，当面试者跳进自己挖好的坑里面的时候，就是结束一次交锋的时候；当面试者看出来自己挖好的坑，并绕过去的时候，也是结束一轮交锋的时候。</p>
+<p data-tool="mdnice编辑器" style="font-size: 16px; padding-top: 8px; padding-bottom: 8px; margin: 0; line-height: 26px; color: rgba(0, 0, 0, 1)">所以，不要急于答题，多想，多问。不管是对于面试者还是面试官，一个好的面试体验，一定不是没有互动的一问一答，而是一个相互拉锯的过程。</p>
+</section>
+</div>
+<div class="clear"></div>
+<div id="blog_post_info_block" role="contentinfo">
+    <div id="blog_post_info"></div>
+    <div class="clear"></div>
+    <div id="post_next_prev"></div>
+</div>
+            </div>
+            <div class="postDesc">posted @ 
+<span id="post-date" data-last-update-days="311.90208958987847" data-date-created="BlogServer.Application.Dto.BlogPost.BlogPostDto" data-date-updated="2023-07-17 13:02">2023-07-17 13:02</span>&nbsp;
+<a href="https://www.cnblogs.com/thisiswhy">why技术</a>&nbsp;
+阅读(<span id="post_view_count">18656</span>)&nbsp;
+评论(<span id="post_comment_count">44</span>)&nbsp;
+<a href="https://i.cnblogs.com/EditPosts.aspx?postid=17559808" rel="nofollow">编辑</a>&nbsp;
+<a href="javascript:void(0)" onclick="AddToWz(17559808);return false;">收藏</a>&nbsp;
+<a href="javascript:void(0)" onclick="reportManager.report({ currentUserId: '', targetType: 'blogPost', targetId: '17559808', targetLink: 'https://www.cnblogs.com/thisiswhy/p/17559808.html', title: '面试官：一个 SpringBoot 项目能处理多少请求？（小心有坑）' })">举报</a>
+</div>
+        </div>
+	    
+	    
+    </div><!--end: topics 文章、评论容器-->
+</div>
+<script>
+    var cb_entryId = 17559808, cb_entryCreatedDate = '2023-07-17 13:02', cb_postType = 1, cb_postTitle = '面试官：一个 SpringBoot 项目能处理多少请求？（小心有坑）';
+    var allowComments = true, cb_blogId = 567091, cb_blogApp = 'thisiswhy', cb_blogUserGuid = '29a08954-3cc6-46e2-b8e3-08d7431a305b';
+    mermaidRender.render()
+    markdown_highlight()
+    zoomManager.apply("#cnblogs_post_body img:not(.code_img_closed):not(.code_img_opened)");    
+</script>
+<a id="!comments"></a>
+<div id="blog-comments-placeholder"></div>
+<div id="comment_form" class="commentform">
+    <a name="commentform"></a>
+    <div id="divCommentShow"></div>
+    <div id="comment_nav">
+            <a class="comment-nav-left forpc" href="https://cnblogs.vip/" target="_blank">会员力量，点亮园子希望</a>
+        <div class="comment-nav-right">
+            <span id="span_refresh_tips"></span><a href="#" onclick="return RefreshPage();">刷新页面</a><a href="#top">返回顶部</a>
+        </div>
+    </div>
+    <div id="comment_form_container"></div>
+    <div class="ad_text_commentbox" id="ad_text_under_commentbox"></div>
+        <div id="cnblogs_ch"></div>
+    <div id="opt_under_post"></div>
+        <div id="cnblogs_c1" class="under-post-card">
+            <a href="https://www.finclip.com?channel=cnblog2024" rel="nofollow" target="_blank" onclick="countCreativeClicks('C1-凡泰极客')">
+                <img src="https://img2024.cnblogs.com/blog/35695/202405/35695-20240517155930267-114888508.jpg" onload="countCreativeImpressions('C1-凡泰极客')" alt="" />
+                <span id="c1_impression" style="display:none"></span>
+            </a>
+        </div>
+    <div id="under_post_card1"></div>
+    <div id="under_post_card2"></div>
+    <div id="HistoryToday" class="under-post-card"></div>
+    <script type="text/javascript">
+        var commentManager = new blogCommentManager();
+        commentManager.renderComments(0);
+        fixPostBody();
+        window.footnoteTipManager.generateFootnoteTips();
+
+            window.tocManager.displayDisableTocTips = false;
+            window.tocManager.generateToc();
+            
+                setTimeout(function() { countViews(cb_blogId, cb_entryId); }, 50);
+            
+            deliverT2();
+            deliverC1C2();
+            loadNewsAndKb();
+            
+                LoadPostCategoriesTags(cb_blogId, cb_entryId);
+            
+            LoadPostInfoBlock(cb_blogId, cb_entryId, cb_blogApp, cb_blogUserGuid);
+            GetPrevNextPost(cb_entryId, cb_blogId, cb_entryCreatedDate, cb_postType);
+            loadOptUnderPost();
+            GetHistoryToday(cb_blogId, cb_blogApp, cb_entryCreatedDate);
+                </script>
+</div>
+
+	</div><!--end: forFlow -->
+	</div><!--end: mainContent 主体内容容器-->
+	<div id="sideBar">
+		<div id="sideBarMain">
+			<div id="sidebar_news" class="newsItem">
+    <h3 class="catListTitle">公告</h3>
+<div id="blog-news">    
+    <div id="sidebar_news_content">
+    </div>
+</div>
+<script>loadBlogNews();</script>
+
+ 
+</div>
+<div id="sidebar_c3"></div>
+			<div id="blog-calendar" style="display:none"></div><script>loadBlogDefaultCalendar();</script>			
+			<div id="leftcontentcontainer">
+				<div id="blog-sidecolumn"></div>
+                    <script>loadBlogSideColumn();</script>
+			</div>			
+		</div><!--end: sideBarMain -->
+	</div><!--end: sideBar 侧边栏容器 -->
+	<div class="clear"></div>
+	</div><!--end: main -->
+	<div class="clear"></div>
+	<div id="footer">
+		<!--done-->
+Copyright &copy; 2024 why技术
+<br /><span id="poweredby">Powered by .NET 8.0 on Kubernetes</span>
+
+
+
+	</div><!--end: footer -->
+</div><!--end: home 自定义的最大容器 -->
+
+
+
+    
+
+    <input type="hidden" id="antiforgery_token" value="CfDJ8ONv0caE5GtEh3YJ5j088kkU3LDSEqEZTnpeL5TKAmJSzLNLqkWrir_OVEQ3AxQ_fxy0O3V_sk2XuPcm-KMS36bf5vPSDOEMbYcP4BUqZ45f0z-_dLqmB3pZjzdjM8NlWBgntCEnmr2LmytsOgtk_vk" />
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-M95P3TTWJZ"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-M95P3TTWJZ');
+</script>
+<script defer src="https://hm.baidu.com/hm.js?866c9be12d4a814454792b1fd0fed295"></script>
+</body>
+</html>

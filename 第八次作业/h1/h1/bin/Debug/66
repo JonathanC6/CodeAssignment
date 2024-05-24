@@ -1,0 +1,585 @@
+﻿<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="referrer" content="origin-when-cross-origin" />
+    <meta name="description" content="AsyncLocal 用法简介 通过 AsyncLocal 我们可以在一个逻辑上下文中维护一份私有数据，该上下文后续代码中都可以访问和修改这份数据，但另一个无关的上下文是无法访问的。 无论是在新创建的 Task 中还是 await 关键词之后，我们都能够访问前面设置的 AsyncLocal 的数据。" />
+    <meta property="og:description" content="AsyncLocal 用法简介 通过 AsyncLocal 我们可以在一个逻辑上下文中维护一份私有数据，该上下文后续代码中都可以访问和修改这份数据，但另一个无关的上下文是无法访问的。 无论是在新创建的 Task 中还是 await 关键词之后，我们都能够访问前面设置的 AsyncLocal 的数据。" />
+    <meta http-equiv="Cache-Control" content="no-transform" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>.NET AsyncLocal 避坑指南 - 黑洞视界 - 博客园</title>
+    <link rel="canonical" href="https://www.cnblogs.com/eventhorizon/p/17170301.html" />
+    <link rel="shortcut icon" id="favicon" href="//assets.cnblogs.com/favicon.svg?v=2" type="image/svg+xml" />
+    
+    <link rel="stylesheet" href="/css/blog-common.min.css?v=JnYHs5HAUCOVmwbxBNuH-ED7ggVDfqtff-pdhyndpr8" />
+    
+
+    
+        <link id="highlighter-theme-cnblogs" type="text/css" rel="stylesheet" href="/css/hljs/cnblogs.css?v=5J1NDtbnnIr2Rc2SdhEMlMxD4l9Eydj88B31E7_NhS4" />
+    <link type="text/css" rel="stylesheet" href="https://www.cnblogs.com/eventhorizon/custom.css?v=wB8XayPlrfyvSyTt9fTBjv3PUrw=" />
+    
+    <link id="mobile-style" media="only screen and (max-width: 767px)" type="text/css" rel="stylesheet" href="/css/mobile-common.min.css?v=F2e9dMGzAUzDRZU-W-4qVsoLMeDjGqD2cUFxFY5EcWc" />
+    
+    <link type="application/rss+xml" rel="alternate" href="https://www.cnblogs.com/eventhorizon/rss" />
+    <link type="application/rsd+xml" rel="EditURI" href="https://www.cnblogs.com/eventhorizon/rsd.xml" />
+    <link type="application/wlwmanifest+xml" rel="wlwmanifest" href="https://www.cnblogs.com/eventhorizon/wlwmanifest.xml" />
+    <script>
+        var currentBlogId = 421737;
+        var currentBlogApp = 'eventhorizon';
+        var isLogined = false;
+        var isBlogOwner = false;
+        var skinName = 'Custom';
+        var visitorUserId = '';
+        var hasCustomScript = true;
+        window.cb_enable_mathjax = false;
+        window.mathEngine = 0;
+        window.codeHighlightEngine = 1;
+        window.enableCodeLineNumber = false;
+        window.codeHighlightTheme = 'cnblogs';
+        window.darkModeCodeHighlightTheme = 'vs2015';
+        window.isDarkCodeHighlightTheme = false;
+        window.isDarkModeCodeHighlightThemeDark = true;
+        window.isDisableCodeHighlighter = false;
+        window.enableCodeThemeTypeFollowSystem = false;
+        window.enableMacStyleCodeBlock = false;
+    </script>
+        <script>
+            window.currentPostId = 17170301;
+            window.currentPostDateAdded = '2023-03-01 23:13';
+        </script>
+    <script src="https://assets.cnblogs.com/scripts/jquery-3.3.1.min.js"></script>
+    <script src="https://cdn-www.cnblogs.com/js/blog-common.min.js?v=e7iDdKE0ie8Fi0lKgiYt7eXqsQNrVeJmcEHX6zqQWKc"></script>
+        <script>updateCustomBlogReferrer();</script>
+    
+</head>
+<body class="skin-custom no-navbar">
+    <a name="top"></a>
+    <div id="top_nav" class="navbar forpc navbar-custom">
+        <nav id="nav_main" class="navbar-main">
+            <ul id="nav_left" class="navbar-list navbar-left">
+                <li class="navbar-branding">
+                    <a href="https://www.cnblogs.com/" title="开发者的网上家园" role="banner">
+                        <img src="//assets.cnblogs.com/logo.svg" alt="博客园Logo" />
+                    </a>
+                </li>
+                <li><a href="https://cnblogs.vip/">会员</a></li>
+                <li><a href="https://cnblogs.vip/store">周边</a></li>
+                <li>
+                    <a href="https://news.cnblogs.com/" onclick="countClicks('nav', 'skin-navbar-news')">新闻</a>
+                </li>
+                <li>
+                    <a href="https://q.cnblogs.com/" onclick="countClicks('nav', 'skin-navbar-q')">博问</a>
+                </li>
+                    <li>
+                        <a href="https://www.cnblogs.com/cmt/p/18172236" target="_blank">融资</a>
+                    </li>
+                <li><a href="https://market.cnblogs.com" target="_blank">云市场</a></li>
+            </ul>
+            <ul id="nav_right" class="navbar-list navbar-right">
+                <li>
+                    <form id="zzk_search" class="navbar-search dropdown" action="https://zzk.cnblogs.com/s" method="get" role="search">
+                        <input name="w" id="zzk_search_input" placeholder="代码改变世界" type="search" tabindex="3" autocomplete="off" />
+                        <button id="zzk_search_button" onclick="window.navbarSearchManager.triggerActiveOption()">
+                            <img id="search_icon" class="focus-hidden" src="//assets.cnblogs.com/icons/search.svg" alt="搜索" />
+                            <img class="hidden focus-visible" src="//assets.cnblogs.com/icons/enter.svg" alt="搜索" />
+                        </button>
+                        <ul id="navbar_search_options" class="dropdown-menu quick-search-menu">
+                            <li tabindex="0" class="active" onclick="zzkSearch(event, document.getElementById('zzk_search_input').value)">
+                                <div class="keyword-wrapper">
+                                    <img src="//assets.cnblogs.com/icons/search.svg" alt="搜索" />
+                                    <div class="keyword"></div>
+                                </div>
+                                <span class="search-area">所有博客</span>
+                            </li>
+                                    <li tabindex="1" onclick="zzkBlogSearch(event, 'eventhorizon', document.getElementById('zzk_search_input').value)">
+                                        <div class="keyword-wrapper">
+                                            <img src="//assets.cnblogs.com/icons/search.svg" alt="搜索" />
+                                            <div class="keyword"></div>
+                                        </div>
+                                        <span class="search-area">当前博客</span>
+                                    </li>
+                        </ul>
+                    </form>
+                </li>
+                <li id="navbar_login_status" class="navbar-list">
+                    <a class="navbar-user-info navbar-blog" href="https://i.cnblogs.com/EditPosts.aspx?opt=1" alt="写随笔" title="写随笔">
+                        <img id="new_post_icon" class="navbar-icon" src="//assets.cnblogs.com/icons/newpost.svg" alt="写随笔" />
+                    </a>
+                    <a id="navblog-myblog-icon" class="navbar-user-info navbar-blog" href="https://passport.cnblogs.com/GetBlogApplyStatus.aspx" alt="我的博客" title="我的博客">
+                        <img id="myblog_icon" class="navbar-icon" src="//assets.cnblogs.com/icons/myblog.svg" alt="我的博客" />
+                    </a>
+                    <a class="navbar-user-info navbar-message navbar-icon-wrapper" href="https://msg.cnblogs.com/" alt="短消息" title="短消息">
+                        <img id="msg_icon" class="navbar-icon" src="//assets.cnblogs.com/icons/message.svg" alt="短消息" />
+                        <span id="msg_count" style="display: none"></span>
+                    </a>
+                    <a id="navbar_lite_mode_indicator" data-current-page="blog" style="display: none" href="javascript:void(0)" alt="简洁模式" title="简洁模式启用，您在访问他人博客时会使用简洁款皮肤展示">
+                        <img class="navbar-icon" src="//assets.cnblogs.com/icons/lite-mode-on.svg" alt="简洁模式" />
+                    </a>
+                    <div id="user_info" class="navbar-user-info dropdown">
+                        <a class="dropdown-button" href="https://home.cnblogs.com/">
+                            <img id="user_icon" class="navbar-avatar" src="//assets.cnblogs.com/icons/avatar-default.svg" alt="用户头像" />
+                        </a>
+                        <div class="dropdown-menu">
+                            <a id="navblog-myblog-text" href="https://passport.cnblogs.com/GetBlogApplyStatus.aspx">我的博客</a>
+                            <a href="https://home.cnblogs.com/">我的园子</a>
+                            <a href="https://account.cnblogs.com/settings/account">账号设置</a>
+                            <a href="javascript:void(0)" id="navbar_lite_mode_toggle" title="简洁模式会使用简洁款皮肤显示所有博客">
+    简洁模式 <img id="navbar_lite_mode_on" src="/images/lite-mode-check.svg" class="hide" /><span id="navbar_lite_mode_spinner" class="hide">...</span>
+</a>
+                            <a href="javascript:void(0)" onclick="account.logout();">退出登录</a>
+                        </div>
+                    </div>
+                    <a class="navbar-anonymous" href="https://account.cnblogs.com/signup">注册</a>
+                    <a class="navbar-anonymous" href="javascript:void(0);" onclick="account.login()">登录</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    
+
+    <!--done-->
+<div id="home">
+<div id="header">
+	<div id="blogTitle">
+        <a id="lnkBlogLogo" href="https://www.cnblogs.com/eventhorizon/"><img id="blogLogo" src="/skins/custom/images/logo.gif" alt="返回主页" /></a>		
+		
+<!--done-->
+<h1><a id="Header1_HeaderTitle" class="headermaintitle HeaderMainTitle" href="https://www.cnblogs.com/eventhorizon">黑洞视界</a>
+</h1>
+<h2></h2>
+
+
+
+
+		
+	</div><!--end: blogTitle 博客的标题和副标题 -->
+	<div id="navigator">
+		
+<ul id="navList">
+<li><a id="blog_nav_sitehome" class="menu" href="https://www.cnblogs.com/">
+博客园</a>
+</li>
+<li>
+<a id="blog_nav_myhome" class="menu" href="https://www.cnblogs.com/eventhorizon/">
+首页</a>
+</li>
+<li>
+
+<a id="blog_nav_newpost" class="menu" href="https://i.cnblogs.com/EditPosts.aspx?opt=1">
+新随笔</a>
+</li>
+<li>
+<a id="blog_nav_contact" class="menu" href="https://msg.cnblogs.com/send/%E9%BB%91%E6%B4%9E%E8%A7%86%E7%95%8C">
+联系</a></li>
+<li>
+<a id="blog_nav_rss" class="menu" href="javascript:void(0)" data-rss="https://www.cnblogs.com/eventhorizon/rss/">
+订阅</a>
+<!--<partial name="./Shared/_XmlLink.cshtml" model="Model" /></li>--></li>
+<li>
+<a id="blog_nav_admin" class="menu" href="https://i.cnblogs.com/">
+管理</a>
+</li>
+</ul>
+
+
+		<div class="blogStats">
+			<div id="blog_stats_place_holder"><script>loadBlogStats();</script></div>
+		</div><!--end: blogStats -->
+	</div><!--end: navigator 博客导航栏 -->
+</div><!--end: header 头部 -->
+<div id="main">
+	<div id="mainContent">
+	<div class="forFlow">
+		<div id="post_detail">
+    <!--done-->
+    <div id="topics">
+        <div class="post">
+            <h1 class = "postTitle">
+                <a id="cb_post_title_url" class="postTitle2 vertical-middle" href="https://www.cnblogs.com/eventhorizon/p/17170301.html" title="发布于 2023-03-01 23:13">
+    <span role="heading" aria-level="2">.NET AsyncLocal 避坑指南</span>
+    
+
+</a>
+
+            </h1>
+            <div class="clear"></div>
+            <div class="postBody">
+                <div id="cnblogs_post_body" class="blogpost-body cnblogs-markdown">
+<p></p><div class="toc"><div class="toc-container-header">目录</div><ul><li><a href="#asynclocal-用法简介" rel="noopener">AsyncLocal 用法简介</a></li><li><a href="#asynclocal-实现原理" rel="noopener">AsyncLocal 实现原理</a></li><li><a href="#asynclocal-的坑" rel="noopener">AsyncLocal 的坑</a></li><li><a href="#asynclocal-的避坑指南" rel="noopener">AsyncLocal 的避坑指南</a></li><li><a href="#httpcontextaccessor-的实现原理" rel="noopener">HttpContextAccessor 的实现原理</a></li></ul></div><p></p>
+<h1 id="asynclocal-用法简介">AsyncLocal 用法简介</h1>
+<p>通过 AsyncLocal 我们可以在一个逻辑上下文中维护一份私有数据，该上下文后续代码中都可以访问和修改这份数据，但另一个无关的上下文是无法访问的。</p>
+<p>无论是在新创建的 Task 中还是 await 关键词之后，我们都能够访问前面设置的 AsyncLocal 的数据。</p>
+<pre><code class="language-C#">class Program
+{
+    private static AsyncLocal&lt;string&gt; _asyncLocal = new AsyncLocal&lt;string&gt;();
+    
+    static async Task Main(string[] args)
+    {
+        _asyncLocal.Value = "Hello World!";
+        Task.Run(() =&gt; Console.WriteLine($"AsyncLocal in task: {_asyncLocal.Value}"));
+
+        await FooAsync();
+        Console.WriteLine($"AsyncLocal after await FooAsync: {_asyncLocal.Value}");
+    }
+
+    private static async Task FooAsync()
+    {
+        await Task.Delay(100);
+        Console.WriteLine($"AsyncLocal after await in FooAsync: {_asyncLocal.Value}");
+    }
+}
+</code></pre>
+<p>输出结果：</p>
+<blockquote>
+<pre><code class="language-Log">AsyncLocal in task: Hello World!
+AsyncLocal after await in FooAsync: Hello World!
+AsyncLocal after await FooAsync: Hello World!
+</code></pre>
+</blockquote>
+<h1 id="asynclocal-实现原理">AsyncLocal 实现原理</h1>
+<p>在我之前的博客 <a href="https://mp.weixin.qq.com/s?__biz=MzkyOTQyMzg2OA==&amp;mid=2247483796&amp;idx=1&amp;sn=7bed5f6da13431610f2ec4c7e63485f9&amp;chksm=c2088907f57f00116cd084da5c08b9761c8911861e77df9912d8172472612a05cf3e40ba3498&amp;token=1405093735&amp;lang=zh_CN#rd" target="_blank" rel="noopener">揭秘 .NET 中的 AsyncLocal</a> 中深入介绍了 AsyncLocal 的实现原理，这里只做简单的回顾。</p>
+<p>AsyncLocal 的实际数据存储在 ExecutionContext 中，而 ExecutionContext 作为线程的私有字段与线程绑定，在线程会发生切换的地方，runtime 会将切换前的 ExecutionContext 保存起来，切换后再恢复到新线程上。</p>
+<p>这个保存和恢复的过程是由 runtime 自动完成的，例如会发生在以下几个地方：</p>
+<ul>
+<li>new Thread(ThreadStart start).Start()</li>
+<li>Task.Run(Action action)</li>
+<li>ThreadPool.QueueUserWorkItem(WaitCallback callBack)</li>
+<li>await 之后</li>
+</ul>
+<p>以 await 为例，当我们在一个方法中使用了 await 关键词，编译器会将这个方法编译成一个状态机，这个状态机会在 await 之前和之后分别保存和恢复 ExecutionContext。</p>
+<pre><code class="language-C#">class Program
+{
+    private static AsyncLocal&lt;string&gt; _asyncLocal = new AsyncLocal&lt;string&gt;();
+    
+    static async Task Main(string[] args)
+    {
+        _asyncLocal.Value = "Hello World!";
+        await FooAsync();
+        Console.WriteLine($"AsyncLocal after await FooAsync: {_asyncLocal.Value}");
+    }
+
+    private static async Task FooAsync()
+    {
+        await Task.Delay(100);
+    }
+}
+</code></pre>
+<p>输出结果：</p>
+<blockquote>
+<pre><code class="language-Log">AsyncLocal after await FooAsync: Hello World!
+</code></pre>
+</blockquote>
+<p><img src="https://img2023.cnblogs.com/blog/1201123/202303/1201123-20230301231131589-360671251.png" alt="" loading="lazy"></p>
+<h1 id="asynclocal-的坑">AsyncLocal 的坑</h1>
+<p>有时候我们会在 FooAsync 方法中去修改 AsyncLocal 的值，并希望在 Main 方法在 await FooAsync 之后能够获取到修改后的值，但是实际上这是不可能的。</p>
+<pre><code class="language-C#">class Program
+{
+    private static AsyncLocal&lt;string&gt; _asyncLocal = new AsyncLocal&lt;string&gt;();
+    
+    static async Task Main(string[] args)
+    {
+        _asyncLocal.Value = "A";
+        Console.WriteLine($"AsyncLocal before FooAsync: {_asyncLocal.Value}");
+        await FooAsync();
+        Console.WriteLine($"AsyncLocal after await FooAsync: {_asyncLocal.Value}");
+    }
+
+    private static async Task FooAsync()
+    {
+        _asyncLocal.Value = "B";
+        Console.WriteLine($"AsyncLocal before await in FooAsync: {_asyncLocal.Value}");
+        await Task.Delay(100);
+        Console.WriteLine($"AsyncLocal after await in FooAsync: {_asyncLocal.Value}");
+    }
+}
+</code></pre>
+<p>输出结果：</p>
+<blockquote>
+<pre><code class="language-Log">AsyncLocal before FooAsync: A
+AsyncLocal before await in FooAsync: B
+AsyncLocal after await in FooAsync: B
+AsyncLocal after await FooAsync: A
+</code></pre>
+</blockquote>
+<p>为什么我们在 FooAsync 方法中修改了 AsyncLocal 的值，但是在 await FooAsync 之后，AsyncLocal 的值却没有被修改呢？</p>
+<p>原因是 ExecutionContext 被设计成了一个不可变的对象，当我们在 FooAsync 方法中修改了 AsyncLocal 的值，实际上是创建了一个新的 ExecutionContext，原来其他的 AsyncLocal 的值被值拷贝到了新的 ExecutionContext 中，新的 AsyncLocal 的值只会写入到新的 ExecutionContext 中，而原来的 ExecutionContext 及其关联的 AsyncLocal 仍然保持不变。</p>
+<p>这样的设计是为了保证线程的安全性，因为在多线程环境下，如果 ExecutionContext 是可变的，那么在切换线程的时候，可能会出现数据不一致的情况。</p>
+<p>我们通常把这种设计称为 Copy On Write（简称COW），即在修改数据的时候，会先拷贝一份数据，然后在拷贝的数据上进行修改，这样就不会影响到原来的数据。</p>
+<p><strong>ExecutionContext 中可能不止一个 AsyncLocal 的数据，修改任意一个 AsyncLocal 都会导致 ExecutionContext 的 COW。</strong></p>
+<p>所以上面代码的执行过程如下：<br>
+<img src="https://img2023.cnblogs.com/blog/1201123/202303/1201123-20230301231130981-1986001489.png" alt="" loading="lazy"></p>
+<h1 id="asynclocal-的避坑指南">AsyncLocal 的避坑指南</h1>
+<p>那么我们如何在 FooAsync 方法中修改 AsyncLocal 的值，并且在 Main 方法中获取到修改后的值呢？</p>
+<p>我们需要借助一个中介者，让中介者来保存 AsyncLocal 的值，然后在 FooAsync 方法中修改中介者的属性值，这样就可以在 Main 方法中获取到修改后的值了。</p>
+<p>下面我们设计一个 ValueHolder 来保存 AsyncLocal 的值，修改 Value 并不会修改 AsyncLocal 的值，而是修改 ValueHolder 的属性值，这样就不会触发 ExecutionContext 的 COW。</p>
+<p>我们还需要设计一个 ValueAccessor 来封装 ValueHolder 对值的访问和修改，这样可以保证 ValueHolder 的值只能在 ValueAccessor 中被修改。</p>
+<pre><code class="language-C#">class ValueAccessor&lt;T&gt; : IValueAccessor&lt;T&gt;
+{
+    private static AsyncLocal&lt;ValueHolder&lt;T&gt;&gt; _asyncLocal = new AsyncLocal&lt;ValueHolder&lt;T&gt;&gt;();
+
+    public T Value
+    {
+        get =&gt; _asyncLocal.Value != null ? _asyncLocal.Value.Value : default;
+        set
+        {
+            _asyncLocal.Value ??= new ValueHolder&lt;T&gt;();
+
+            _asyncLocal.Value.Value = value;
+        }
+    }
+}
+
+class ValueHolder&lt;T&gt;
+{
+    public T Value { get; set; }
+}
+
+class Program
+{
+    private static IValueAccessor&lt;string&gt; _valueAccessor = new ValueAccessor&lt;string&gt;();
+
+    static async Task Main(string[] args)
+    {
+        _valueAccessor.Value = "A";
+        Console.WriteLine($"ValueAccessor before await FooAsync in Main: {_valueAccessor.Value}");
+        await FooAsync();
+        Console.WriteLine($"ValueAccessor after await FooAsync in Main: {_valueAccessor.Value}");
+    }
+
+    private static async Task FooAsync()
+    {
+        _valueAccessor.Value = "B";
+        Console.WriteLine($"ValueAccessor before await in FooAsync: {_valueAccessor.Value}");
+        await Task.Delay(100);
+        Console.WriteLine($"ValueAccessor after await in FooAsync: {_valueAccessor.Value}");
+    }
+}
+</code></pre>
+<p>输出结果：</p>
+<blockquote>
+<pre><code class="language-Log">ValueAccessor before await FooAsync in Main: A
+ValueAccessor before await in FooAsync: B
+ValueAccessor after await in FooAsync: B
+ValueAccessor after await FooAsync in Main: B
+</code></pre>
+</blockquote>
+<h1 id="httpcontextaccessor-的实现原理">HttpContextAccessor 的实现原理</h1>
+<p>我们常用的 <code>HttpContextAccessor</code> 通过<code>HttpContextHolder</code> 来间接地在 <code>AsyncLocal</code> 中存储 <code>HttpContext。</code></p>
+<p>如果要更新 HttpContext，只需要在 HttpContextHolder 中更新即可。因为 AsyncLocal 的值不会被修改，更新 HttpContext 时 ExecutionContext 也不会出现 COW 的情况。</p>
+<p>不过 HttpContextAccessor 中的逻辑有点特殊，它的 HttpContextHolder 是为保证清除 HttpContext 时，这个 HttpContext 能在所有引用它的 ExecutionContext 中被清除（可能因为修改 HttpContextHolder 之外的 AsyncLocal 数据导致 ExecutionContext 已经 COW 很多次了）。</p>
+<p>下面是 HttpContextAccessor 的实现，英文注释是原文，中文注释是我自己的理解。</p>
+<pre><code class="language-C#">/// &lt;/summary&gt;
+public class HttpContextAccessor : IHttpContextAccessor
+{
+    private static readonly AsyncLocal&lt;HttpContextHolder&gt; _httpContextCurrent = new AsyncLocal&lt;HttpContextHolder&gt;();
+
+    /// &lt;inheritdoc/&gt;
+    public HttpContext? HttpContext
+    {
+        get
+        {
+            return _httpContextCurrent.Value?.Context;
+        }
+        set
+        {
+            var holder = _httpContextCurrent.Value;
+            if (holder != null)
+            {
+                // Clear current HttpContext trapped in the AsyncLocals, as its done.
+                // 这边的逻辑是为了保证清除 HttpContext 时，这个 HttpContext 能在所有引用它的 ExecutionContext 中被清除
+                holder.Context = null;
+            }
+
+            if (value != null)
+            {
+                // Use an object indirection to hold the HttpContext in the AsyncLocal,
+                // so it can be cleared in all ExecutionContexts when its cleared.
+                // 这边直接修改了 AsyncLocal 的值，所以会导致 ExecutionContext 的 COW。新的 HttpContext 不会被传递到原先的 ExecutionContext 中。
+                _httpContextCurrent.Value = new HttpContextHolder { Context = value };
+            }
+        }
+    }
+
+    private sealed class HttpContextHolder
+    {
+        public HttpContext? Context;
+    }
+}
+</code></pre>
+<p>但 HttpContextAccessor 的实现并不允许将新赋值的非 null 的 HttpContext 传递到外层的 ExecutionContext 中，可以参考上面的源码及注释理解。</p>
+<pre><code class="language-C#">class Program
+{
+    private static IHttpContextAccessor _httpContextAccessor = new HttpContextAccessor();
+    
+    static async Task Main(string[] args)
+    {
+        var httpContext = new DefaultHttpContext
+        {
+            Items = new Dictionary&lt;object, object&gt;
+            {
+                { "Name", "A"}
+            }
+        };
+        _httpContextAccessor.HttpContext = httpContext;
+        Console.WriteLine($"HttpContext before await FooAsync in Main: {_httpContextAccessor.HttpContext.Items["Name"]}");
+        await FooAsync();
+        // HttpContext 被清空了，下面这行输出 null
+        Console.WriteLine($"HttpContext after await FooAsync in Main: {_httpContextAccessor.HttpContext?.Items["Name"]}");
+    }
+
+    private static async Task FooAsync()
+    {
+        _httpContextAccessor.HttpContext = new DefaultHttpContext
+        {
+            Items = new Dictionary&lt;object, object&gt;
+            {
+                { "Name", "B"}
+            }
+        };
+        Console.WriteLine($"HttpContext before await in FooAsync: {_httpContextAccessor.HttpContext.Items["Name"]}");
+        await Task.Delay(1000);
+        Console.WriteLine($"HttpContext after await in FooAsync: {_httpContextAccessor.HttpContext.Items["Name"]}");
+    }
+}
+</code></pre>
+<p>输出结果：</p>
+<blockquote>
+<pre><code class="language-Log">HttpContext before await FooAsync in Main: A
+HttpContext before await in FooAsync: B
+HttpContext after await in FooAsync: B
+HttpContext after await FooAsync in Main: 
+</code></pre>
+</blockquote>
+<p>欢迎关注个人技术公众号<br>
+<img src="https://img2023.cnblogs.com/blog/1201123/202303/1201123-20230302194546214-138980196.png" alt="" loading="lazy"></p>
+
+</div>
+<div class="clear"></div>
+<div id="blog_post_info_block" role="contentinfo">
+    <div id="blog_post_info"></div>
+    <div class="clear"></div>
+    <div id="post_next_prev"></div>
+</div>
+            </div>
+            <div class="postDesc">posted @ 
+<span id="post-date" data-last-update-days="402.00418045806134" data-date-created="BlogServer.Application.Dto.BlogPost.BlogPostDto" data-date-updated="2023-04-18 10:35">2023-03-01 23:13</span>&nbsp;
+<a href="https://www.cnblogs.com/eventhorizon">黑洞视界</a>&nbsp;
+阅读(<span id="post_view_count">6498</span>)&nbsp;
+评论(<span id="post_comment_count">19</span>)&nbsp;
+<a href="https://i.cnblogs.com/EditPosts.aspx?postid=17170301" rel="nofollow">编辑</a>&nbsp;
+<a href="javascript:void(0)" onclick="AddToWz(17170301);return false;">收藏</a>&nbsp;
+<a href="javascript:void(0)" onclick="reportManager.report({ currentUserId: '', targetType: 'blogPost', targetId: '17170301', targetLink: 'https://www.cnblogs.com/eventhorizon/p/17170301.html', title: '.NET AsyncLocal 避坑指南' })">举报</a>
+</div>
+        </div>
+	    
+	    
+    </div><!--end: topics 文章、评论容器-->
+</div>
+<script>
+    var cb_entryId = 17170301, cb_entryCreatedDate = '2023-03-01 23:13', cb_postType = 1, cb_postTitle = '.NET AsyncLocal 避坑指南';
+    var allowComments = true, cb_blogId = 421737, cb_blogApp = 'eventhorizon', cb_blogUserGuid = '2375f862-0d47-4382-268a-08d49c352df3';
+    mermaidRender.render()
+    markdown_highlight()
+    zoomManager.apply("#cnblogs_post_body img:not(.code_img_closed):not(.code_img_opened)");    
+</script>
+<a id="!comments"></a>
+<div id="blog-comments-placeholder"></div>
+<div id="comment_form" class="commentform">
+    <a name="commentform"></a>
+    <div id="divCommentShow"></div>
+    <div id="comment_nav">
+            <a class="comment-nav-left forpc" href="https://cnblogs.vip/" target="_blank">会员力量，点亮园子希望</a>
+        <div class="comment-nav-right">
+            <span id="span_refresh_tips"></span><a href="#" onclick="return RefreshPage();">刷新页面</a><a href="#top">返回顶部</a>
+        </div>
+    </div>
+    <div id="comment_form_container"></div>
+    <div class="ad_text_commentbox" id="ad_text_under_commentbox"></div>
+        <div id="cnblogs_ch"></div>
+    <div id="opt_under_post"></div>
+        <div id="cnblogs_c1" class="under-post-card">
+            <a href="https://www.finclip.com?channel=cnblog2024" rel="nofollow" target="_blank" onclick="countCreativeClicks('C1-凡泰极客')">
+                <img src="https://img2024.cnblogs.com/blog/35695/202405/35695-20240517155930267-114888508.jpg" onload="countCreativeImpressions('C1-凡泰极客')" alt="" />
+                <span id="c1_impression" style="display:none"></span>
+            </a>
+        </div>
+    <div id="under_post_card1"></div>
+    <div id="under_post_card2"></div>
+    <div id="HistoryToday" class="under-post-card"></div>
+    <script type="text/javascript">
+        var commentManager = new blogCommentManager();
+        commentManager.renderComments(0);
+        fixPostBody();
+        window.footnoteTipManager.generateFootnoteTips();
+
+            window.tocManager.displayDisableTocTips = false;
+            window.tocManager.generateToc();
+            
+                setTimeout(function() { countViews(cb_blogId, cb_entryId); }, 50);
+            
+            deliverT2();
+            deliverC1C2();
+            loadNewsAndKb();
+            
+                LoadPostCategoriesTags(cb_blogId, cb_entryId);
+            
+            LoadPostInfoBlock(cb_blogId, cb_entryId, cb_blogApp, cb_blogUserGuid);
+            GetPrevNextPost(cb_entryId, cb_blogId, cb_entryCreatedDate, cb_postType);
+            loadOptUnderPost();
+            GetHistoryToday(cb_blogId, cb_blogApp, cb_entryCreatedDate);
+                </script>
+</div>
+
+	</div><!--end: forFlow -->
+	</div><!--end: mainContent 主体内容容器-->
+	<div id="sideBar">
+		<div id="sideBarMain">
+			<div id="sidebar_news" class="newsItem">
+    <h3 class="catListTitle">公告</h3>
+<div id="blog-news">    
+    <div id="sidebar_news_content">
+    </div>
+</div>
+<script>loadBlogNews();</script>
+
+ 
+</div>
+<div id="sidebar_c3"></div>
+			<div id="blog-calendar" style="display:none"></div><script>loadBlogDefaultCalendar();</script>			
+			<div id="leftcontentcontainer">
+				<div id="blog-sidecolumn"></div>
+                    <script>loadBlogSideColumn();</script>
+			</div>			
+		</div><!--end: sideBarMain -->
+	</div><!--end: sideBar 侧边栏容器 -->
+	<div class="clear"></div>
+	</div><!--end: main -->
+	<div class="clear"></div>
+	<div id="footer">
+		<!--done-->
+Copyright &copy; 2024 黑洞视界
+<br /><span id="poweredby">Powered by .NET 8.0 on Kubernetes</span>
+
+
+
+	</div><!--end: footer -->
+</div><!--end: home 自定义的最大容器 -->
+
+
+
+    
+
+    <input type="hidden" id="antiforgery_token" value="CfDJ8ONv0caE5GtEh3YJ5j088klgqRGQf1fvgu3-Lorcw7CO_jzFVk2ArMB-vptElAtgdC38lqbnYzx2vk4fXxDCbfTJthY4vzb7XLprQPV1uq-pZoNgfU50L6EwrQ4TKI84wDgOLYbEU4PZdLb4X7RJTJM" />
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-M95P3TTWJZ"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-M95P3TTWJZ');
+</script>
+<script defer src="https://hm.baidu.com/hm.js?866c9be12d4a814454792b1fd0fed295"></script>
+</body>
+</html>

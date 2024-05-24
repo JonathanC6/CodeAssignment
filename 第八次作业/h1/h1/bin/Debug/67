@@ -1,0 +1,636 @@
+﻿<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="referrer" content="origin-when-cross-origin" />
+    <meta name="description" content="你有没有这样的经验：用个软件，隔三岔五弹个框：系统异常！无论作为用户还是程序员，一见到“系统异常”四个大字，我整个人都不好了。" />
+    <meta property="og:description" content="你有没有这样的经验：用个软件，隔三岔五弹个框：系统异常！无论作为用户还是程序员，一见到“系统异常”四个大字，我整个人都不好了。" />
+    <meta http-equiv="Cache-Control" content="no-transform" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>我已经受够了“系统异常”！ - 林子er - 博客园</title>
+    <link rel="canonical" href="https://www.cnblogs.com/linvanda/p/17120205.html" />
+    <link rel="shortcut icon" id="favicon" href="//assets.cnblogs.com/favicon.svg?v=2" type="image/svg+xml" />
+    
+    <link rel="stylesheet" href="/css/blog-common.min.css?v=JnYHs5HAUCOVmwbxBNuH-ED7ggVDfqtff-pdhyndpr8" />
+    
+
+    <link id="MainCss" rel="stylesheet" href="/skins/codinglife/bundle-codinglife.min.css?v=BpDsZaqt3Vo17LmofajxibGWthTFRyeegD3DeE1U2E0" />
+        <link id="highlighter-theme-cnblogs" type="text/css" rel="stylesheet" href="/css/hljs/cnblogs.css?v=5J1NDtbnnIr2Rc2SdhEMlMxD4l9Eydj88B31E7_NhS4" />
+    
+    
+    <link id="mobile-style" media="only screen and (max-width: 767px)" type="text/css" rel="stylesheet" href="/skins/codinglife/bundle-codinglife-mobile.min.css?v=nKYRRiCAgdHHKoqtFkqXweTDit8MaL8XLJDkQUS4rf4" />
+    
+    <link type="application/rss+xml" rel="alternate" href="https://www.cnblogs.com/linvanda/rss" />
+    <link type="application/rsd+xml" rel="EditURI" href="https://www.cnblogs.com/linvanda/rsd.xml" />
+    <link type="application/wlwmanifest+xml" rel="wlwmanifest" href="https://www.cnblogs.com/linvanda/wlwmanifest.xml" />
+    <script>
+        var currentBlogId = 593879;
+        var currentBlogApp = 'linvanda';
+        var isLogined = false;
+        var isBlogOwner = false;
+        var skinName = 'CodingLife';
+        var visitorUserId = '';
+        var hasCustomScript = false;
+        window.cb_enable_mathjax = true;
+        window.mathEngine = 0;
+        window.codeHighlightEngine = 1;
+        window.enableCodeLineNumber = false;
+        window.codeHighlightTheme = 'cnblogs';
+        window.darkModeCodeHighlightTheme = 'vs2015';
+        window.isDarkCodeHighlightTheme = false;
+        window.isDarkModeCodeHighlightThemeDark = true;
+        window.isDisableCodeHighlighter = false;
+        window.enableCodeThemeTypeFollowSystem = false;
+        window.enableMacStyleCodeBlock = false;
+    </script>
+        <script>
+            window.currentPostId = 17120205;
+            window.currentPostDateAdded = '2023-02-14 17:04';
+        </script>
+    <script src="https://assets.cnblogs.com/scripts/jquery-3.3.1.min.js"></script>
+    <script src="https://cdn-www.cnblogs.com/js/blog-common.min.js?v=e7iDdKE0ie8Fi0lKgiYt7eXqsQNrVeJmcEHX6zqQWKc"></script>
+    
+</head>
+<body class="skin-codinglife has-navbar mathjax2">
+    <a name="top"></a>
+    <div id="top_nav" class="navbar forpc">
+        <nav id="nav_main" class="navbar-main">
+            <ul id="nav_left" class="navbar-list navbar-left">
+                <li class="navbar-branding">
+                    <a href="https://www.cnblogs.com/" title="开发者的网上家园" role="banner">
+                        <img src="//assets.cnblogs.com/logo.svg" alt="博客园Logo" />
+                    </a>
+                </li>
+                <li><a href="https://cnblogs.vip/">会员</a></li>
+                <li><a href="https://cnblogs.vip/store">周边</a></li>
+                <li>
+                    <a href="https://news.cnblogs.com/" onclick="countClicks('nav', 'skin-navbar-news')">新闻</a>
+                </li>
+                <li>
+                    <a href="https://q.cnblogs.com/" onclick="countClicks('nav', 'skin-navbar-q')">博问</a>
+                </li>
+                    <li>
+                        <a href="https://www.cnblogs.com/cmt/p/18172236" target="_blank">融资</a>
+                    </li>
+                <li><a href="https://market.cnblogs.com" target="_blank">云市场</a></li>
+            </ul>
+            <ul id="nav_right" class="navbar-list navbar-right">
+                <li>
+                    <form id="zzk_search" class="navbar-search dropdown" action="https://zzk.cnblogs.com/s" method="get" role="search">
+                        <input name="w" id="zzk_search_input" placeholder="代码改变世界" type="search" tabindex="3" autocomplete="off" />
+                        <button id="zzk_search_button" onclick="window.navbarSearchManager.triggerActiveOption()">
+                            <img id="search_icon" class="focus-hidden" src="//assets.cnblogs.com/icons/search.svg" alt="搜索" />
+                            <img class="hidden focus-visible" src="//assets.cnblogs.com/icons/enter.svg" alt="搜索" />
+                        </button>
+                        <ul id="navbar_search_options" class="dropdown-menu quick-search-menu">
+                            <li tabindex="0" class="active" onclick="zzkSearch(event, document.getElementById('zzk_search_input').value)">
+                                <div class="keyword-wrapper">
+                                    <img src="//assets.cnblogs.com/icons/search.svg" alt="搜索" />
+                                    <div class="keyword"></div>
+                                </div>
+                                <span class="search-area">所有博客</span>
+                            </li>
+                                    <li tabindex="1" onclick="zzkBlogSearch(event, 'linvanda', document.getElementById('zzk_search_input').value)">
+                                        <div class="keyword-wrapper">
+                                            <img src="//assets.cnblogs.com/icons/search.svg" alt="搜索" />
+                                            <div class="keyword"></div>
+                                        </div>
+                                        <span class="search-area">当前博客</span>
+                                    </li>
+                        </ul>
+                    </form>
+                </li>
+                <li id="navbar_login_status" class="navbar-list">
+                    <a class="navbar-user-info navbar-blog" href="https://i.cnblogs.com/EditPosts.aspx?opt=1" alt="写随笔" title="写随笔">
+                        <img id="new_post_icon" class="navbar-icon" src="//assets.cnblogs.com/icons/newpost.svg" alt="写随笔" />
+                    </a>
+                    <a id="navblog-myblog-icon" class="navbar-user-info navbar-blog" href="https://passport.cnblogs.com/GetBlogApplyStatus.aspx" alt="我的博客" title="我的博客">
+                        <img id="myblog_icon" class="navbar-icon" src="//assets.cnblogs.com/icons/myblog.svg" alt="我的博客" />
+                    </a>
+                    <a class="navbar-user-info navbar-message navbar-icon-wrapper" href="https://msg.cnblogs.com/" alt="短消息" title="短消息">
+                        <img id="msg_icon" class="navbar-icon" src="//assets.cnblogs.com/icons/message.svg" alt="短消息" />
+                        <span id="msg_count" style="display: none"></span>
+                    </a>
+                    <a id="navbar_lite_mode_indicator" data-current-page="blog" style="display: none" href="javascript:void(0)" alt="简洁模式" title="简洁模式启用，您在访问他人博客时会使用简洁款皮肤展示">
+                        <img class="navbar-icon" src="//assets.cnblogs.com/icons/lite-mode-on.svg" alt="简洁模式" />
+                    </a>
+                    <div id="user_info" class="navbar-user-info dropdown">
+                        <a class="dropdown-button" href="https://home.cnblogs.com/">
+                            <img id="user_icon" class="navbar-avatar" src="//assets.cnblogs.com/icons/avatar-default.svg" alt="用户头像" />
+                        </a>
+                        <div class="dropdown-menu">
+                            <a id="navblog-myblog-text" href="https://passport.cnblogs.com/GetBlogApplyStatus.aspx">我的博客</a>
+                            <a href="https://home.cnblogs.com/">我的园子</a>
+                            <a href="https://account.cnblogs.com/settings/account">账号设置</a>
+                            <a href="javascript:void(0)" id="navbar_lite_mode_toggle" title="简洁模式会使用简洁款皮肤显示所有博客">
+    简洁模式 <img id="navbar_lite_mode_on" src="/images/lite-mode-check.svg" class="hide" /><span id="navbar_lite_mode_spinner" class="hide">...</span>
+</a>
+                            <a href="javascript:void(0)" onclick="account.logout();">退出登录</a>
+                        </div>
+                    </div>
+                    <a class="navbar-anonymous" href="https://account.cnblogs.com/signup">注册</a>
+                    <a class="navbar-anonymous" href="javascript:void(0);" onclick="account.login()">登录</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    
+
+    <!--done-->
+<div id="home">
+<div id="header">
+	<div id="blogTitle">
+        <a id="lnkBlogLogo" href="https://www.cnblogs.com/linvanda/"><img id="blogLogo" src="/skins/custom/images/logo.gif" alt="返回主页" /></a>		
+		
+<!--done-->
+<h1><a id="Header1_HeaderTitle" class="headermaintitle HeaderMainTitle" href="https://www.cnblogs.com/linvanda">林子er</a>
+</h1>
+<h2>用硬核且生趣的方式讲计算机、编程、互联网通识和历史</h2>
+
+
+
+
+		
+	</div><!--end: blogTitle 博客的标题和副标题 -->
+	<div id="navigator">
+		
+<ul id="navList">
+<li><a id="blog_nav_sitehome" class="menu" href="https://www.cnblogs.com/">
+博客园</a>
+</li>
+<li>
+<a id="blog_nav_myhome" class="menu" href="https://www.cnblogs.com/linvanda/">
+首页</a>
+</li>
+<li>
+
+<a id="blog_nav_newpost" class="menu" href="https://i.cnblogs.com/EditPosts.aspx?opt=1">
+新随笔</a>
+</li>
+<li>
+<a id="blog_nav_contact" class="menu" href="https://msg.cnblogs.com/send/%E6%9E%97%E5%AD%90er">
+联系</a></li>
+<li>
+<a id="blog_nav_rss" class="menu" href="javascript:void(0)" data-rss="https://www.cnblogs.com/linvanda/rss/">
+订阅</a>
+<!--<partial name="./Shared/_XmlLink.cshtml" model="Model" /></li>--></li>
+<li>
+<a id="blog_nav_admin" class="menu" href="https://i.cnblogs.com/">
+管理</a>
+</li>
+</ul>
+
+
+		<div class="blogStats">
+			<div id="blog_stats_place_holder"><script>loadBlogStats();</script></div>
+		</div><!--end: blogStats -->
+	</div><!--end: navigator 博客导航栏 -->
+</div><!--end: header 头部 -->
+<div id="main">
+	<div id="mainContent">
+	<div class="forFlow">
+		<div id="post_detail">
+    <!--done-->
+    <div id="topics">
+        <div class="post">
+            <h1 class = "postTitle">
+                <a id="cb_post_title_url" class="postTitle2 vertical-middle" href="https://www.cnblogs.com/linvanda/p/17120205.html" title="发布于 2023-02-14 17:04">
+    <span role="heading" aria-level="2">我已经受够了“系统异常”！</span>
+    
+
+</a>
+
+            </h1>
+            <div class="clear"></div>
+            <div class="postBody">
+                    <div id="cnblogs_post_description" style="display: none">
+        
+        你有没有这样的经验：用个软件，隔三岔五弹个框：系统异常！无论作为用户还是程序员，一见到“系统异常”四个大字，我整个人都不好了。
+    </div>
+<div id="cnblogs_post_body" class="blogpost-body cnblogs-markdown">
+<p>作为用户，你有没有这样的经验：用个软件，隔三岔五弹个框：系统异常！</p>
+<p>作为程序员，你有没有这样的经验：</p>
+<p>运营同学又屁颠屁颠跑来求助：“用户不能下单了！”</p>
+<p>“报什么错？”</p>
+<p>“系统异常！”</p>
+<p>无论作为用户还是程序员，一见到“系统异常”四个大字，我整个人都不好了。</p>
+<p>它除了告诉我系统出问题了，没有任何有价值的信息。</p>
+<p>这往往是程序员一天苦逼生活的开始。</p>
+<p>我们获取不到任何有价值的信息，只能到处抓虾。</p>
+<p>先看看系统负载，嗯，没问题。</p>
+<p>再看看错误日志，一大堆日志滚来滚去，也看不出所以然。</p>
+<p>于是我们不得不求助运营同学：“去要一下用户手机号或者账号，手机型号、版本，最好能录个频！”</p>
+<p>等了半天，运营妹妹终于搞来了这些信息，于是我们又一顿各种查日志，然后盯着代码一行一行找，最终发现了 bug 所在。</p>
+<p><br><br></p>
+<h3 id="为什么会有系统异常">为什么会有“系统异常”？</h3>
+<p>喜欢将对外错误信息一股脑写成“系统异常”的，一般处于以下几种原因：</p>
+<ol>
+<li>刚入行的小白，尚未深入体验程序员的苦难生活。</li>
+<li>“敏感信息”信徒，对他们来说，任何系统错误信息都属于敏感信息，需要“包装”一下。</li>
+<li>高敏行业，公司强制要求。</li>
+</ol>
+<p>我见过一些系统是这样处理的：</p>
+<pre><code>class BaseController {
+    errorHandler(err) {
+        this.response.sendJSON({code: 500, message: '系统异常'})
+    }
+}
+</code></pre>
+<p>意思是，该系统的所有 throws 都被转成“系统异常”！</p>
+<p>关键还连个日志都不记录！</p>
+<p>后续的开发人员为了方便定位错误，便在业务层代码里面各种 log，业务代码惨不忍睹。</p>
+<p><br><br></p>
+<h3 id="系统异常爱好者们的改进措施">“系统异常”爱好者们的改进措施</h3>
+<p>上面那种极端的代码是比较少见的，一般遇到更多的是这样：</p>
+<pre><code>class BaseController {
+    errorHandler(err) {
+        // 生成异常标识并记录日志
+        let flag = random()
+        log(err, flag)
+        this.response.sendJSON({"code": 500, "message": `系统异常(${flag})`})
+    }
+}
+</code></pre>
+<p>给系统异常后面带了个 flag 标识，当出现问题时，根据标识就能快速定位日志来排查问题了，对于有完善日志系统（如 ELK）的项目来说已经大大改善了程序员们的生存状况。</p>
+<p>但上面的代码有什么问题呢？</p>
+<p>试想某支付逻辑有如下代码：</p>
+<pre><code>if (balance &lt; amount) {
+    throw new NotEnoughException('卡余额不足')
+}
+</code></pre>
+<p>余额不足，很常见的场景，但用户看到的是这样的提示：“系统异常(1877618)”。</p>
+<p>此时，我不知道用户和程序员有没有崩溃，至少你的老板是崩溃的。</p>
+<p><br><br></p>
+<h3 id="系统异常们的终结错误码们横空出现">“系统异常”们的终结：“错误码”们横空出现</h3>
+<p>“系统异常”们搞出的事情令人猿共愤，如今这些信徒已经不多了，要么迫于压力改邪归正了，要么被主管开除殆尽了。</p>
+<p>如今，你更可能遇到的是这样的代码：</p>
+<p>配置文件：</p>
+<pre><code>// 全局：定义统一的错误码和错误文字
+const OK = 200
+const SYS_ERR = 500
+const NOT_FOUND = 404
+const NOT_ENOUGH = 405
+
+const map = {
+    200: "OK",
+    500: "系统错误",
+    404: "未找到资源",
+    405: "余额不足",
+}
+
+// 错误码转文字
+function error(code) {
+    return map[code]
+}
+</code></pre>
+<p>业务层代码：</p>
+<pre><code>...
+if (balance &lt; amount) {
+    // 该自定义异常类仅允许传入错误码，内部根据 error() 函数转文字
+    throw new MyException(NOT_ENOUGH)
+}
+</code></pre>
+<p>控制器：</p>
+<pre><code>class BaseController {
+    errorHandler(err) {
+        log(err)
+        this.response.sendJSON({"code": err.code, "message": err.message})
+        // 或者：this.response.sendJSON({"code": err.code, "message": error(err.code)})
+    }
+}
+</code></pre>
+<p>这种错误处理原则是<strong>通过错误码统一整个项目的 code 和 message</strong>，开发人员不能在程序中自己定义错误描述。</p>
+<p>我称这类程序员为”错误码“信徒。</p>
+<p>“错误码”们主要的担心是：如果让开发人员自己在代码里面定义错误描述，会导致“哈莫雷特”问题，即每个人的描述可能都不一样，而且有可能会导致敏感信息泄露。</p>
+<p>相对于“系统异常”们，“错误码”们已经有了长足的进步，大家终于知道系统发生了什么样的错误，老板们也不用担心因客户卡余额不足导致的“系统异常”砸了品牌形象了。</p>
+<p>从此人猿共欢了！</p>
+<p>从此人猿共欢了？</p>
+<p>用户购买 500 元商品时提示“卡余额不足”，但更好的提示应该是“卡余额不足，当前可用余额 420.00”。</p>
+<p>当根据 userId 查不到用户信息时，应该提示“用户不存在”，但不能保证开发人员因不想定义新 code 而直接使用 404（未找到资源）。</p>
+<p>错误码机制的问题是其<strong>文字提示过于笼统</strong>，导致在某些错误场景下丢失重要价值信息（进而导致问题排查上的困难，问题迟迟得不到解决），另一些场景下则带来不好的用户体验。</p>
+<p>对于开发人员来说，它会带来两种效果：一些开发人员不想新定义一大堆错误码，于是将就着使用现有的错误码，导致错误提示不伦不类；另外一些开发人员则倾向于定义大量的错误码，几乎每处异常都定义一个新错误码（理由是每处异常文字提示都不一样），最终导致错误码失控。</p>
+<p><br><br></p>
+<h3 id="错误码们的改进">“错误码”们的改进</h3>
+<p>改进其实很简单，就是允许异常类传入自定义描述：</p>
+<pre><code>// 增加了可选参数 message，允许传入自定义描述
+class MyException(code, message = '') {
+    ...
+}
+</code></pre>
+<p>期望程序中有如下调用：</p>
+<pre><code>if (balance &lt; amount) {
+    throw new MyException(NOT_ENOUGH, '卡余额不足，当前可用余额' + balance)
+}
+</code></pre>
+<p>但你会惊奇地发现，大部分地方仍旧是这样调的：</p>
+<pre><code>if (balance &lt; amount) {
+    throw new MyException(NOT_ENOUGH)
+}
+</code></pre>
+<p>“错误码”们忽略了很重要的心理学上的问题。</p>
+<p>人都是有惰性的，如果你提供了偷懒的途径，他没有理由不偷懒。</p>
+<p><br><br></p>
+<h3 id="反错误码们我们追求自由">反“错误码”们：我们追求自由</h3>
+<p>和“系统异常”们以及“错误码”们力求严格限制系统输出不同，“自由派”追求极致的自由，code 和 message 都不用约束，开发人员想怎么写就怎么写。</p>
+<p>所以你可能在多个地方看到“卡余额不足”的错误，但每个的错误码都不同（可能是不同的人写的，也可能是同一个开发人员在不同时期写的，甚至是同一个人在同一天写的，写的时候完全看心情）。</p>
+<p>自由派的做法对于错误提示是有好处的，开发人员可以尽情地定制个性化的提示内容，当系统出现异常时能根据现场提示很快定位错误所在。不过由于错误码是随性写的，对于依赖错误码的调用方（系统）并不友好。一些系统需要依据 API 返回的错误码做一些特殊逻辑处理，当调用方认为 405 表示余额不足，然而过几天又来个 503 的余额不足时，调用方程序员的内心肯定是崩溃的。</p>
+<p><br><br></p>
+<h3 id="中庸之道">中庸之道</h3>
+<p>本人的异常处理原则是：<strong>强制固定 code、自定义 message</strong>。</p>
+<p>要想设计出“人猿共欢”的异常处理机制，必须先搞清楚谁需要用到这些信息。</p>
+<p><strong>异常信息的第一使用者是人</strong>，这里包括使用者（用户）和异常处理者（运营人员、程序员）。</p>
+<p>细分一下，异常又分为<strong>业务异常</strong>和<strong>系统 bug</strong>。</p>
+<p>业务异常是指业务流程中的异常场景，如支付时卡余额不足导致无法支付、用券时发现券不符合使用条件、用户执行了某个未授权的操作等。这类异常的触发者是用户自己（而不是系统），信息受众是用户。所以业务异常的信息提示必须注重用户体验，优秀的提示文字至少要做到以下几点：</p>
+<ol>
+<li>尊重用户，不要让用户感觉受到冒犯或戏谑（请慎用自认为很“幽默”的话语）；</li>
+<li>清晰，应包含触发异常的关键信息（如当余额不足时应提示当前余额是多少）；</li>
+<li>具备指引性，用户看了之后清楚该怎么做；</li>
+</ol>
+<p>第二类异常是系统 bug，如接口超时、非预期参数导致程序崩溃、代码逻辑 bug 等。该类异常的触发者是系统（或者说开发系统的程序员），信息受众是程序员。所以 bug 类型异常的信息提示必须对程序员友好，让程序员看到错误提示后能够快速定位到问题的原因、代码所在的位置。</p>
+<p>我们说异常，一般就是指 bug 型异常，这类异常占程序员的精力也是最多的，也最值得优化处理机制。</p>
+<p>bug 型异常具有如下特征：</p>
+<ol>
+<li>不可控性。没有程序员会主动去写 bug，但没有哪个系统完全没有 bug。我们无法预知 bug 到底来自哪里、会有什么样的提示信息；</li>
+<li>定位困难。当系统提示“余额不足”时，我们很快知道是用户卡没钱了，但当系统提示“参数类型错误”时，我们往往只能一脸懵逼；</li>
+<li>可能涉及敏感信息。如 SQL 操作错误时可能会将整个 SQL 语句暴露给外界；</li>
+</ol>
+<p>因而优秀的 bug 型异常处理机制应做到：</p>
+<ol>
+<li>提示信息对程序员友好；</li>
+<li>记录函数调用栈信息；</li>
+<li>脱敏。</li>
+</ol>
+<p>提示信息对程序员友好，可能意味着对用户并不友好，一些程序员正是据此以“用户体验”之名将 bug 提示信息转换成了“对用户友好”的提示文案，结果是所有人看了都云里雾里。</p>
+<p>我的观点是：bug 型异常压根不用考虑用户体验。</p>
+<p>为啥？</p>
+<p>因为系统出 bug 本身已经是非常糟糕的用户体验了，用户不会因诸如“哎呀，系统开小差了”之类的废话就变得好受些，用户真正关心的是尽快能正常下单。</p>
+<p>此时的当务之急是快速修复 bug，所以提示文案的定位功能就非常重要，一段纯技术性的文字，对于用户来说可能是天书，但对于程序员很实用。</p>
+<p>然而，这不意味着给到用户端的错误提示就可以为所欲为。如果我们为了方便定位便将整个程序调用栈 alert 出来，虽然可能并不会进一步拉低用户体验，但至少给人的感觉是不专业，而且过多的信息也意味着很容易暴露敏感信息（如程序路径、软件版本、SQL 语句），如果对方是个黑客，你只能自祈多福了。</p>
+<p>另外要注重脱敏。大部分框架在数据库操作失败时，其 message 信息中都会包含诸如 SQL 语句之类的敏感信息，这类信息不可暴露到外面。</p>
+<p>综上，我们可以采取<strong>文案+日志</strong>的策略，文案中包含关键信息，日志中包含详细信息（包括调用栈信息）。</p>
+<p>大部分的 DB 库抛出的异常都有共同基类（如 DBException），我们可以针对这类异常做脱敏处理。</p>
+<blockquote>
+<p>这也告诉我们另一件事：当我们自己开发公共库时，最好为该库定义一个统一基类异常，这样当使用者想要特殊处理该库抛出的所有异常时不至于狗咬刺猬无处下牙了。</p>
+</blockquote>
+<p>另外，有些团队并不想记录业务型异常的调用栈信息（“卡余额不足”时，调用栈信息并无多大意义）。我们可以在框架层面定义个业务异常基类：BusinessException，异常处理时不记录该类型的调用栈信息。</p>
+<p><strong>异常信息的另一个使用者是系统</strong>。包括其他服务、前端 js 脚本等。</p>
+<p>我见过类似这样的代码：</p>
+<pre><code>try {
+    ...
+} catch (e) {
+    switch (e.message) {
+        case '用户不存在':
+            ...
+        case ...
+    }
+}
+</code></pre>
+<p>如果某个后端程序员哪天心血来潮将“用户不存在”改成“用户信息不存在”，系统就崩了。</p>
+<p>写出如此脆弱系统的程序员应该被钉到 1024 号耻辱柱上！</p>
+<p>不过，在钉钉子之前，我们应该倾听一下他那痛苦的心声：接口返回的错误码实在是杂乱无章，光“用户不存在”的错误码就有八个，说不定未来还会增加。为“系统稳定性”考虑，最终选择匹配 message。</p>
+<p>好吧，应该将后端程序员一起钉上去！</p>
+<p>系统只会，也只应该关注错误码。所以和 message 的随意性不同，code 应具备相当的稳定性。</p>
+<p>同一个系统，如果 406 表示“用户不存在”，就绝不应该再用其他值（如 604）表示相同的含义。</p>
+<p>另外，“code 面向系统”这一特点也要求 <strong>code 定义的是某一类异常（而不是某一个异常）</strong>。例如“订单创建失败”是一类异常，在业务代码中针对不同的失败原因有不同的 message，但其 code 都是一样的。</p>
+<p>然而人类对数字并不敏感，要不同的程序员都保证写 <code>throw new Exception('用户不存在', 406)</code>（而不是写<code>throw new Exception('用户不存在', 604)</code>）是不可能的。</p>
+<p>所以需要将数字文本化，也就是定义错误码常量：</p>
+<pre><code>const USER_NOT_EXISTS = 406
+</code></pre>
+<p>代码中只能使用错误码常量：</p>
+<pre><code>throw new Exception('用户不存在', USER_NOT_EXISTS)
+</code></pre>
+<p>禁止使用字面量。</p>
+<p>不过上面这段 throw 并不理想，首先默认类型 Exception 并不具备业务语义，另外开发人员如果硬是用数字字面量谁也没办法。更可取的方式是针对每种类型异常定义单独的异常类，该异常类仅允许传入 message，类内部自行绑定 code：</p>
+<pre><code>// 用户不存在
+class UserNotExistsException extends Exception { 
+    constructor(message) {
+        super(message)
+        
+        this.code = ErrCode.USER_NOT_EXISTS
+    }
+}
+</code></pre>
+<p>使用：</p>
+<pre><code>if (!User.find(uid)) {
+    // 此写法更具表达性，而且开发人员无需关注错误码
+    throw new UserNotExistsException(`用户不存在(uid:${uid})`)
+}
+</code></pre>
+<p><br><br></p>
+<h3 id="异常捕获机制伪代码示例">异常捕获机制伪代码示例</h3>
+<p>先总结一下中庸主义的异常捕获机制特点：</p>
+<ol>
+<li>强制开发人员自己编写异常描述文案；</li>
+<li>整个项目强制使用统一的错误码定义；</li>
+<li>为业务型异常定义单独的基类；</li>
+<li>关键信息脱敏处理；</li>
+</ol>
+<p><strong>统一错误码定义：</strong></p>
+<pre><code>const OK = 200
+const SYS_ERR = 500
+const NOT_FOUND = 404
+const NOT_ENOUGH = 405
+const USER_NOT_EXISTS = 406
+...
+</code></pre>
+<p><strong>业务异常基类：</strong></p>
+<pre><code>class BussinessException extends Exception {
+    ...
+}
+</code></pre>
+<p><strong>异常类定义：</strong></p>
+<pre><code>class UserNotExistsException extends BussinessException {
+    constructor(message) {
+        super(message)
+        
+        this.code = ErrCode.USER_NOT_EXISTS
+    }
+}
+
+...
+</code></pre>
+<p><strong>业务层使用：</strong></p>
+<pre><code>...
+if (!User.find(uid)) {
+    throw new UserNotExistsException(`用户不存在(uid:${uid})`)
+}
+...
+</code></pre>
+<p><strong>控制器基类捕获异常</strong></p>
+<pre><code>class BaseController {
+    ...
+    
+    errorHandler(err) {
+        // 是否业务型异常
+        const isBussError = err instanceof BussinessException
+        // 是否数据库异常
+        const isDBError = err instanceof DBException
+        // 生成用于跟踪异常日志的随机串
+        const flag = isBussError ? '' : random()
+        
+        let message = err.message
+        if (isDBError) {
+            // 数据库异常，脱敏
+            message = `数据异常(flag:${flag})`
+        } else if (!isBussError) {
+            // 非业务型异常记录 flag 标识
+            message += `(flag:${flag})`
+        }
+        
+        // 记录日志（日志要记录原始的 message）
+        log(err.message, isBussError ? '' : err.stackTrace(), flag)
+        
+        // 返回给调用端
+        this.response.sendJSON({"code": err.code, "message": message})
+    }
+    
+    function log(message, stackTrace, flag) {
+        ...
+    }
+    ...
+}
+</code></pre>
+<p><br><br></p>
+<h3 id="基于约定的异常处理机制">基于约定的异常处理机制</h3>
+<p>即便框架层提供了完善的异常处理机制，你还是无法阻止开发人员写这样的代码：</p>
+<pre><code>if (!User.find(uid)) {
+    throw new Exception(’系统异常‘, 500)
+}
+</code></pre>
+<p>一行代码就给你打回原形！</p>
+<p>所以异常处理机制是基于约定的（团队公约）。</p>
+<p>技术 Leader 必须对全员做系统的培训，并公开制定团队代码规范，对不符合规范的 pull request 坚决打回，对屡教不改的要进行“小黑屋谈话”！</p>
+
+</div>
+<div id="MySignature" role="contentinfo">
+    左手技术，右手历史，欢迎关注公众号”编码胡同“，订阅最新文章。
+</div>
+<div class="clear"></div>
+<div id="blog_post_info_block" role="contentinfo">
+    <div id="blog_post_info"></div>
+    <div class="clear"></div>
+    <div id="post_next_prev"></div>
+</div>
+            </div>
+            <div class="postDesc">posted @ 
+<span id="post-date" data-last-update-days="464.72362599970484" data-date-created="BlogServer.Application.Dto.BlogPost.BlogPostDto" data-date-updated="2023-02-14 17:19">2023-02-14 17:04</span>&nbsp;
+<a href="https://www.cnblogs.com/linvanda">林子er</a>&nbsp;
+阅读(<span id="post_view_count">10345</span>)&nbsp;
+评论(<span id="post_comment_count">17</span>)&nbsp;
+<a href="https://i.cnblogs.com/EditPosts.aspx?postid=17120205" rel="nofollow">编辑</a>&nbsp;
+<a href="javascript:void(0)" onclick="AddToWz(17120205);return false;">收藏</a>&nbsp;
+<a href="javascript:void(0)" onclick="reportManager.report({ currentUserId: '', targetType: 'blogPost', targetId: '17120205', targetLink: 'https://www.cnblogs.com/linvanda/p/17120205.html', title: '我已经受够了“系统异常”！' })">举报</a>
+</div>
+        </div>
+	    
+	    
+    </div><!--end: topics 文章、评论容器-->
+</div>
+<script>
+    var cb_entryId = 17120205, cb_entryCreatedDate = '2023-02-14 17:04', cb_postType = 1, cb_postTitle = '我已经受够了“系统异常”！';
+    var allowComments = true, cb_blogId = 593879, cb_blogApp = 'linvanda', cb_blogUserGuid = '9b926585-c1ee-4e72-9372-08d7d7b52bb0';
+    mermaidRender.render()
+    markdown_highlight()
+    zoomManager.apply("#cnblogs_post_body img:not(.code_img_closed):not(.code_img_opened)");    
+</script>
+<a id="!comments"></a>
+<div id="blog-comments-placeholder"></div>
+<div id="comment_form" class="commentform">
+    <a name="commentform"></a>
+    <div id="divCommentShow"></div>
+    <div id="comment_nav">
+            <a class="comment-nav-left forpc" href="https://cnblogs.vip/" target="_blank">会员力量，点亮园子希望</a>
+        <div class="comment-nav-right">
+            <span id="span_refresh_tips"></span><a href="#" onclick="return RefreshPage();">刷新页面</a><a href="#top">返回顶部</a>
+        </div>
+    </div>
+    <div id="comment_form_container"></div>
+    <div class="ad_text_commentbox" id="ad_text_under_commentbox"></div>
+        <div id="cnblogs_ch"></div>
+    <div id="opt_under_post"></div>
+        <div id="cnblogs_c1" class="under-post-card">
+            <a href="https://www.finclip.com?channel=cnblog2024" rel="nofollow" target="_blank" onclick="countCreativeClicks('C1-凡泰极客')">
+                <img src="https://img2024.cnblogs.com/blog/35695/202405/35695-20240517155930267-114888508.jpg" onload="countCreativeImpressions('C1-凡泰极客')" alt="" />
+                <span id="c1_impression" style="display:none"></span>
+            </a>
+        </div>
+    <div id="under_post_card1"></div>
+    <div id="under_post_card2"></div>
+    <div id="HistoryToday" class="under-post-card"></div>
+    <script type="text/javascript">
+        var commentManager = new blogCommentManager();
+        commentManager.renderComments(0);
+        fixPostBody();
+        window.footnoteTipManager.generateFootnoteTips();
+
+            window.tocManager.displayDisableTocTips = false;
+            window.tocManager.generateToc();
+            
+                setTimeout(function() { countViews(cb_blogId, cb_entryId); }, 50);
+            
+            deliverT2();
+            deliverC1C2();
+            loadNewsAndKb();
+            
+                LoadPostCategoriesTags(cb_blogId, cb_entryId);
+            
+            LoadPostInfoBlock(cb_blogId, cb_entryId, cb_blogApp, cb_blogUserGuid);
+            GetPrevNextPost(cb_entryId, cb_blogId, cb_entryCreatedDate, cb_postType);
+            loadOptUnderPost();
+            GetHistoryToday(cb_blogId, cb_blogApp, cb_entryCreatedDate);
+                </script>
+</div>
+
+	</div><!--end: forFlow -->
+	</div><!--end: mainContent 主体内容容器-->
+	<div id="sideBar">
+		<div id="sideBarMain">
+			<div id="sidebar_news" class="newsItem">
+    <h3 class="catListTitle">公告</h3>
+<div id="blog-news">    
+    <div id="sidebar_news_content">
+    </div>
+</div>
+<script>loadBlogNews();</script>
+
+ 
+</div>
+<div id="sidebar_c3"></div>
+			<div id="blog-calendar" style="display:none"></div><script>loadBlogDefaultCalendar();</script>			
+			<div id="leftcontentcontainer">
+				<div id="blog-sidecolumn"></div>
+                    <script>loadBlogSideColumn();</script>
+			</div>			
+		</div><!--end: sideBarMain -->
+	</div><!--end: sideBar 侧边栏容器 -->
+	<div class="clear"></div>
+	</div><!--end: main -->
+	<div class="clear"></div>
+	<div id="footer">
+		<!--done-->
+Copyright &copy; 2024 林子er
+<br /><span id="poweredby">Powered by .NET 8.0 on Kubernetes</span>
+
+
+
+	</div><!--end: footer -->
+</div><!--end: home 自定义的最大容器 -->
+
+
+
+    
+
+    <input type="hidden" id="antiforgery_token" value="CfDJ8ONv0caE5GtEh3YJ5j088kkZoiXsBIJW_IkIDptqwZmUIMxek0z7BfJPlL0PDTNFHZ-QuwKAEfzKEzb0E7jnt0zLLx9g16rYTA67Ew09zxDPVHmvaAazr5B6Pn0J9ETh3Z78zk6fFRflTW2EtGxrypY" />
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-M95P3TTWJZ"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-M95P3TTWJZ');
+</script>
+<script defer src="https://hm.baidu.com/hm.js?866c9be12d4a814454792b1fd0fed295"></script>
+</body>
+</html>

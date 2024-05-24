@@ -1,0 +1,382 @@
+﻿<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="referrer" content="origin-when-cross-origin" />
+    <meta name="description" content="Semantic Kernel 是一种轻量级应用开发框架，用于快速开发融合 LLM AI的现代应用。 此系列文章，将会从传统软件开发者的角度，逐步认识Semantic Kernel，并了解其核心概念和基本的使用方法。 &amp;#128760;LLM降临的时代 &amp;#129668;LLM的魔法 &amp;#12829" />
+    <meta property="og:description" content="Semantic Kernel 是一种轻量级应用开发框架，用于快速开发融合 LLM AI的现代应用。 此系列文章，将会从传统软件开发者的角度，逐步认识Semantic Kernel，并了解其核心概念和基本的使用方法。 &amp;#128760;LLM降临的时代 &amp;#129668;LLM的魔法 &amp;#12829" />
+    <meta http-equiv="Cache-Control" content="no-transform" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Semantic Kernel &amp; Kernel Memory 入门系列 ❤️‍&#128293; - 宵伯特 - 博客园</title>
+    <link rel="canonical" href="https://www.cnblogs.com/xbotter/p/semantic_kernel_introduction.html" />
+    <link rel="shortcut icon" id="favicon" href="//assets.cnblogs.com/favicon.svg?v=2" type="image/svg+xml" />
+    
+    <link rel="stylesheet" href="/css/blog-common.min.css?v=JnYHs5HAUCOVmwbxBNuH-ED7ggVDfqtff-pdhyndpr8" />
+    
+
+    <link id="MainCss" rel="stylesheet" href="/skins/simplememory/bundle-simplememory.min.css?v=SiaEEyuLLyqQ30U6p0_gAunDLOqZtbt7kF5APbDruVo" />
+        <link media="(prefers-color-scheme: light)" id="highlighter-theme-default" type="text/css" rel="stylesheet" href="/css/hljs/default.css?v=k11Kc9dBmT05-stOE4FqDNFwAkAtHav-5i1KGJanwgI" />
+        <link media="(prefers-color-scheme: dark)" id="highlighter-theme-vs2015-dark" type="text/css" rel="stylesheet" href="/css/hljs/vs2015.css?v=CW_0vf5ci1rUGokoTVmmkav1K7xe6lNGyjWNwugPUFg" />
+    
+    <link type="text/css" rel="stylesheet" href="/css/fonts/CascadiaCode-SemiLight.min.css" />
+    <link id="mobile-style" media="only screen and (max-width: 767px)" type="text/css" rel="stylesheet" href="/skins/SimpleMemory/bundle-simplememory-mobile.min.css?v=20avRjbdbr8kYqxlGwdQXCDadIqpdIPaT1DzHC6hI9w" />
+    
+    <link type="application/rss+xml" rel="alternate" href="https://www.cnblogs.com/xbotter/rss" />
+    <link type="application/rsd+xml" rel="EditURI" href="https://www.cnblogs.com/xbotter/rsd.xml" />
+    <link type="application/wlwmanifest+xml" rel="wlwmanifest" href="https://www.cnblogs.com/xbotter/wlwmanifest.xml" />
+    <script>
+        var currentBlogId = 775976;
+        var currentBlogApp = 'xbotter';
+        var isLogined = false;
+        var isBlogOwner = false;
+        var skinName = 'SimpleMemory';
+        var visitorUserId = '';
+        var hasCustomScript = false;
+        window.cb_enable_mathjax = true;
+        window.mathEngine = 1;
+        window.codeHighlightEngine = 1;
+        window.enableCodeLineNumber = true;
+        window.codeHighlightTheme = 'default';
+        window.darkModeCodeHighlightTheme = 'vs2015';
+        window.isDarkCodeHighlightTheme = false;
+        window.isDarkModeCodeHighlightThemeDark = true;
+        window.isDisableCodeHighlighter = false;
+        window.enableCodeThemeTypeFollowSystem = true;
+        window.enableMacStyleCodeBlock = false;
+    </script>
+        <script>
+            window.currentPostId = 17324067;
+            window.currentPostDateAdded = '2023-04-16 21:07';
+        </script>
+    <script src="https://assets.cnblogs.com/scripts/jquery-3.3.1.min.js"></script>
+    <script src="https://cdn-www.cnblogs.com/js/blog-common.min.js?v=e7iDdKE0ie8Fi0lKgiYt7eXqsQNrVeJmcEHX6zqQWKc"></script>
+    
+</head>
+<body class="skin-simplememory has-navbar mathjax3">
+    <a name="top"></a>
+    <div id="top_nav" class="navbar forpc">
+        <nav id="nav_main" class="navbar-main">
+            <ul id="nav_left" class="navbar-list navbar-left">
+                <li class="navbar-branding">
+                    <a href="https://www.cnblogs.com/" title="开发者的网上家园" role="banner">
+                        <img src="//assets.cnblogs.com/logo.svg" alt="博客园Logo" />
+                    </a>
+                </li>
+                <li><a href="https://cnblogs.vip/">会员</a></li>
+                <li><a href="https://cnblogs.vip/store">周边</a></li>
+                <li>
+                    <a href="https://news.cnblogs.com/" onclick="countClicks('nav', 'skin-navbar-news')">新闻</a>
+                </li>
+                <li>
+                    <a href="https://q.cnblogs.com/" onclick="countClicks('nav', 'skin-navbar-q')">博问</a>
+                </li>
+                    <li>
+                        <a href="https://www.cnblogs.com/cmt/p/18172236" target="_blank">融资</a>
+                    </li>
+                <li><a href="https://market.cnblogs.com" target="_blank">云市场</a></li>
+            </ul>
+            <ul id="nav_right" class="navbar-list navbar-right">
+                <li>
+                    <form id="zzk_search" class="navbar-search dropdown" action="https://zzk.cnblogs.com/s" method="get" role="search">
+                        <input name="w" id="zzk_search_input" placeholder="代码改变世界" type="search" tabindex="3" autocomplete="off" />
+                        <button id="zzk_search_button" onclick="window.navbarSearchManager.triggerActiveOption()">
+                            <img id="search_icon" class="focus-hidden" src="//assets.cnblogs.com/icons/search.svg" alt="搜索" />
+                            <img class="hidden focus-visible" src="//assets.cnblogs.com/icons/enter.svg" alt="搜索" />
+                        </button>
+                        <ul id="navbar_search_options" class="dropdown-menu quick-search-menu">
+                            <li tabindex="0" class="active" onclick="zzkSearch(event, document.getElementById('zzk_search_input').value)">
+                                <div class="keyword-wrapper">
+                                    <img src="//assets.cnblogs.com/icons/search.svg" alt="搜索" />
+                                    <div class="keyword"></div>
+                                </div>
+                                <span class="search-area">所有博客</span>
+                            </li>
+                                    <li tabindex="1" onclick="zzkBlogSearch(event, 'xbotter', document.getElementById('zzk_search_input').value)">
+                                        <div class="keyword-wrapper">
+                                            <img src="//assets.cnblogs.com/icons/search.svg" alt="搜索" />
+                                            <div class="keyword"></div>
+                                        </div>
+                                        <span class="search-area">当前博客</span>
+                                    </li>
+                        </ul>
+                    </form>
+                </li>
+                <li id="navbar_login_status" class="navbar-list">
+                    <a class="navbar-user-info navbar-blog" href="https://i.cnblogs.com/EditPosts.aspx?opt=1" alt="写随笔" title="写随笔">
+                        <img id="new_post_icon" class="navbar-icon" src="//assets.cnblogs.com/icons/newpost.svg" alt="写随笔" />
+                    </a>
+                    <a id="navblog-myblog-icon" class="navbar-user-info navbar-blog" href="https://passport.cnblogs.com/GetBlogApplyStatus.aspx" alt="我的博客" title="我的博客">
+                        <img id="myblog_icon" class="navbar-icon" src="//assets.cnblogs.com/icons/myblog.svg" alt="我的博客" />
+                    </a>
+                    <a class="navbar-user-info navbar-message navbar-icon-wrapper" href="https://msg.cnblogs.com/" alt="短消息" title="短消息">
+                        <img id="msg_icon" class="navbar-icon" src="//assets.cnblogs.com/icons/message.svg" alt="短消息" />
+                        <span id="msg_count" style="display: none"></span>
+                    </a>
+                    <a id="navbar_lite_mode_indicator" data-current-page="blog" style="display: none" href="javascript:void(0)" alt="简洁模式" title="简洁模式启用，您在访问他人博客时会使用简洁款皮肤展示">
+                        <img class="navbar-icon" src="//assets.cnblogs.com/icons/lite-mode-on.svg" alt="简洁模式" />
+                    </a>
+                    <div id="user_info" class="navbar-user-info dropdown">
+                        <a class="dropdown-button" href="https://home.cnblogs.com/">
+                            <img id="user_icon" class="navbar-avatar" src="//assets.cnblogs.com/icons/avatar-default.svg" alt="用户头像" />
+                        </a>
+                        <div class="dropdown-menu">
+                            <a id="navblog-myblog-text" href="https://passport.cnblogs.com/GetBlogApplyStatus.aspx">我的博客</a>
+                            <a href="https://home.cnblogs.com/">我的园子</a>
+                            <a href="https://account.cnblogs.com/settings/account">账号设置</a>
+                            <a href="javascript:void(0)" id="navbar_lite_mode_toggle" title="简洁模式会使用简洁款皮肤显示所有博客">
+    简洁模式 <img id="navbar_lite_mode_on" src="/images/lite-mode-check.svg" class="hide" /><span id="navbar_lite_mode_spinner" class="hide">...</span>
+</a>
+                            <a href="javascript:void(0)" onclick="account.logout();">退出登录</a>
+                        </div>
+                    </div>
+                    <a class="navbar-anonymous" href="https://account.cnblogs.com/signup">注册</a>
+                    <a class="navbar-anonymous" href="javascript:void(0);" onclick="account.login()">登录</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    
+
+    <!--done-->
+<div id="home">
+<div id="header">
+	<div id="blogTitle">
+        <a id="lnkBlogLogo" href="https://www.cnblogs.com/xbotter/"><img id="blogLogo" src="/skins/custom/images/logo.gif" alt="返回主页" /></a>		
+		
+<!--done-->
+<h1><a id="Header1_HeaderTitle" class="headermaintitle HeaderMainTitle" href="https://www.cnblogs.com/xbotter">XBOTTER‘s</a>
+</h1>
+<h2>cnblog</h2>
+
+
+
+
+		
+	</div><!--end: blogTitle 博客的标题和副标题 -->
+	<div id="navigator">
+		
+<ul id="navList">
+<li><a id="blog_nav_sitehome" class="menu" href="https://www.cnblogs.com/">
+博客园</a>
+</li>
+<li>
+<a id="blog_nav_myhome" class="menu" href="https://www.cnblogs.com/xbotter/">
+首页</a>
+</li>
+<li>
+
+<a id="blog_nav_newpost" class="menu" href="https://i.cnblogs.com/EditPosts.aspx?opt=1">
+新随笔</a>
+</li>
+<li>
+<a id="blog_nav_contact" class="menu" href="https://msg.cnblogs.com/send/%E5%AE%B5%E4%BC%AF%E7%89%B9">
+联系</a></li>
+<li>
+<a id="blog_nav_rss" class="menu" href="javascript:void(0)" data-rss="https://www.cnblogs.com/xbotter/rss/">
+订阅</a>
+<!--<partial name="./Shared/_XmlLink.cshtml" model="Model" /></li>--></li>
+<li>
+<a id="blog_nav_admin" class="menu" href="https://i.cnblogs.com/">
+管理</a>
+</li>
+</ul>
+
+
+		<div class="blogStats">
+			<div id="blog_stats_place_holder"><script>loadBlogStats();</script></div>
+		</div><!--end: blogStats -->
+	</div><!--end: navigator 博客导航栏 -->
+</div><!--end: header 头部 -->
+<div id="main">
+	<div id="mainContent">
+	<div class="forFlow">
+		<div id="post_detail">
+    <!--done-->
+    <div id="topics">
+        <div class="post">
+            <h1 class = "postTitle">
+                <a id="cb_post_title_url" class="postTitle2 vertical-middle" href="https://www.cnblogs.com/xbotter/p/semantic_kernel_introduction.html" title="发布于 2023-04-16 21:07">
+    <span role="heading" aria-level="2">Semantic Kernel &amp; Kernel Memory 入门系列 ❤️‍&#128293;</span>
+    
+
+</a>
+
+            </h1>
+            <div class="clear"></div>
+            <div class="postBody">
+                    <div id="cnblogs_post_description" style="display: none">
+        
+        Semantic Kernel & Kernel Memory 学习入门文章合集
+    </div>
+<div id="cnblogs_post_body" class="blogpost-body cnblogs-markdown">
+<p>Semantic Kernel 是一种轻量级应用开发框架，用于快速开发融合 LLM AI的现代应用。</p>
+<p>此系列文章，将会从传统软件开发者的角度，逐步认识Semantic Kernel，并了解其核心概念和基本的使用方法。</p>
+<ol>
+<li><a href="https://www.cnblogs.com/xbotter/p/semantic_kernel_introduction_llm.html" target="_blank" rel="noopener">🛸LLM降临的时代</a></li>
+<li><a href="https://www.cnblogs.com/xbotter/p/semantic_kernel_introduction_llm_magic.html" target="_blank" rel="noopener">🪄LLM的魔法</a></li>
+<li><a href="https://www.cnblogs.com/xbotter/p/semantic_kernel_introducation_kernel_and_skills.html" target="_blank" rel="noopener">🔥Kernel 内核和🧂Plugins 插件</a></li>
+<li><a href="https://www.cnblogs.com/xbotter/p/semantic_kernel_introduction_semantic_function.html" target="_blank" rel="noopener">💬Semantic Function</a></li>
+<li><a href="https://www.cnblogs.com/xbotter/p/semantic_kernel_introduction_native_function.html" target="_blank" rel="noopener">💾Native Function</a></li>
+<li><a href="https://www.cnblogs.com/xbotter/p/semantic_kernel_introduction_memory_part_1.html" target="_blank" rel="noopener">🥑突破提示词的限制</a></li>
+<li><a href="https://www.cnblogs.com/xbotter/p/semantic_kernel_introduction_memory_part_2.html" target="_blank" rel="noopener">🥑Memory内存</a></li>
+<li><a href="https://www.cnblogs.com/xbotter/p/semantic_kernel_introduction_connector.html" target="_blank" rel="noopener">🍋Connector连接器</a></li>
+<li><a href="https://www.cnblogs.com/xbotter/p/semantic_kernel_introduction_planner.html" target="_blank" rel="noopener">📅 Planner 规划器</a></li>
+</ol>
+<p>如果您对RAG的实践和应用感兴趣，也可以关注Kernel Memory系列文章，带您了解如何应用RAG模式。</p>
+<ol>
+<li><a href="https://www.cnblogs.com/xbotter/p/kernel_memory_rag.html" target="_blank" rel="noopener">RAG 简介</a></li>
+<li><a href="https://www.cnblogs.com/xbotter/p/kernel_memory_embedding.html" target="_blank" rel="noopener">Embedding 简介</a></li>
+<li><a href="https://www.cnblogs.com/xbotter/p/kernel_memory_import.html" target="_blank" rel="noopener">文档预处理</a></li>
+<li><a href="https://www.cnblogs.com/xbotter/p/kernel_memory_quick_start.html" target="_blank" rel="noopener">快速开始</a></li>
+<li><a href="https://www.cnblogs.com/xbotter/p/kernel_memory_service.html" target="_blank" rel="noopener">Kernel Memory Service</a></li>
+<li><a href="https://www.cnblogs.com/xbotter/p/kernel_memory_summaries.html" target="_blank" rel="noopener">生成并获取文档摘要</a></li>
+<li><a href="https://www.cnblogs.com/xbotter/p/kernel_memory_document_tag.html" target="_blank" rel="noopener">文档的管理</a></li>
+<li><a href="https://www.cnblogs.com/xbotter/p/kernel_memory_custom_handler.html" target="_blank" rel="noopener">自定义处理流程</a></li>
+<li><a href="https://www.cnblogs.com/xbotter/p/kernel_memory_semantic_kernel_plugin.html" target="_blank" rel="noopener">Semantic Kernel 插件</a></li>
+<li><a href="https://www.cnblogs.com/xbotter/p/17941210/kernel_memory_async_pipeline" target="_blank" rel="noopener">异步管道</a></li>
+</ol>
+<p>相关学习资料：</p>
+<ul>
+<li>
+<p>Semantic Kernel Github 仓库<br>
+<a href="https://github.com/microsoft/semantic-kernel" target="_blank" rel="noopener">microsoft/semantic-kernel</a></p>
+</li>
+<li>
+<p>Semantic Kernel Microsoft Learn 文档<br>
+<a href="https://learn.microsoft.com/en-us/semantic-kernel/" target="_blank" rel="noopener">Semantic Kernel documentation | Microsoft Learn</a></p>
+</li>
+<li>
+<p>Semantic Kernel 团队博客<br>
+<a href="https://devblogs.microsoft.com/semantic-kernel/" target="_blank" rel="noopener">Semantic Kernel</a></p>
+</li>
+<li>
+<p><a href="https://microsoft.github.io/kernel-memory/" target="_blank" rel="noopener">Kernel Memory 在线文档</a></p>
+</li>
+<li>
+<p>John Meada 的SK Recipes<br>
+<a href="https://github.com/johnmaeda/SK-Recipes" target="_blank" rel="noopener">johnmaeda/SK-Recipes</a></p>
+</li>
+</ul>
+<p><img src="https://img2023.cnblogs.com/blog/758442/202304/758442-20230416204730019-536560080.png" alt="image" loading="lazy"></p>
+
+</div>
+<div class="clear"></div>
+<div id="blog_post_info_block" role="contentinfo">
+    <div id="blog_post_info"></div>
+    <div class="clear"></div>
+    <div id="post_next_prev"></div>
+</div>
+            </div>
+            <div class="postDesc">posted @ 
+<span id="post-date" data-last-update-days="55.556260496282405" data-date-created="BlogServer.Application.Dto.BlogPost.BlogPostDto" data-date-updated="2024-03-29 21:20">2023-04-16 21:07</span>&nbsp;
+<a href="https://www.cnblogs.com/xbotter">宵伯特</a>&nbsp;
+阅读(<span id="post_view_count">3696</span>)&nbsp;
+评论(<span id="post_comment_count">3</span>)&nbsp;
+<a href="https://i.cnblogs.com/EditPosts.aspx?postid=17324067" rel="nofollow">编辑</a>&nbsp;
+<a href="javascript:void(0)" onclick="AddToWz(17324067);return false;">收藏</a>&nbsp;
+<a href="javascript:void(0)" onclick="reportManager.report({ currentUserId: '', targetType: 'blogPost', targetId: '17324067', targetLink: 'https://www.cnblogs.com/xbotter/p/semantic_kernel_introduction.html', title: 'Semantic Kernel &amp;amp; Kernel Memory 入门系列 ❤️‍&amp;#128293;' })">举报</a>
+</div>
+        </div>
+	    
+	    
+    </div><!--end: topics 文章、评论容器-->
+</div>
+<script>
+    var cb_entryId = 17324067, cb_entryCreatedDate = '2023-04-16 21:07', cb_postType = 1, cb_postTitle = 'Semantic Kernel &amp; Kernel Memory 入门系列 ❤️‍&#128293;';
+    var allowComments = true, cb_blogId = 775976, cb_blogApp = 'xbotter', cb_blogUserGuid = 'd5768580-3cfc-e411-b908-9dcfd8948a71';
+    mermaidRender.render()
+    markdown_highlight()
+    zoomManager.apply("#cnblogs_post_body img:not(.code_img_closed):not(.code_img_opened)");    
+</script>
+<a id="!comments"></a>
+<div id="blog-comments-placeholder"></div>
+<div id="comment_form" class="commentform">
+    <a name="commentform"></a>
+    <div id="divCommentShow"></div>
+    <div id="comment_nav">
+            <a class="comment-nav-left forpc" href="https://cnblogs.vip/" target="_blank">会员力量，点亮园子希望</a>
+        <div class="comment-nav-right">
+            <span id="span_refresh_tips"></span><a href="#" onclick="return RefreshPage();">刷新页面</a><a href="#top">返回顶部</a>
+        </div>
+    </div>
+    <div id="comment_form_container"></div>
+    <div class="ad_text_commentbox" id="ad_text_under_commentbox"></div>
+        <div id="cnblogs_ch"></div>
+    <div id="opt_under_post"></div>
+        <div id="cnblogs_c1" class="under-post-card">
+            <a href="https://www.finclip.com?channel=cnblog2024" rel="nofollow" target="_blank" onclick="countCreativeClicks('C1-凡泰极客')">
+                <img src="https://img2024.cnblogs.com/blog/35695/202405/35695-20240517155930267-114888508.jpg" onload="countCreativeImpressions('C1-凡泰极客')" alt="" />
+                <span id="c1_impression" style="display:none"></span>
+            </a>
+        </div>
+    <div id="under_post_card1"></div>
+    <div id="under_post_card2"></div>
+    <div id="HistoryToday" class="under-post-card"></div>
+    <script type="text/javascript">
+        var commentManager = new blogCommentManager();
+        commentManager.renderComments(0);
+        fixPostBody();
+        window.footnoteTipManager.generateFootnoteTips();
+
+            window.tocManager.displayDisableTocTips = false;
+            window.tocManager.generateToc();
+            
+                setTimeout(function() { countViews(cb_blogId, cb_entryId); }, 50);
+            
+            deliverT2();
+            deliverC1C2();
+            loadNewsAndKb();
+            
+                LoadPostCategoriesTags(cb_blogId, cb_entryId);
+            
+            LoadPostInfoBlock(cb_blogId, cb_entryId, cb_blogApp, cb_blogUserGuid);
+            GetPrevNextPost(cb_entryId, cb_blogId, cb_entryCreatedDate, cb_postType);
+            loadOptUnderPost();
+            GetHistoryToday(cb_blogId, cb_blogApp, cb_entryCreatedDate);
+                </script>
+</div>
+
+	</div><!--end: forFlow -->
+	</div><!--end: mainContent 主体内容容器-->
+	<div id="sideBar">
+		<div id="sideBarMain">
+			
+<div id="sidebar_c3"></div>
+			<div id="blog-calendar" style="display:none"></div><script>loadBlogDefaultCalendar();</script>			
+			<div id="leftcontentcontainer">
+				<div id="blog-sidecolumn"></div>
+                    <script>loadBlogSideColumn();</script>
+			</div>			
+		</div><!--end: sideBarMain -->
+	</div><!--end: sideBar 侧边栏容器 -->
+	<div class="clear"></div>
+	</div><!--end: main -->
+	<div class="clear"></div>
+	<div id="footer">
+		<!--done-->
+Copyright &copy; 2024 宵伯特
+<br /><span id="poweredby">Powered by .NET 8.0 on Kubernetes</span>
+
+
+
+	</div><!--end: footer -->
+</div><!--end: home 自定义的最大容器 -->
+
+
+
+    
+
+    <input type="hidden" id="antiforgery_token" value="CfDJ8ONv0caE5GtEh3YJ5j088knV7qIlSkm9zyLDi2asDVIdAS_Cp5BO9A1cczsLiauJBmc6m3EC8ZohufWMoNWB8-UmsNbXtqYgr8AAN1chAUr2cFtNlQmmVDHCM357wH5IWCbC9BhWkvR0UQy_dxRwvJw" />
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-M95P3TTWJZ"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-M95P3TTWJZ');
+</script>
+<script defer src="https://hm.baidu.com/hm.js?866c9be12d4a814454792b1fd0fed295"></script>
+</body>
+</html>

@@ -1,0 +1,488 @@
+﻿<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="referrer" content="origin-when-cross-origin" />
+    <meta name="description" content="本文来自博客园，作者：T-BARBARIANS，博文严禁转载，转载必究！ 一、前言 近几年开发了一些大型的应用程序，在程序性能调优或者解决一些疑难杂症问题的过程中，遇到最多的还是与内存相关的一些问题。例如glibc内存分配器ptmalloc，google的内存分配器tcmalloc都存在“内存泄漏”" />
+    <meta property="og:description" content="本文来自博客园，作者：T-BARBARIANS，博文严禁转载，转载必究！ 一、前言 近几年开发了一些大型的应用程序，在程序性能调优或者解决一些疑难杂症问题的过程中，遇到最多的还是与内存相关的一些问题。例如glibc内存分配器ptmalloc，google的内存分配器tcmalloc都存在“内存泄漏”" />
+    <meta http-equiv="Cache-Control" content="no-transform" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>我的内存去哪了？ - T-BARBARIANS - 博客园</title>
+    <link rel="canonical" href="https://www.cnblogs.com/t-bar/p/17359545.html" />
+    <link rel="shortcut icon" id="favicon" href="//assets.cnblogs.com/favicon.svg?v=2" type="image/svg+xml" />
+    
+    <link rel="stylesheet" href="/css/blog-common.min.css?v=JnYHs5HAUCOVmwbxBNuH-ED7ggVDfqtff-pdhyndpr8" />
+    
+
+    <link id="MainCss" rel="stylesheet" href="/skins/codinglife/bundle-codinglife.min.css?v=BpDsZaqt3Vo17LmofajxibGWthTFRyeegD3DeE1U2E0" />
+        <link id="highlighter-theme-cnblogs" type="text/css" rel="stylesheet" href="/css/hljs/cnblogs.css?v=5J1NDtbnnIr2Rc2SdhEMlMxD4l9Eydj88B31E7_NhS4" />
+    
+    
+    <link id="mobile-style" media="only screen and (max-width: 767px)" type="text/css" rel="stylesheet" href="/skins/codinglife/bundle-codinglife-mobile.min.css?v=nKYRRiCAgdHHKoqtFkqXweTDit8MaL8XLJDkQUS4rf4" />
+    
+    <link type="application/rss+xml" rel="alternate" href="https://www.cnblogs.com/t-bar/rss" />
+    <link type="application/rsd+xml" rel="EditURI" href="https://www.cnblogs.com/t-bar/rsd.xml" />
+    <link type="application/wlwmanifest+xml" rel="wlwmanifest" href="https://www.cnblogs.com/t-bar/wlwmanifest.xml" />
+    <script>
+        var currentBlogId = 459017;
+        var currentBlogApp = 't-bar';
+        var isLogined = false;
+        var isBlogOwner = false;
+        var skinName = 'CodingLife';
+        var visitorUserId = '';
+        var hasCustomScript = false;
+        window.cb_enable_mathjax = false;
+        window.mathEngine = 0;
+        window.codeHighlightEngine = 1;
+        window.enableCodeLineNumber = false;
+        window.codeHighlightTheme = 'cnblogs';
+        window.darkModeCodeHighlightTheme = 'vs2015';
+        window.isDarkCodeHighlightTheme = false;
+        window.isDarkModeCodeHighlightThemeDark = true;
+        window.isDisableCodeHighlighter = false;
+        window.enableCodeThemeTypeFollowSystem = false;
+        window.enableMacStyleCodeBlock = false;
+    </script>
+        <script>
+            window.currentPostId = 17359545;
+            window.currentPostDateAdded = '2023-05-29 13:53';
+        </script>
+    <script src="https://assets.cnblogs.com/scripts/jquery-3.3.1.min.js"></script>
+    <script src="https://cdn-www.cnblogs.com/js/blog-common.min.js?v=e7iDdKE0ie8Fi0lKgiYt7eXqsQNrVeJmcEHX6zqQWKc"></script>
+    
+</head>
+<body class="skin-codinglife has-navbar">
+    <a name="top"></a>
+    <div id="top_nav" class="navbar forpc">
+        <nav id="nav_main" class="navbar-main">
+            <ul id="nav_left" class="navbar-list navbar-left">
+                <li class="navbar-branding">
+                    <a href="https://www.cnblogs.com/" title="开发者的网上家园" role="banner">
+                        <img src="//assets.cnblogs.com/logo.svg" alt="博客园Logo" />
+                    </a>
+                </li>
+                <li><a href="https://cnblogs.vip/">会员</a></li>
+                <li><a href="https://cnblogs.vip/store">周边</a></li>
+                <li>
+                    <a href="https://news.cnblogs.com/" onclick="countClicks('nav', 'skin-navbar-news')">新闻</a>
+                </li>
+                <li>
+                    <a href="https://q.cnblogs.com/" onclick="countClicks('nav', 'skin-navbar-q')">博问</a>
+                </li>
+                    <li>
+                        <a href="https://www.cnblogs.com/cmt/p/18172236" target="_blank">融资</a>
+                    </li>
+                <li><a href="https://market.cnblogs.com" target="_blank">云市场</a></li>
+            </ul>
+            <ul id="nav_right" class="navbar-list navbar-right">
+                <li>
+                    <form id="zzk_search" class="navbar-search dropdown" action="https://zzk.cnblogs.com/s" method="get" role="search">
+                        <input name="w" id="zzk_search_input" placeholder="代码改变世界" type="search" tabindex="3" autocomplete="off" />
+                        <button id="zzk_search_button" onclick="window.navbarSearchManager.triggerActiveOption()">
+                            <img id="search_icon" class="focus-hidden" src="//assets.cnblogs.com/icons/search.svg" alt="搜索" />
+                            <img class="hidden focus-visible" src="//assets.cnblogs.com/icons/enter.svg" alt="搜索" />
+                        </button>
+                        <ul id="navbar_search_options" class="dropdown-menu quick-search-menu">
+                            <li tabindex="0" class="active" onclick="zzkSearch(event, document.getElementById('zzk_search_input').value)">
+                                <div class="keyword-wrapper">
+                                    <img src="//assets.cnblogs.com/icons/search.svg" alt="搜索" />
+                                    <div class="keyword"></div>
+                                </div>
+                                <span class="search-area">所有博客</span>
+                            </li>
+                                    <li tabindex="1" onclick="zzkBlogSearch(event, 't-bar', document.getElementById('zzk_search_input').value)">
+                                        <div class="keyword-wrapper">
+                                            <img src="//assets.cnblogs.com/icons/search.svg" alt="搜索" />
+                                            <div class="keyword"></div>
+                                        </div>
+                                        <span class="search-area">当前博客</span>
+                                    </li>
+                        </ul>
+                    </form>
+                </li>
+                <li id="navbar_login_status" class="navbar-list">
+                    <a class="navbar-user-info navbar-blog" href="https://i.cnblogs.com/EditPosts.aspx?opt=1" alt="写随笔" title="写随笔">
+                        <img id="new_post_icon" class="navbar-icon" src="//assets.cnblogs.com/icons/newpost.svg" alt="写随笔" />
+                    </a>
+                    <a id="navblog-myblog-icon" class="navbar-user-info navbar-blog" href="https://passport.cnblogs.com/GetBlogApplyStatus.aspx" alt="我的博客" title="我的博客">
+                        <img id="myblog_icon" class="navbar-icon" src="//assets.cnblogs.com/icons/myblog.svg" alt="我的博客" />
+                    </a>
+                    <a class="navbar-user-info navbar-message navbar-icon-wrapper" href="https://msg.cnblogs.com/" alt="短消息" title="短消息">
+                        <img id="msg_icon" class="navbar-icon" src="//assets.cnblogs.com/icons/message.svg" alt="短消息" />
+                        <span id="msg_count" style="display: none"></span>
+                    </a>
+                    <a id="navbar_lite_mode_indicator" data-current-page="blog" style="display: none" href="javascript:void(0)" alt="简洁模式" title="简洁模式启用，您在访问他人博客时会使用简洁款皮肤展示">
+                        <img class="navbar-icon" src="//assets.cnblogs.com/icons/lite-mode-on.svg" alt="简洁模式" />
+                    </a>
+                    <div id="user_info" class="navbar-user-info dropdown">
+                        <a class="dropdown-button" href="https://home.cnblogs.com/">
+                            <img id="user_icon" class="navbar-avatar" src="//assets.cnblogs.com/icons/avatar-default.svg" alt="用户头像" />
+                        </a>
+                        <div class="dropdown-menu">
+                            <a id="navblog-myblog-text" href="https://passport.cnblogs.com/GetBlogApplyStatus.aspx">我的博客</a>
+                            <a href="https://home.cnblogs.com/">我的园子</a>
+                            <a href="https://account.cnblogs.com/settings/account">账号设置</a>
+                            <a href="javascript:void(0)" id="navbar_lite_mode_toggle" title="简洁模式会使用简洁款皮肤显示所有博客">
+    简洁模式 <img id="navbar_lite_mode_on" src="/images/lite-mode-check.svg" class="hide" /><span id="navbar_lite_mode_spinner" class="hide">...</span>
+</a>
+                            <a href="javascript:void(0)" onclick="account.logout();">退出登录</a>
+                        </div>
+                    </div>
+                    <a class="navbar-anonymous" href="https://account.cnblogs.com/signup">注册</a>
+                    <a class="navbar-anonymous" href="javascript:void(0);" onclick="account.login()">登录</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    
+
+    <!--done-->
+<div id="home">
+<div id="header">
+	<div id="blogTitle">
+        <a id="lnkBlogLogo" href="https://www.cnblogs.com/t-bar/"><img id="blogLogo" src="/skins/custom/images/logo.gif" alt="返回主页" /></a>		
+		
+<!--done-->
+<h1><a id="Header1_HeaderTitle" class="headermaintitle HeaderMainTitle" href="https://www.cnblogs.com/t-bar">T-BARBARIANS</a>
+</h1>
+<h2></h2>
+
+
+
+
+		
+	</div><!--end: blogTitle 博客的标题和副标题 -->
+	<div id="navigator">
+		
+<ul id="navList">
+<li><a id="blog_nav_sitehome" class="menu" href="https://www.cnblogs.com/">
+博客园</a>
+</li>
+<li>
+<a id="blog_nav_myhome" class="menu" href="https://www.cnblogs.com/t-bar/">
+首页</a>
+</li>
+<li>
+
+<a id="blog_nav_newpost" class="menu" href="https://i.cnblogs.com/EditPosts.aspx?opt=1">
+新随笔</a>
+</li>
+<li>
+<a id="blog_nav_contact" class="menu" href="https://msg.cnblogs.com/send/T-BARBARIANS">
+联系</a></li>
+<li>
+<a id="blog_nav_rss" class="menu" href="javascript:void(0)" data-rss="https://www.cnblogs.com/t-bar/rss/">
+订阅</a>
+<!--<partial name="./Shared/_XmlLink.cshtml" model="Model" /></li>--></li>
+<li>
+<a id="blog_nav_admin" class="menu" href="https://i.cnblogs.com/">
+管理</a>
+</li>
+</ul>
+
+
+		<div class="blogStats">
+			<div id="blog_stats_place_holder"><script>loadBlogStats();</script></div>
+		</div><!--end: blogStats -->
+	</div><!--end: navigator 博客导航栏 -->
+</div><!--end: header 头部 -->
+<div id="main">
+	<div id="mainContent">
+	<div class="forFlow">
+		<div id="post_detail">
+    <!--done-->
+    <div id="topics">
+        <div class="post">
+            <h1 class = "postTitle">
+                <a id="cb_post_title_url" class="postTitle2 vertical-middle" href="https://www.cnblogs.com/t-bar/p/17359545.html" title="发布于 2023-05-29 13:53">
+    <span role="heading" aria-level="2">我的内存去哪了？</span>
+    
+
+</a>
+
+            </h1>
+            <div class="clear"></div>
+            <div class="postBody">
+                <div id="cnblogs_post_body" class="blogpost-body blogpost-body-html">
+<p><span style="font-size: 15px">本文来自博客园，作者：<a href="https://www.cnblogs.com/t-bar/" rel="noopener" target="_blank">T-BARBARIANS</a>，博文严禁转载，转载必究！</span></p>
+<p>&nbsp;</p>
+<p><span style="font-size: 14pt"><strong>一、前言</strong></span></p>
+<p><span style="font-size: 15px">　　近几年开发了一些大型的应用程序，在程序性能调优或者解决一些疑难杂症问题的过程中，遇到最多的还是与内存相关的一些问题。例如glibc内存分配器ptmalloc，google的内存分配器tcmalloc都存在“内存泄漏”，即内存不归还操作系统的问题；ptmalloc内存分配性能低下的问题；随着系统长时间运行，buffer/cache被某些应用大量使用，几乎完整占用系统内存，导致其他应用程序内存申请失败等等问题。</span></p>
+<p><span style="font-size: 15px">　　之所以内存相关的问题层出不穷，关键还是它的地位太重要了。这次还是与内存相关，分享的是追踪buffer/cache占用的内存到底被谁（哪些应用程序）偷吃了！</span></p>
+<p><span style="font-size: 15px">　　有关buffer/cache的文章，大多提及的是如何释放并归还到系统的方法，但是分析buffer/cache内存消耗背后原因的相关文章却凤毛麟角。buffer/cache为什么会增长，它到底被哪些程序使用了，我相信这也是很多同行的疑惑，因此想通过本篇文章分享一些buffer/cache内存消耗问题的跟踪方法，为类似问题的优化和解决提供一些参考。</span></p>
+<p><span style="font-size: 14pt"><strong>二、问题描述</strong></span></p>
+<p><span style="font-size: 15px">　　如下图1和图2所示，buffer/cache已经占用了46GB的内存，达到了整个系统内存的37%，这个占比已经非常高了。buffer/cache长期占用不释放，同时供系统上其它进程使用的可用内存几乎快没了。</span></p>
+<p><img src="https://img2023.cnblogs.com/blog/1485868/202305/1485868-20230504141218607-1630451209.png" alt="" loading="lazy" style="display: block; margin-left: auto; margin-right: auto"></p>
+<p style="text-align: center"><span style="font-size: 13px">图1</span></p>
+<p><img src="https://img2023.cnblogs.com/blog/1485868/202305/1485868-20230504141330590-935574753.png" alt="" loading="lazy" style="display: block; margin-left: auto; margin-right: auto"></p>
+<p style="text-align: center"><span style="font-size: 13px">图2</span></p>
+<p><span style="font-size: 15px">&nbsp;　　长此以往，会出现什么问题呢？最直接的问题就是其他进程没法玩了，比如大一点的内存块就无法申请。之前分享过一次相关问题的定位，参见链接：<a href="https://www.cnblogs.com/t-bar/p/16626951.html" target="_blank" rel="noopener">https://www.cnblogs.com/t-bar/p/16626951.html</a>，我在这篇文章里也详细介绍了buffer/cache的释放方法，解决了当时的燃眉之急。</span></p>
+<p><span style="font-size: 15px">　　为啥最近又开始与buffer/cache纠缠上了呢？</span></p>
+<p><span style="font-size: 15px">　　“echo 1 &gt; /proc/sys/vm/drop_caches”释放的是所有cache，这些cache是当前系统上所有程序在运行过程中加载到内存的一些文件信息，这些信息被当做缓存用，好处是CPU下次读取某个文件时就会比第一次从磁盘读取快多了。drop_caches执行时会清空所有cache，这样会带来一个问题：当某些程序需要读取之前加载到cache的信息时就需要重新从磁盘读取，这就会产生IO等待，或者IO竞争，从而拖累程序性能。在某些平台上，我们已经发现有高性能程序因为cache的粗暴清空产生了性能抖动。因此，我们就没法像以前一样回避buffer/cache到底被谁使用的问题，并且直接粗暴释放的策略在某些平台上也就失效了。</span></p>
+<p><span style="font-size: 15px">　　根据上面的描述，我们当前面临的问题就是：究竟是谁占用了buffer/cache，以及弄清是谁占用后，是否可以规避它对buffer/cache的大量使用。面对这个问题，</span><span style="font-size: 15px">老板最近又上火了。</span></p>
+<p><img src="https://img2023.cnblogs.com/blog/1485868/202305/1485868-20230504144036467-968685774.png" alt="" loading="lazy" style="display: block; margin-left: auto; margin-right: auto"></p>
+<p><span style="font-size: 14pt"><strong>三、buffer/cache使用跟踪</strong></span></p>
+<p><span style="font-size: 15px">　　</span><span style="font-size: 15px">开始介绍一下调查buffer/cache占用的跟踪思路吧。</span></p>
+<p><span style="font-size: 15px">　　<span style="font-size: 16px"><strong>1、hcache</strong></span></span></p>
+<p><span style="font-size: 15px">　　网上有一些帖子分享了hcache可以查看哪些文件使用了cache，那hache真的可以帮助我们对buffer/cache进行全面调查吗？我们一起来看看。</span></p>
+<p><span style="font-size: 15px">　　根据前面的问题描述，当前buffer/cache已经占用了46GB的内存。先使用hcache查看一下top100的cache占用，如下图所示（截取了Cached靠前的一部分）。</span></p>
+<p><img src="https://img2023.cnblogs.com/blog/1485868/202305/1485868-20230505205810003-1932307471.png" alt="" loading="lazy" style="display: block; margin-left: auto; margin-right: auto"></p>
+<p style="text-align: center">&nbsp;&nbsp;<span style="font-size: 13px">图3</span></p>
+<p><span style="font-size: 15px">　　top100，即使top200的Size统计之和，也只有几个GB，离46GB相差甚远，结果说明hcache遗漏了很多cache的使用统计。</span></p>
+<p><span style="font-size: 15px">　　hcache还有一个能力，查看某个进程当前使用的cache。我们看看clickhouse的cache使用，结果如下图所示。</span></p>
+<p><img src="https://img2023.cnblogs.com/blog/1485868/202305/1485868-20230505102447419-1307232757.png" alt="" loading="lazy" style="display: block; margin-left: auto; margin-right: auto"></p>
+<p style="text-align: center"><span style="font-size: 13px">图4</span></p>
+<p>　　<span style="font-size: 15px">正在运行的clickhouse，居然只能看到程序可执行文件本身当前的cache占用，程序运行过程中已打开的cache文件却没统计。不过这里有个小收获：程序加载进内存后，程序的可执行文件，依赖的库文件使用的内存都是在buffer/cache里。</span></p>
+<p><img src="https://img2023.cnblogs.com/blog/1485868/202305/1485868-20230505102827776-608043486.png" alt="" loading="lazy" style="display: block; margin-left: auto; margin-right: auto"></p>
+<p style="text-align: center"><span style="font-size: 13px">图5</span></p>
+<p>　　<span style="font-size: 15px">从上面的结果发现hcahce有很多缺点，只能粗略的看到一些可执行程序文件，或者一些库文件使用的cache大小，没有统计各程序运行态的cache使用，因此对cache占用问题的排查作用非常有限。</span></p>
+<p>&nbsp;　　<strong><span style="font-size: 16px">2、top + lsof + fincore</span></strong></p>
+<p><span style="font-size: 15px">　　找了很多资料，除了hcache确实没有其他方法可以统计当前运行程序消耗的cache大小了，但是hcache本身不可靠。没有直接的办法，那就只有另辟蹊径了，这也是buffer/cache分布情况不便跟踪调查的原因。</span></p>
+<p><span style="font-size: 15px">　　</span><span style="font-size: 15px">该从哪里入手呢？当然是top命令给方向，哪些程序cpu使用率高，且使用了一定的内存，那就查它。因为只有它们才有可能在不断的使用cache，调查大方向有了。</span></p>
+<p><img src="https://img2023.cnblogs.com/blog/1485868/202305/1485868-20230505113230695-823727620.png" alt="" loading="lazy" style="display: block; margin-left: auto; margin-right: auto"></p>
+<p style="text-align: center"><span style="font-size: 13px">图6</span></p>
+<p><span style="font-size: 15px">　　下一步呢？buffer/cache的使用肯定跟文件相关啊，还是那句话：linux一切皆文件。那有没有可以实时查看某个进程当前已打开的文件方法？lsof命令可以！我们用lsof查一下clickhouse，某时刻，clickhouse打开的文件如下图7图8所示，篇幅太长，图7只截取了前面部分。</span></p>
+<p><img src="https://img2023.cnblogs.com/blog/1485868/202305/1485868-20230505143735390-587951402.png" alt="" loading="lazy" style="display: block; margin-left: auto; margin-right: auto"></p>
+<p style="text-align: center"><span style="font-size: 13px">图7</span></p>
+<p style="text-align: left">　　<span style="font-size: 15px">图8只截取了类型TYPE=REG（REG表示文件类型为普通，还有DIR为目录等等等），即截取了clickhouse当前打开，且正在使用的一部分类型为普通的文件。</span></p>
+<p><img src="https://img2023.cnblogs.com/blog/1485868/202305/1485868-20230505151532628-244742700.png" alt="" loading="lazy" style="display: block; margin-left: auto; margin-right: auto"></p>
+<p style="text-align: center"><span style="font-size: 13px">图8</span></p>
+<p><span style="font-size: 15px">　　不断的执行：lsof -p $(pidof clickhouse-server)，发现每次查看到的文件名都不一样。好了，这说明clickhouse会在运行过程中不断的大量打开，读写和关闭文件。嫌疑很重了。</span></p>
+<p><span style="font-size: 15px">　　</span><span style="font-size: 15px">下一步呢？有没有办法可以实时查看当前这些文件是不是使用了cache，以及各自使用cache的大小？还真有，fincore可以查看某个文件使用的cache大小，链接：<a href="https://github.com/david415/linux-ftools" target="_blank" rel="noopener">https://github.com/david415/linux-ftools</a>。轮子就是齐全啊，要啥有啥。</span></p>
+<p><span style="font-size: 15px">　　<strong>命令行：</strong>lsof -p $(pidof clickhouse-server) | grep 'REG' | awk '{print $9}' | xargs ./fincore --pages=false --summarize --only-cached *</span></p>
+<p><span style="font-size: 15px">　　截图较大，点开看会清晰一点。</span></p>
+<p><img src="https://img2023.cnblogs.com/blog/1485868/202305/1485868-20230505154858668-1804021770.png" alt="" loading="lazy" style="display: block; margin-left: auto; margin-right: auto"></p>
+<p style="text-align: center">&nbsp;<span style="font-size: 13px">图9</span></p>
+<p><span style="font-size: 15px">　　fincore统计了命令行执行时，clickhouse当前打开的文件使用的cache之和为1.2GB左右。到这里，当前的探索结果与前文提到的问题：究竟是谁占用了buffer/cache，越来越接近了。</span></p>
+<p><span style="font-size: 15px">　　通过top + lsof，发现了一个非常重要的线索，就是clickhouse在目录/opt/runtime/esch/ch/store下频繁的打开了很多文件，那这个目录下面到底都是一些什么文件？有没有都使用了cache呢？clickhouse是不是cache的消耗大户呢？解决这些疑惑就产生了另外一个需求，需要一种可以统计指定目录的cache大小的工具。这次fincore也不行了，</span><span style="font-size: 15px">fincore有一个致命弱点，即只能获得某个指定文件的cache占用大小，不能获取指定目录使用的cache大小，更别指望统计嵌套目录的cache大小。因此，是时候该请vmtouch出场了，链接：<a href="https://github.com/hoytech/vmtouch" target="_blank" rel="noopener">https://github.com/hoytech/vmtouch</a>，还是这句话：轮子就是齐全啊，要啥有啥。</span></p>
+<p><span style="font-size: 15px">　　<span style="font-size: 16px"><strong>3、vmtouch</strong></span></span></p>
+<p>&nbsp;　　<span style="font-size: 15px">vmtouch可以统计指定目录的cache占用大小，即使是嵌套目录。</span></p>
+<p><span style="font-size: 15px">　　迫不及待的直接奔主题，看看clickhouse目录/opt/runtime/esch/ch/store下是什么，以及使用了多少cache。截取了该目录下的部分文件，内容如下图所示。</span></p>
+<p><img src="https://img2023.cnblogs.com/blog/1485868/202305/1485868-20230505212745885-211171589.png" alt="" loading="lazy" style="display: block; margin-left: auto; margin-right: auto"></p>
+<p style="text-align: center"><span style="font-size: 13px">图10</span></p>
+<p>　　<span style="font-size: 15px">直接统计一下/opt/runtime/esch/ch/store目录占用的cache规模吧，结果如下图所示。</span></p>
+<p><img src="https://img2023.cnblogs.com/blog/1485868/202305/1485868-20230505212859980-1186358549.png" alt="" loading="lazy" style="display: block; margin-left: auto; margin-right: auto"></p>
+<p style="text-align: center"><span style="font-size: 13px">图11</span></p>
+<p style="text-align: left"><span style="font-size: 15px">　　shit，居然吃了我42GB的内存啊！地主家的余粮也不多啊---老板哭着说。</span></p>
+<p style="text-align: left"><span style="font-size: 15px">　　激动之余，我还要确认一下42GB cache的使用者是不是它！如何证明呢，还是使用“echo 1 &gt; /proc/sys/vm/drop_caches”，看看释放完毕之后，free可用内存的大小是否会增长42GB左右。</span></p>
+<p style="text-align: left"><span style="font-size: 15px">　　执行前的内存分布情况：</span></p>
+<p><img src="https://img2023.cnblogs.com/blog/1485868/202305/1485868-20230505213936499-392233902.png" alt="" loading="lazy" style="display: block; margin-left: auto; margin-right: auto"></p>
+<p style="text-align: center">&nbsp;<span style="font-size: 13px">图12</span></p>
+<p><img src="https://img2023.cnblogs.com/blog/1485868/202305/1485868-20230504141330590-935574753.png" alt="" loading="lazy" style="display: block; margin-left: auto; margin-right: auto"></p>
+<p style="text-align: center"><span style="font-size: 13px">&nbsp;图13</span></p>
+<p style="text-align: left"><span style="font-size: 15px">　　执行后的内存分布情况：</span></p>
+<p><img src="https://img2023.cnblogs.com/blog/1485868/202305/1485868-20230505213729008-556946943.png" alt="" loading="lazy" style="display: block; margin-left: auto; margin-right: auto"></p>
+<p style="text-align: center">图14</p>
+<p><img src="https://img2023.cnblogs.com/blog/1485868/202305/1485868-20230505213808345-1404592529.png" alt="" loading="lazy" style="display: block; margin-left: auto; margin-right: auto"></p>
+<p style="text-align: center"><span style="font-size: 13px">图15</span></p>
+<p><span style="font-size: 15px">　　执行cache释放后，free从2GB变为了45GB，扩大了43GB；buffer/cache从46GB变为了3GB，减小了43GB。从cache释放了clickhouse的42GB+1GB其它程序占用的cache，</span><span style="font-size: 15px">说明我们环境上，clickhouse就是cache的消耗大户！老板沸不沸腾我不知道，反正我是沸腾了。</span><span style="font-size: 15px"><br></span></p>
+<p><span style="font-size: 18px"><strong>四、clickhouse cache耗费</strong></span></p>
+<p><span style="font-size: 15px">　　为什么clickhouse对buffer/cache的消耗如此巨大？在好奇心的驱使下，又开始了新的调查。此时此景想到了一句歌词：一波还未平息，一波又来侵袭，茫茫人海，狂风暴雨。。。</span></p>
+<p><span style="font-size: 15px">　　<span style="font-size: 16px"><strong>1、clickhouse cache耗费原因</strong></span></span></p>
+<p><span style="font-size: 15px">　　从哪开始调查呢？想起了lsof命令的执行结果，如前文图9所示的重要线索，clickhouse有大量时间都在打开目录：/opt/runtime/esch/ch/store/<strong>032</strong>/03216cf6-357f-477f-bc9b-5eedb07a5d07，判断该目录下面肯定有大量消耗cache的文件。直接进入该目录，继续使用vmtouch统计，不出所料，结果如下图所示，<strong>032</strong>目录就吃了24GB内存，心好痛啊。</span></p>
+<p><img src="https://img2023.cnblogs.com/blog/1485868/202305/1485868-20230517144142299-752848552.png" alt="" loading="lazy" style="display: block; margin-left: auto; margin-right: auto"></p>
+<p style="text-align: center"><span style="font-size: 13px">图16</span></p>
+<p><span style="font-size: 16px">　　<span style="font-size: 15px">clickhouse的什么机制会如此疯狂的消耗cache呢？我们再看看目录下有些什么类型的文件，截取了部分文件。</span></span></p>
+<p><img src="https://img2023.cnblogs.com/blog/1485868/202305/1485868-20230517145650737-1770207959.png" alt="" loading="lazy" style="display: block; margin-left: auto; margin-right: auto"></p>
+<p style="text-align: center">&nbsp;<span style="font-size: 13px">图17</span></p>
+<p>&nbsp;　　<span style="font-size: 15px">发现目录下主要是很多以日期编号开头的目录文件，有纯数字组成的，也有带有merge字符的目录。随便打开一个5月17日当天的目录文件：<strong>20230517_563264_565136_5</strong><br></span></p>
+<p><img src="https://img2023.cnblogs.com/blog/1485868/202305/1485868-20230517145138812-2023145016.png" alt="" loading="lazy" style="display: block; margin-left: auto; margin-right: auto"></p>
+<p style="text-align: center"><span style="font-size: 13px">图18</span></p>
+<p><span style="font-size: 15px">　　<strong>20230517_563264_565136_5&nbsp;</strong>目录就占用了2GB cache，惊不惊喜意不意外？而且上面的所有文件，都完全加载到了cache中，比如在磁盘中占用743MB的文件<strong>cuid.bin</strong>，同样在cache中占用了742MB。</span></p>
+<p><img src="https://img2023.cnblogs.com/blog/1485868/202305/1485868-20230517151437362-716651677.png" alt="" loading="lazy" style="display: block; margin-left: auto; margin-right: auto"></p>
+<p style="text-align: center"><span style="font-size: 13px">图19</span></p>
+<p><span style="font-size: 15px">　　查阅clickhouse资料后才发现，数字编号的目录都是clickhouse的很多分区part，clickhouse服务会根据相关策略自动的在后台合并这些分区。想想，如果在每一次合并分区时，才将上一次的某两个分区从磁盘进行IO读取，那将带来多大的性能开销。因此，clickhouse的开发者会将上一次的分区合并结果保存在cache里，下一次该分区与其它分区再次进行合并时，直接从内存里读取数据就好了。这就是为什么clickhouse消耗如此巨大cache的原因。当然，clickhouse对cache的消耗与您当前环境的数据存储规模呈正相关。</span></p>
+<p><span style="font-size: 15px">　　再来看一个问题，那昨天的所有分区，加载的数据还会保留在cache里吗？</span></p>
+<p><span style="font-size: 15px">　　我找了一个昨天的分区，可以发现昨天的分区目录里的文件是不再占用cache的。上一天的分区，clickhouse认为是合并完成的分区，已经不需要再进行合并了，自然就clear了cache的占用，开发者也是想到了的。</span></p>
+<p><img src="https://img2023.cnblogs.com/blog/1485868/202305/1485868-20230517150810735-2002026773.png" alt="" loading="lazy" style="display: block; margin-left: auto; margin-right: auto"></p>
+<p style="text-align: center"><span style="font-size: 13px">图20</span></p>
+<p><span style="font-size: 15px">　　<strong><span style="font-size: 16px">2、clickhouse cache耗费调整</span></strong></span></p>
+<p><span style="font-size: 15px">　　可是当天分区消耗的cache，以及merge过程中使用的cache就让我没法玩了，尤其是在clickhouse服务并未独立部署的场景。那clickhouse自身可以支持改变这一机制吗？带着疑问又开始了一探究竟，完全没法停下来。</span></p>
+<p><span style="font-size: 15px">　　</span><span style="font-size: 15px">后来在clickhouse社区找到了一个可以节省cache使用的相关问题。链接：<a href="https://github.com/ClickHouse/ClickHouse/issues/1566" target="_blank" rel="noopener">https://github.com/ClickHouse/ClickHouse/issues/1566</a>，</span><span style="font-size: 15px">有配置<strong>min_part_size_for_direct_merge，</strong>意思是超过min_part_size时，启用direct_io。也就是此时clickhouse会通过<strong>direct_io</strong>的方式读写merge的源文件和目的文件，而不是使用cache缓存，通过这种方式减少cache的使用。</span></p>
+<p><img src="https://img2023.cnblogs.com/blog/1485868/202305/1485868-20230522114248678-877113722.png" alt="" loading="lazy" style="display: block; margin-left: auto; margin-right: auto"></p>
+<p style="text-align: center"><span style="font-size: 13px">&nbsp;图21</span></p>
+<p>&nbsp;　　<span style="font-size: 15px">我们的clickhouse版本比较高，看社区记录，clickhouse官方将之前的<span style="color: rgba(0, 0, 0, 1)"><strong>min_part_size_for_direct_merge</strong></span>改成为</span><span style="background-color: rgba(255, 255, 255, 1); color: rgba(255, 102, 0, 1)"><strong><span style="font-size: 15px">min_merge_bytes_to_use_direct_io</span></strong></span><span style="font-size: 15px">，Minimal amount of bytes to enable O_DIRECT in merge (0 - disabled)。默认超过10GB时会使用<strong>direct_io</strong>的方式进行merge。</span></p>
+<p><img src="https://img2023.cnblogs.com/blog/1485868/202305/1485868-20230522155512954-611650100.png" alt="" loading="lazy" style="display: block; margin-left: auto; margin-right: auto"></p>
+<p style="text-align: center">&nbsp;图22</p>
+<p>&nbsp;　　<span style="font-size: 15px">那我将<span style="color: rgba(255, 102, 0, 1)"><strong>min_merge_bytes_to_use_direct_io</strong><span style="color: rgba(0, 0, 0, 1)">设置足够小，甚至是1byte，是不是就可以完全避免对cache的使用了？<strong><span style="color: rgba(255, 0, 0, 1)">答案是否定的</span></strong>，原因是：</span></span><span style="color: rgba(255, 102, 0, 1)"><span style="color: rgba(0, 0, 0, 1)"><span style="color: rgba(255, 102, 0, 1)"><strong>min_merge_bytes_to_use_direct_io</strong><span style="color: rgba(0, 0, 0, 1)">只是读写表数据时使用了<strong>direct_io</strong>，替换了常用的<strong>buffer_io</strong>。也就是说只是在数据传输过程不使用cache，节省的是这个环节的cache内存消耗。merge完成后，先通过<strong>direct_io</strong>将数据写入到磁盘，同时会继续使用cache缓存merge完成后的数据，方便为下一次与其它分区进行快速merge做准备。因为每次merge都是merge旧数据与新数据，因此新合成的分区所使用的cache只会比merge前的更大。<strong>direct_io</strong>与<strong>buffer_io</strong>的区别如下图所示。</span></span></span></span></span></p>
+<p><img src="https://img2023.cnblogs.com/blog/1485868/202305/1485868-20230525172735408-1497166775.png" alt="" loading="lazy" style="display: block; margin-left: auto; margin-right: auto"></p>
+<p style="text-align: center">&nbsp;图23</p>
+<p>　　<span style="font-size: 15px">需要注意的是，设置<span style="color: rgba(255, 102, 0, 1)"><strong>min_merge_bytes_to_use_direct_io</strong></span>还有一个副作用，当发生merge行为时会导致磁盘IO急剧拉高。因为direct_io是对磁盘进行直接操作，这种IO方式与buffer_io(使用了page cache做缓冲层)相比，带给磁盘的冲击更大。但是如果钞票比较多，可以做磁盘raid，或者增加了SSD，磁盘能够扛住direct_io冲击的同时，还能支持前端的丝滑查询，那就另当别论啦！</span></p>
+<p><img src="https://img2023.cnblogs.com/blog/1485868/202305/1485868-20230525174242374-333271905.png" alt="" loading="lazy" style="display: block; margin-left: auto; margin-right: auto"></p>
+<p style="text-align: center">图24</p>
+<p>&nbsp;　　<span style="font-size: 15px">另外还设置过相关参数：<span style="color: rgba(255, 102, 0, 1)"><strong>max_bytes_to_merge_at_max_space_in_pool</strong></span>，用处不大，就不继续介绍了，读者可以自行验证。只能说clickhouse当前没有提供待merge分区文件所占用cache的清理机制。</span></p>
+<p><span style="font-size: 18px"><strong>五、cache清理</strong></span></p>
+<p><span style="font-size: 15px">　　一顿操作猛如虎，定睛一看原地杵。clickhouse自身无法限制cahce消耗；“</span>echo 1 &gt; /proc/sys/vm/drop_caches<span style="font-size: 15px">”又太粗暴，会清理掉其它进程加载到cache中的内容。只想搞掉clickhouse占用的大量cache，该怎么办？</span></p>
+<p><span style="font-size: 15px">　　有时候你不得不相信车到山前必有路，船到桥头自然直。再次请出vmtouch！</span></p>
+<p><span style="font-size: 15px">　　vmtouch的help中有一个“-e”的选项，即“evict pages from memory”，顾名思义将page cache从内存中驱逐出去。既然vmtouch可以统计指定文件或目录占用的cache，那自然就可以实现对指定文件或目录的cahce清理！</span></p>
+<p><img src="https://img2023.cnblogs.com/blog/1485868/202305/1485868-20230526230048234-360945878.png" alt="" loading="lazy" style="display: block; margin-left: auto; margin-right: auto"></p>
+<p style="text-align: center">&nbsp;图25</p>
+<p>　　<span style="font-size: 15px">先来看看执行效果。执行前有内存分布，以及某个目录下cache的使用情况：</span></p>
+<p><img src="https://img2023.cnblogs.com/blog/1485868/202305/1485868-20230526231135863-2091350515.png" alt="" loading="lazy" style="display: block; margin-left: auto; margin-right: auto"></p>
+<p style="text-align: center">图26</p>
+<p><img src="https://img2023.cnblogs.com/blog/1485868/202305/1485868-20230526231252076-936098781.png" alt="" loading="lazy" style="display: block; margin-left: auto; margin-right: auto"></p>
+<p style="text-align: center">&nbsp;图27</p>
+<p>　　<span style="font-size: 15px">执行：<span style="color: rgba(255, 102, 0, 1)"><strong>vmtouch -e ./*</strong> </span>后，内存分布如下图28所示。惊喜吗？刚好减少了某个目录下占用的30GB cache，同时free内存增加了30GB，实现了对指定目录cache消耗的定点清理！</span></p>
+<p><img src="https://img2023.cnblogs.com/blog/1485868/202305/1485868-20230526231415382-1229969749.png" alt="" loading="lazy" style="display: block; margin-left: auto; margin-right: auto"></p>
+<p style="text-align: center">&nbsp;图28</p>
+<p>&nbsp;　　<span style="font-size: 15px">很好奇vmtouch实现指定目录内存清理的方法，去看了看源码，简单贴两张图就大致明白了。</span></p>
+<p><span style="font-size: 15px">　　1、传递指定path；<br></span></p>
+<p><span style="font-size: 15px">　　2、如果该path下无目录，则通过<span style="color: rgba(255, 102, 0, 1)"><strong>vmtouch_file</strong></span>函数执行cache的释放操作；如果该目录下存在其他文件（包括子目录），则遍历该目录下的所有文件，并通过<span style="color: rgba(51, 153, 102, 1)"><strong>vmtouch_crawl</strong></span>实现递归调用，回到第1步。</span></p>
+<p><img src="https://img2023.cnblogs.com/blog/1485868/202305/1485868-20230528181055592-676021599.png" alt="" loading="lazy" style="display: block; margin-left: auto; margin-right: auto"></p>
+<p style="text-align: center">&nbsp;图29</p>
+<p><span style="font-size: 15px">&nbsp;　　那<span style="color: rgba(255, 102, 0, 1)"><strong>vmtouch_file</strong><span style="color: rgba(0, 0, 0, 1)">函数如何实现cache的释放操作呢？答案就是通过系统调用：</span></span><span style="color: rgba(255, 0, 0, 1)"><strong>posix_fadvise</strong></span>，并使用POSIX_FADV_DONTNEED宏。</span><span style="font-size: 15px">定义如下：</span></p>
+<div class="cnblogs_code">
+<pre><span style="color: rgba(0, 128, 128, 1)">1</span> <span style="color: rgba(0, 0, 255, 1)">int</span> posix_fadvise(<span style="color: rgba(0, 0, 255, 1)">int</span> fd, off_t offset, off_t len, <span style="color: rgba(0, 0, 255, 1)">int</span><span style="color: rgba(0, 0, 0, 1)"> advice);
+</span><span style="color: rgba(0, 128, 128, 1)">2</span>  
+<span style="color: rgba(0, 128, 128, 1)">3</span> <span style="color: rgba(0, 0, 0, 1)">advice:
+</span><span style="color: rgba(0, 128, 128, 1)">4</span> POSIX_FADV_DONTNEED，指定的数据在未来的一段时间内不会被访问，丢弃page cache中的数据</pre>
+</div>
+<p>　　<span style="font-size: 15px">当advice为POSIX_FADV_DONTNEED时，内核会先将脏页刷盘，再清除相关page cache，从而达到cache释放的目的！</span></p>
+<p><img src="https://img2023.cnblogs.com/blog/1485868/202305/1485868-20230526232348270-181239413.png" alt="" loading="lazy" style="display: block; margin-left: auto; margin-right: auto"></p>
+<p style="text-align: center">图30</p>
+<p style="text-align: left"><span style="font-size: 15px">　　但是查阅资料，发现&nbsp;<span style="color: rgba(255, 0, 0, 1)"><span style="color: rgba(0, 0, 0, 1)"><strong>posix_fadvise&nbsp;</strong>实现脏页刷盘使用的参数是：</span></span>WB_SYNC_NONE，即<strong>posix_fadvise&nbsp;</strong>不会同步等待其它进程发起的脏页刷盘行为，这可能会带来一个问题：不能完全释放指定路径下的cache，因此可以在执行cache释放前先使用 fsync，将所有的脏页进行回写，完成后再调用&nbsp;<strong>posix_fadvise</strong>，实现指定path下所有cache的释放。如果不关心脏页使用的cache是否可以被全被释放，那直接使用<strong>posix_fadvise&nbsp;</strong>就好了。<br></span></p>
+<p style="text-align: left"><span style="font-size: 15px">　　写到这里，可能有些读者会产生一个问题，清理cache就真的很好吗？</span><span style="font-size: 15px">答案是肯定的。为什么这么说呢，我想可以概括为以下两点：</span></p>
+<p style="text-align: left"><span style="font-size: 15px">　　一是有些服务使用完cache后，这部分cache再也不会被访问，这一类cache消耗当然是需要干掉的；</span></p>
+<p style="text-align: left"><span style="font-size: 15px">　　二是类似我们环境clickhouse这一类应用，它们会再次使用之前使用过的cache。这种情形确实不好办，但是如果不办它，最后就是大家都别玩了，鱼和熊掌不可兼得。因此，对这一类应用，定期清理cache是必要的，通过一个折中的办法让大家共存下来。对依赖cache这一类应用，cache清理后就只有辛苦下磁盘了（人在家中坐，锅从天上来）。</span></p>
+<p><span style="font-size: 18px"><strong>六、结语</strong></span></p>
+<p><span style="font-size: 15px">　　摸索cache的过程曲折且漫长，还好最后找到了一个大家都可以接受的办法。文章篇幅比较长，简单总结一下全文吧，概括起来可归纳为以下四点：</span></p>
+<p><span style="font-size: 15px">　　1、验证了 hcache 无法统计cache的全面消耗情况，推荐了一种通过 lsof+fincore 探测进程中活跃目录以及文件的方法，并以此作为cache消耗的关键调查线索。这种方法适用于多种场景下的cache消耗调查，不仅仅是clickhosue。</span></p>
+<p><span style="font-size: 15px">　　2、通过vmtouch可以统计出某个文件、目录，甚至是嵌套目录下各文件真正使用cache的大小，从而明确cache消耗的分布情况。</span></p>
+<p><span style="font-size: 15px">　　3、分析了clickhouse大量消耗cache的原因，探索了clickhouse自身是否具备减少cache使用的能力和机制。</span></p>
+<p><span style="font-size: 15px">　　4、提供了清理各文件，或者各指定目录所占用cache的通用方法，属于定点清除的骚操作。</span></p>
+<p><span style="font-size: 15px">　　</span></p>
+<p><span style="font-size: 15px">　　技术是不断实践积累的，在此分享出来与大家一起共勉！</span></p>
+<p><span style="font-size: 15px">　　如果文章对你有些许帮助，还请各位技术爱好者登录点赞呀，非常感谢！</span></p>
+<p>&nbsp;</p>
+<p><span style="font-size: 15px">　　本文来自博客园，作者：<a href="https://www.cnblogs.com/t-bar/" rel="noopener" target="_blank">T-BARBARIANS</a>，博文严禁转载，转载必究！</span></p>
+<p>&nbsp;</p>
+</div>
+<div class="clear"></div>
+<div id="blog_post_info_block" role="contentinfo">
+    <div id="blog_post_info"></div>
+    <div class="clear"></div>
+    <div id="post_next_prev"></div>
+</div>
+            </div>
+            <div class="postDesc">posted @ 
+<span id="post-date" data-last-update-days="239.84653495596297" data-date-created="BlogServer.Application.Dto.BlogPost.BlogPostDto" data-date-updated="2023-09-27 14:22">2023-05-29 13:53</span>&nbsp;
+<a href="https://www.cnblogs.com/t-bar">T-BARBARIANS</a>&nbsp;
+阅读(<span id="post_view_count">10860</span>)&nbsp;
+评论(<span id="post_comment_count">9</span>)&nbsp;
+<a href="https://i.cnblogs.com/EditPosts.aspx?postid=17359545" rel="nofollow">编辑</a>&nbsp;
+<a href="javascript:void(0)" onclick="AddToWz(17359545);return false;">收藏</a>&nbsp;
+<a href="javascript:void(0)" onclick="reportManager.report({ currentUserId: '', targetType: 'blogPost', targetId: '17359545', targetLink: 'https://www.cnblogs.com/t-bar/p/17359545.html', title: '我的内存去哪了？' })">举报</a>
+</div>
+        </div>
+	    
+	    
+    </div><!--end: topics 文章、评论容器-->
+</div>
+<script>
+    var cb_entryId = 17359545, cb_entryCreatedDate = '2023-05-29 13:53', cb_postType = 1, cb_postTitle = '我的内存去哪了？';
+    var allowComments = true, cb_blogId = 459017, cb_blogApp = 't-bar', cb_blogUserGuid = '1bb713d8-d749-4077-191b-08d614cddf57';
+    mermaidRender.render()
+    markdown_highlight()
+    zoomManager.apply("#cnblogs_post_body img:not(.code_img_closed):not(.code_img_opened)");    
+</script>
+<a id="!comments"></a>
+<div id="blog-comments-placeholder"></div>
+<div id="comment_form" class="commentform">
+    <a name="commentform"></a>
+    <div id="divCommentShow"></div>
+    <div id="comment_nav">
+            <a class="comment-nav-left forpc" href="https://cnblogs.vip/" target="_blank">会员力量，点亮园子希望</a>
+        <div class="comment-nav-right">
+            <span id="span_refresh_tips"></span><a href="#" onclick="return RefreshPage();">刷新页面</a><a href="#top">返回顶部</a>
+        </div>
+    </div>
+    <div id="comment_form_container"></div>
+    <div class="ad_text_commentbox" id="ad_text_under_commentbox"></div>
+        <div id="cnblogs_ch"></div>
+    <div id="opt_under_post"></div>
+        <div id="cnblogs_c1" class="under-post-card">
+            <a href="https://www.finclip.com?channel=cnblog2024" rel="nofollow" target="_blank" onclick="countCreativeClicks('C1-凡泰极客')">
+                <img src="https://img2024.cnblogs.com/blog/35695/202405/35695-20240517155930267-114888508.jpg" onload="countCreativeImpressions('C1-凡泰极客')" alt="" />
+                <span id="c1_impression" style="display:none"></span>
+            </a>
+        </div>
+    <div id="under_post_card1"></div>
+    <div id="under_post_card2"></div>
+    <div id="HistoryToday" class="under-post-card"></div>
+    <script type="text/javascript">
+        var commentManager = new blogCommentManager();
+        commentManager.renderComments(0);
+        fixPostBody();
+        window.footnoteTipManager.generateFootnoteTips();
+
+            window.tocManager.displayDisableTocTips = false;
+            window.tocManager.generateToc();
+            
+                setTimeout(function() { countViews(cb_blogId, cb_entryId); }, 50);
+            
+            deliverT2();
+            deliverC1C2();
+            loadNewsAndKb();
+            
+                LoadPostCategoriesTags(cb_blogId, cb_entryId);
+            
+            LoadPostInfoBlock(cb_blogId, cb_entryId, cb_blogApp, cb_blogUserGuid);
+            GetPrevNextPost(cb_entryId, cb_blogId, cb_entryCreatedDate, cb_postType);
+            loadOptUnderPost();
+            GetHistoryToday(cb_blogId, cb_blogApp, cb_entryCreatedDate);
+                </script>
+</div>
+
+	</div><!--end: forFlow -->
+	</div><!--end: mainContent 主体内容容器-->
+	<div id="sideBar">
+		<div id="sideBarMain">
+			<div id="sidebar_news" class="newsItem">
+    <h3 class="catListTitle">公告</h3>
+<div id="blog-news">    
+    <div id="sidebar_news_content">
+    </div>
+</div>
+<script>loadBlogNews();</script>
+
+ 
+</div>
+<div id="sidebar_c3"></div>
+			<div id="blog-calendar" style="display:none"></div><script>loadBlogDefaultCalendar();</script>			
+			<div id="leftcontentcontainer">
+				<div id="blog-sidecolumn"></div>
+                    <script>loadBlogSideColumn();</script>
+			</div>			
+		</div><!--end: sideBarMain -->
+	</div><!--end: sideBar 侧边栏容器 -->
+	<div class="clear"></div>
+	</div><!--end: main -->
+	<div class="clear"></div>
+	<div id="footer">
+		<!--done-->
+Copyright &copy; 2024 T-BARBARIANS
+<br /><span id="poweredby">Powered by .NET 8.0 on Kubernetes</span>
+
+
+
+	</div><!--end: footer -->
+</div><!--end: home 自定义的最大容器 -->
+
+
+
+    
+
+    <input type="hidden" id="antiforgery_token" value="CfDJ8ONv0caE5GtEh3YJ5j088knwiIq6y-KVCMOP4rDi7E-B9pv5A4TE1I8lKNe-7wfgRyfAD8sPQfax_SasBgCdmv-XjTrUC9B4KD5sOI0Skl0wq_ZI_ZH00TXGze2sBQQSz0IYFQSCO_2ZcKcIpX4LFwM" />
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-M95P3TTWJZ"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-M95P3TTWJZ');
+</script>
+<script defer src="https://hm.baidu.com/hm.js?866c9be12d4a814454792b1fd0fed295"></script>
+</body>
+</html>

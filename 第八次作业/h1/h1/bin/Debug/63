@@ -1,0 +1,553 @@
+﻿<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="referrer" content="origin-when-cross-origin" />
+    <meta name="description" content="RabbitMQ生产故障问题分析 由某一次真实生产环境rabbitMQ故障引发血案，下面复盘问题发生原因以及问题解决方法。 1、 问题引发 由某个服务BI-collector-xx队列出现阻塞，影响很整个rabbitMQ集群服务不可用，多个应用MQ生产者服务出现假死状态，系统影响面较广，业务影响很大" />
+    <meta property="og:description" content="RabbitMQ生产故障问题分析 由某一次真实生产环境rabbitMQ故障引发血案，下面复盘问题发生原因以及问题解决方法。 1、 问题引发 由某个服务BI-collector-xx队列出现阻塞，影响很整个rabbitMQ集群服务不可用，多个应用MQ生产者服务出现假死状态，系统影响面较广，业务影响很大" />
+    <meta http-equiv="Cache-Control" content="no-transform" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>RabbitMQ真实生产故障问题还原与分析 - 陈国利 - 博客园</title>
+    <link rel="canonical" href="https://www.cnblogs.com/cgli/p/17179590.html" />
+    <link rel="shortcut icon" id="favicon" href="//assets.cnblogs.com/favicon.svg?v=2" type="image/svg+xml" />
+    
+    <link rel="stylesheet" href="/css/blog-common.min.css?v=JnYHs5HAUCOVmwbxBNuH-ED7ggVDfqtff-pdhyndpr8" />
+    
+
+    <link id="MainCss" rel="stylesheet" href="/skins/sea/bundle-sea.min.css?v=YMVQaOhwlnYavMWEPMZ-2vNAjah_YVn4F_TzjxzOEUs" />
+        <link id="highlighter-theme-prism-vs" type="text/css" rel="stylesheet" href="/css/prismjs/prism-vs.css?v=iw94Vx6XGFo5fy49uNJMV-ufDfBnPBmg30wF42RVSCk" />
+    
+    <link type="text/css" rel="stylesheet" href="/css/fonts/SFMono-Regular.min.css" />
+    <link id="mobile-style" media="only screen and (max-width: 767px)" type="text/css" rel="stylesheet" href="/skins/sea/bundle-sea-mobile.min.css?v=cubLw4sSLIRZoGTLdLOqGcsmhCoS_8RIxtu-JK8FKBE" />
+    
+    <link type="application/rss+xml" rel="alternate" href="https://www.cnblogs.com/cgli/rss" />
+    <link type="application/rsd+xml" rel="EditURI" href="https://www.cnblogs.com/cgli/rsd.xml" />
+    <link type="application/wlwmanifest+xml" rel="wlwmanifest" href="https://www.cnblogs.com/cgli/wlwmanifest.xml" />
+    <script>
+        var currentBlogId = 76119;
+        var currentBlogApp = 'cgli';
+        var isLogined = false;
+        var isBlogOwner = false;
+        var skinName = 'sea';
+        var visitorUserId = '';
+        var hasCustomScript = true;
+        window.cb_enable_mathjax = false;
+        window.mathEngine = 0;
+        window.codeHighlightEngine = 2;
+        window.enableCodeLineNumber = false;
+        window.codeHighlightTheme = 'prism-vs';
+        window.darkModeCodeHighlightTheme = 'prism-vsc-dark-plus';
+        window.isDarkCodeHighlightTheme = false;
+        window.isDarkModeCodeHighlightThemeDark = true;
+        window.isDisableCodeHighlighter = false;
+        window.enableCodeThemeTypeFollowSystem = false;
+        window.enableMacStyleCodeBlock = false;
+    </script>
+        <script>
+            window.currentPostId = 17179590;
+            window.currentPostDateAdded = '2023-03-05 00:26';
+        </script>
+    <script src="https://assets.cnblogs.com/scripts/jquery-3.3.1.min.js"></script>
+    <script src="https://cdn-www.cnblogs.com/js/blog-common.min.js?v=e7iDdKE0ie8Fi0lKgiYt7eXqsQNrVeJmcEHX6zqQWKc"></script>
+        <script>updateCustomBlogReferrer();</script>
+    
+</head>
+<body class="skin-sea has-navbar">
+    <a name="top"></a>
+    <div id="top_nav" class="navbar forpc">
+        <nav id="nav_main" class="navbar-main">
+            <ul id="nav_left" class="navbar-list navbar-left">
+                <li class="navbar-branding">
+                    <a href="https://www.cnblogs.com/" title="开发者的网上家园" role="banner">
+                        <img src="//assets.cnblogs.com/logo.svg" alt="博客园Logo" />
+                    </a>
+                </li>
+                <li><a href="https://cnblogs.vip/">会员</a></li>
+                <li><a href="https://cnblogs.vip/store">周边</a></li>
+                <li>
+                    <a href="https://news.cnblogs.com/" onclick="countClicks('nav', 'skin-navbar-news')">新闻</a>
+                </li>
+                <li>
+                    <a href="https://q.cnblogs.com/" onclick="countClicks('nav', 'skin-navbar-q')">博问</a>
+                </li>
+                    <li>
+                        <a href="https://www.cnblogs.com/cmt/p/18172236" target="_blank">融资</a>
+                    </li>
+                <li><a href="https://market.cnblogs.com" target="_blank">云市场</a></li>
+            </ul>
+            <ul id="nav_right" class="navbar-list navbar-right">
+                <li>
+                    <form id="zzk_search" class="navbar-search dropdown" action="https://zzk.cnblogs.com/s" method="get" role="search">
+                        <input name="w" id="zzk_search_input" placeholder="代码改变世界" type="search" tabindex="3" autocomplete="off" />
+                        <button id="zzk_search_button" onclick="window.navbarSearchManager.triggerActiveOption()">
+                            <img id="search_icon" class="focus-hidden" src="//assets.cnblogs.com/icons/search.svg" alt="搜索" />
+                            <img class="hidden focus-visible" src="//assets.cnblogs.com/icons/enter.svg" alt="搜索" />
+                        </button>
+                        <ul id="navbar_search_options" class="dropdown-menu quick-search-menu">
+                            <li tabindex="0" class="active" onclick="zzkSearch(event, document.getElementById('zzk_search_input').value)">
+                                <div class="keyword-wrapper">
+                                    <img src="//assets.cnblogs.com/icons/search.svg" alt="搜索" />
+                                    <div class="keyword"></div>
+                                </div>
+                                <span class="search-area">所有博客</span>
+                            </li>
+                                    <li tabindex="1" onclick="zzkBlogSearch(event, 'cgli', document.getElementById('zzk_search_input').value)">
+                                        <div class="keyword-wrapper">
+                                            <img src="//assets.cnblogs.com/icons/search.svg" alt="搜索" />
+                                            <div class="keyword"></div>
+                                        </div>
+                                        <span class="search-area">当前博客</span>
+                                    </li>
+                        </ul>
+                    </form>
+                </li>
+                <li id="navbar_login_status" class="navbar-list">
+                    <a class="navbar-user-info navbar-blog" href="https://i.cnblogs.com/EditPosts.aspx?opt=1" alt="写随笔" title="写随笔">
+                        <img id="new_post_icon" class="navbar-icon" src="//assets.cnblogs.com/icons/newpost.svg" alt="写随笔" />
+                    </a>
+                    <a id="navblog-myblog-icon" class="navbar-user-info navbar-blog" href="https://passport.cnblogs.com/GetBlogApplyStatus.aspx" alt="我的博客" title="我的博客">
+                        <img id="myblog_icon" class="navbar-icon" src="//assets.cnblogs.com/icons/myblog.svg" alt="我的博客" />
+                    </a>
+                    <a class="navbar-user-info navbar-message navbar-icon-wrapper" href="https://msg.cnblogs.com/" alt="短消息" title="短消息">
+                        <img id="msg_icon" class="navbar-icon" src="//assets.cnblogs.com/icons/message.svg" alt="短消息" />
+                        <span id="msg_count" style="display: none"></span>
+                    </a>
+                    <a id="navbar_lite_mode_indicator" data-current-page="blog" style="display: none" href="javascript:void(0)" alt="简洁模式" title="简洁模式启用，您在访问他人博客时会使用简洁款皮肤展示">
+                        <img class="navbar-icon" src="//assets.cnblogs.com/icons/lite-mode-on.svg" alt="简洁模式" />
+                    </a>
+                    <div id="user_info" class="navbar-user-info dropdown">
+                        <a class="dropdown-button" href="https://home.cnblogs.com/">
+                            <img id="user_icon" class="navbar-avatar" src="//assets.cnblogs.com/icons/avatar-default.svg" alt="用户头像" />
+                        </a>
+                        <div class="dropdown-menu">
+                            <a id="navblog-myblog-text" href="https://passport.cnblogs.com/GetBlogApplyStatus.aspx">我的博客</a>
+                            <a href="https://home.cnblogs.com/">我的园子</a>
+                            <a href="https://account.cnblogs.com/settings/account">账号设置</a>
+                            <a href="javascript:void(0)" id="navbar_lite_mode_toggle" title="简洁模式会使用简洁款皮肤显示所有博客">
+    简洁模式 <img id="navbar_lite_mode_on" src="/images/lite-mode-check.svg" class="hide" /><span id="navbar_lite_mode_spinner" class="hide">...</span>
+</a>
+                            <a href="javascript:void(0)" onclick="account.logout();">退出登录</a>
+                        </div>
+                    </div>
+                    <a class="navbar-anonymous" href="https://account.cnblogs.com/signup">注册</a>
+                    <a class="navbar-anonymous" href="javascript:void(0);" onclick="account.login()">登录</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    
+
+    <!--done-->
+<div id="header">
+	
+<!--done-->
+<div class="header">
+	<div class="headerText">
+		<a id="Header1_HeaderTitle" class="headermaintitle HeaderMainTitle" href="https://www.cnblogs.com/cgli">陈国立</a>
+<br>
+		天行健，君子以自强不息!
+	</div>
+</div>
+
+
+</div>
+
+<div id="mytopmenu">
+	
+		<div id="mylinks">
+<a id="blog_nav_sitehome" class="menu" href="https://www.cnblogs.com/">
+博客园</a>
+ &nbsp;
+
+<a id="blog_nav_myhome" class="menu" href="https://www.cnblogs.com/cgli/">
+首页</a>
+ &nbsp;
+
+
+<a id="blog_nav_newpost" class="menu" href="https://i.cnblogs.com/EditPosts.aspx?opt=1">
+新随笔</a>
+ &nbsp;
+
+<a id="blog_nav_contact" class="menu" href="https://msg.cnblogs.com/send/%E9%99%88%E5%9B%BD%E5%88%A9">
+联系</a> &nbsp;
+
+<a id="blog_nav_rss" class="menu" href="javascript:void(0)" data-rss="https://www.cnblogs.com/cgli/rss/">
+订阅</a>
+<a id="blog_nav_rss_image" href="https://www.cnblogs.com/cgli/rss/">
+    <img src="/skins/sea/images/xml.gif" alt="订阅" />
+</a>&nbsp;
+
+<a id="blog_nav_admin" class="menu" href="https://i.cnblogs.com/">
+管理</a>
+
+
+</div>
+		<DIV id="mystats"><div id="blog_stats_place_holder"><script>loadBlogStats();</script></div></DIV>
+	
+</div>
+<div id="centercontent">
+	<div id="post_detail">
+<div class="post">
+	<h1 class = "postTitle"><a id="cb_post_title_url" class="postTitle2 vertical-middle" href="https://www.cnblogs.com/cgli/p/17179590.html" title="发布于 2023-03-05 00:26">
+    <span role="heading" aria-level="2">RabbitMQ真实生产故障问题还原与分析</span>
+    
+
+</a>
+</h1>
+	<div id="cnblogs_post_body" class="blogpost-body blogpost-body-html">
+<p align="center"><strong>RabbitMQ</strong><strong>生产故障问题分析</strong></p>
+<p style="text-align: left" align="center"><strong>　　</strong><strong>由某一次真实生产环境rabbitMQ故障引发血案，下面复盘问题发生原因以及问题解决方法。</strong></p>
+<p><strong>1、&nbsp;&nbsp;&nbsp; </strong><strong>问题引发</strong></p>
+<p>　　由某个服务BI-collector-xx队列出现阻塞，影响很整个rabbitMQ集群服务不可用，多个应用MQ生产者服务出现假死状态，系统影响面较广，业务影响很大。当时为了应急处理，恢复系统可用，运维相对粗暴的把一堆阻塞队列信息清空，然后重启整个集群。</p>
+<p>在复盘整个故障过程中，我心中有不少疑惑，至少存在以下几个问题点：</p>
+<ol>
+<li>为什么出现队列阻塞？</li>
+<li>某个队列出现阻塞为什么会影响到其他队列的运行（即多队列间相互影响）？</li>
+<li>某个应用MQ队列出现问题，为什么会导致应用不可用呢？</li>
+</ol>
+<p>&nbsp;</p>
+<p><strong>2、&nbsp;&nbsp;&nbsp; </strong><strong>试验队列阻塞</strong></p>
+<p>某天周末在家里，找个测试环境，安装rabbitmq尝试重现这过程，并做模拟测试。</p>
+<p>写两个测试应用Demo（假设是两个项目应用）分别有生产者和消费者，并分别使用队列testA和testB。</p>
+<p>为了尽可能还原生产的情况，一开始测试使用了同一个vhost，后面分别设置不同vhost。</p>
+<p>&nbsp;</p>
+<p>生产者A，示例代码如下</p>
+<p>&nbsp;<img src="https://img2023.cnblogs.com/blog/160088/202303/160088-20230304235752413-451845667.png" alt=""></p>
+<p>消费者A</p>
+<p>&nbsp;<img src="https://img2023.cnblogs.com/blog/160088/202303/160088-20230304235752204-1551093513.png" alt=""></p>
+<p>MQ配置</p>
+<p>&nbsp;<img src="https://img2023.cnblogs.com/blog/160088/202303/160088-20230304235752336-356722277.png" alt=""></p>
+<p>&nbsp;</p>
+<p>生产者B，每次生产10万条消息</p>
+<p>&nbsp;<img src="https://img2023.cnblogs.com/blog/160088/202303/160088-20230304235752399-830355913.png" alt=""></p>
+<p>消费者B，<strong>代码故意写错</strong>（模拟出现异常的情况），不是正常的json串导致解释json时抛出异常</p>
+<p>&nbsp;<img src="https://img2023.cnblogs.com/blog/160088/202303/160088-20230304235752473-1162416663.png" alt=""></p>
+<p>&nbsp;</p>
+<p>先了解一下Rabbitmq客户端启动连接工作过程，通过wireshark抓包分析，如下</p>
+<p>&nbsp;<img src="https://img2023.cnblogs.com/blog/160088/202303/160088-20230304235752797-912731720.png" alt=""></p>
+<p>先对AMQP做一个简单的介绍，请求的AMQP协议方法信息，AMQP协议方法包含类名+方法名+参数，这一列主要展示了类名和方法名</p>
+<ul>
+<li><code>Connection.Start</code>：请求服务端开始建立连接</li>
+<li><code>Channel.Open</code><code>：</code>请求服务端建立信道</li>
+<li><code>Queue.Declare</code><code>：</code>声明队列</li>
+<li><code>Basic.Consume</code><code>：</code>开始一个消费者，请求指定队列的消息</li>
+</ul>
+<p>&nbsp;</p>
+<p>详细方法可以查看<code>amqp</code>官网https://www.rabbitmq.com/amqp-0-9-1-reference.html</p>
+<p>&nbsp;</p>
+<p><strong>工作过程分析：</strong></p>
+<p><code>Basic.Publish</code><code>：</code> 客户端发送<code>Basic.Publish</code>方法请求，将消息发布到<code>exchange</code><code>，</code><code>rabbitmq server</code>会根据路由规则转发到队列中；</p>
+<p><code>Basic.Deliver</code><code>：</code> 服务端发送<code>Basic.Deliver</code>方法请求，投递消息到监听队列的客户端消费者；</p>
+<p><code>Basic.Ack</code><code>：</code> 客户端发送<code>Basic.Ack</code>方法请求，告知rabbimq server,消息已接收处理。</p>
+<p>&nbsp;</p>
+<p>两个应用程序启动后，通过rabbitmq管理控制台可以观察一些参数和监控指标</p>
+<p>&nbsp;</p>
+<p>&nbsp;<img src="https://img2023.cnblogs.com/blog/160088/202303/160088-20230304235752200-2062584777.png" alt=""></p>
+<p>&nbsp;</p>
+<p>&nbsp;<img src="https://img2023.cnblogs.com/blog/160088/202303/160088-20230304235752060-2103534452.png" alt=""></p>
+<p>&nbsp;</p>
+<p>一开始A应用生产和消费都是正常的。</p>
+<p>B消费端错误代码异常，狂刷报错信息</p>
+<p>&nbsp;<img src="https://img2023.cnblogs.com/blog/160088/202303/160088-20230304235752612-1486490291.png" alt=""></p>
+<p>&nbsp;</p>
+<p>&nbsp;<img src="https://img2023.cnblogs.com/blog/160088/202303/160088-20230304235752451-1069194762.png" alt=""></p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>经过大概30分钟运行，观察A生产者应用控制台也有出现异常信息</p>
+<p>&nbsp;<img src="https://img2023.cnblogs.com/blog/160088/202303/160088-20230304235753429-881726301.png" alt=""></p>
+<p>&nbsp;</p>
+<p>查看服务端连接状态出现blocked情况，与生产故障发生情景很类似。</p>
+<p>&nbsp;<img src="https://img2023.cnblogs.com/blog/160088/202303/160088-20230304235752096-1290021463.png" alt=""></p>
+<p>&nbsp;</p>
+<p>此时客户端即本机器，CPU和内存上涨明显，风扇声音很响，明显卡顿，再过30分钟应用基本不可用状态。</p>
+<p>&nbsp;</p>
+<p align="left"><strong>分析原因</strong></p>
+<p align="left">上面错误代码展示了消费者B无法ack，由于没有进行ack导致队里阻塞。那么问题来了，这是为什么呢？其实这是RabbitMQ的一种保护机制。防止当消息激增的时候，海量的消息进入consumer而引发consumer宕机。</p>
+<p align="left"> RabbitMQ提供了一种QOS(服务质量保证)功能，即在非自动确认的消息的前提下，限制信道上的消费者所能保持的最大未确认的数量。可以通过设置prefetchCount实现，自动确认prefetchCount设置无效。</p>
+<p align="left">举例说明:可以理解为在consumer前面加了一个缓冲容器，容器能容纳最大的消息数量就是PrefetchCount。如果容器没有满RabbitMQ就会将消息投递到容器内，如果满了就不投递了。当consumer对消息进行ack以后就会将此消息移除，从而放入新的消息。</p>
+<p align="left">通过上面的配置发现prefetch初始我只配置了2，并且concurrency配置的只有1，所以当我发送了2条错误消息以后，由于解析失败这2条消息一直没有被ack。将缓冲区沾满了，这个时候RabbitMQ认为这个consumer已经没有消费能力了就不继续给它推送消息了，所以就造成了队列阻塞。</p>
+<h4>判断队列是否有阻塞的风险。</h4>
+<p>  当<code>ack</code>模式为<code>manual</code>，并且线上出现了<code>unacked</code>消息，这个时候不用慌。由于QOS是限制信道<code>channel</code>上的消费者所能保持的最大未确认的数量。所以允许出现<code>unacked</code>的数量可以通过<code>channelCount * prefetchCount * </code><code>消费节点数量</code>得出。</p>
+<p><code>channlCount</code>就是由<code>concurrency,max-concurrency</code>决定的。</p>
+<ul>
+<li><code>min = concurrency * prefetch * </code><code>消费节点数量</code><code></code></li>
+<li><code>max = max-concurrency * prefetch * </code><code>消费节点数量</code><code></code></li>
+</ul>
+<p>由此可以得出结论</p>
+<ul>
+<li><code>unacked_msg_count &lt; min</code> 队列不会阻塞。但需要及时处理<code>unacked</code>的消息。</li>
+<li><code>unacked_msg_count &gt;= min</code> 可能会出现堵塞。</li>
+<li><code>unacked_msg_count &gt;= max</code> 队列一定阻塞。</li>
+</ul>
+<h4>重点注意</h4>
+<p><code>1</code><code>、</code><code>unacked</code>的消息在<code>consumer</code>切断连接后(如重启)再连接，会自动回到队头。</p>
+<p>2、若将<code>ack</code>模式改成<code>auto</code>自动，这样会使QOS不生效。会出现大量消息涌入<code>consumer</code>从而可能造成<code>consumer</code>宕机风险。</p>
+<p>&nbsp;</p>
+<p>再回看程序配置，做一些分析和调整</p>
+<p>&nbsp;<img src="https://img2023.cnblogs.com/blog/160088/202303/160088-20230304235752455-394146728.png" alt=""></p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>对B消费端问题代码加个<strong><code>try-catch-finally</code></strong>，不管中间有何问题，都进行消息签收ACK。</p>
+<p>&nbsp;<img src="https://img2023.cnblogs.com/blog/160088/202303/160088-20230304235752421-1913970872.png" alt=""></p>
+<p>&nbsp;</p>
+<p>代码调整之后，两个队列正常运行，客户端两个应用也正常运行。</p>
+<p>&nbsp;<img src="https://img2023.cnblogs.com/blog/160088/202303/160088-20230304235752141-401807990.png" alt=""></p>
+<p>&nbsp;<img src="https://img2023.cnblogs.com/blog/160088/202303/160088-20230304235752129-2129347153.png" alt=""></p>
+<p>&nbsp;</p>
+<p>经过一段时间消费，B消费者端已经把堆积的消息消费完了。</p>
+<p>&nbsp;<img src="https://img2023.cnblogs.com/blog/160088/202303/160088-20230304235752073-1820617666.png" alt=""></p>
+<p>&nbsp;</p>
+<p><strong>3、&nbsp;&nbsp;&nbsp; </strong><strong>第三个问题原因分析</strong></p>
+<p><strong>还是查看抓包信息</strong></p>
+<p>&nbsp;<img src="https://img2023.cnblogs.com/blog/160088/202303/160088-20230304235752806-1293706606.png" alt=""></p>
+<p align="left"><code>Basic.Reject</code>： 客户端发送Basic.Reject方法请求，表示无法处理消息，拒绝消息，此时的requeue参数为true，将消息返回原来的队列；</p>
+<p align="left"><code>Basic.Deliver</code>： 服务端调用Basic.Deliver方法，和第一次Basic.Deliver方法不同的是，此时的redeliver参数为true，表示重新投递消息到监听队列的消费者，然后这两步会一直重复下去。</p>
+<p align="left">RabbitMQ消息监听程序异常时，consumer会向rabbitmq server发送<code>Basic.Reject</code>，表示消息拒绝接受，由于Spring默认<code>requeue-rejected</code>配置为<code>true</code>，消息会重新入队，然后rabbitmq server重新投递。就相当于死循环了，所以容易导致消费端资源占用过高，特别是TCP连接数、线程数、IO飙升，如果个别程序带事务或数据库操作等连接资源得不到释放也会占满，导致应用假死状态（出现问题的时候，查看问题应用出现大量的connection timeout错误报错日志）。</p>
+<p align="left">因此针对性的，有些业务场景（不强调数据强一致性的场景，比如日志收集）可以设置<code>default-requeue-rejected: false</code>即可。</p>
+<div class="cnblogs_code">
+<pre>factory.setDefaultRequeueRejected(<span style="color: rgba(0, 0, 255, 1)">false</span>);</pre>
+</div>
+<p>&nbsp;&nbsp;会根据异常类型选择直接丢弃或加入<a href="https://www.rabbitmq.com/dlx.html" rel="noopener">dead-letter-exchange</a>中。</p>
+<p>&nbsp;</p>
+<p>消费者端正确的使用手动确认示例结构代码，很重要！</p>
+<p><span style="font-family: monospace">&nbsp;</span></p>
+<div class="cnblogs_code">
+<pre><span style="color: rgba(0, 0, 255, 1)">try</span><span style="color: rgba(0, 0, 0, 1)"> {
+    </span><span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)"> 业务逻辑。</span>
+}<span style="color: rgba(0, 0, 255, 1)">catch</span><span style="color: rgba(0, 0, 0, 1)"> (Exception e){
+    </span><span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)"> 输出错误日志。</span>
+}<span style="color: rgba(0, 0, 255, 1)">finally</span><span style="color: rgba(0, 0, 0, 1)"> {
+    </span><span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)"> 消息签收。</span>
+}</pre>
+</div>
+<p>&nbsp;</p>
+<p>&nbsp;&nbsp;</p>
+<p><strong>4、&nbsp;&nbsp;&nbsp; </strong><strong>验证队列设置最大长度限制</strong></p>
+<p>&nbsp;</p>
+<p>设置queueLengthLimit队列最大长度限制 x-max-length=5</p>
+<p>&nbsp;</p>
+<p>&nbsp;<img src="https://img2023.cnblogs.com/blog/160088/202303/160088-20230304235752067-1891870577.png" alt=""></p>
+<p>&nbsp;</p>
+<p>生产者原本想要生产10条消息</p>
+<p>&nbsp;<img src="https://img2023.cnblogs.com/blog/160088/202303/160088-20230304235753182-1198142308.png" alt=""></p>
+<p>&nbsp;</p>
+<p>&nbsp;<img src="https://img2023.cnblogs.com/blog/160088/202303/160088-20230304235752114-1235678599.png" alt=""></p>
+<p>&nbsp;</p>
+<p>由于受到队列最大长度限制，实际上只有5条入队列里面。</p>
+<p>&nbsp;<img src="https://img2023.cnblogs.com/blog/160088/202303/160088-20230304235752112-1200088459.png" alt=""></p>
+<p>消费者拿出来的消息，仅有5条，从NO.6~NO.10</p>
+<p>&nbsp;<img src="https://img2023.cnblogs.com/blog/160088/202303/160088-20230304235752073-1763035846.png" alt=""></p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>改变消费者程序，让生产者一直产生消息，消费者<strong>消费速度明显赶不上生产者的生产速度</strong>。</p>
+<p>&nbsp;</p>
+<p>&nbsp;<img src="https://img2023.cnblogs.com/blog/160088/202303/160088-20230304235752681-716710696.png" alt=""></p>
+<p>&nbsp;<img src="https://img2023.cnblogs.com/blog/160088/202303/160088-20230304235752403-1705808692.png" alt=""></p>
+<p>从消费端来看消息是随机性入队的，队列里面一直最多5条消息，发再多也进不了，消息者和生产者也不会发生什么异常，只是消息会随机性丢失（并没有全部入队）。</p>
+<p>&nbsp;<img src="https://img2023.cnblogs.com/blog/160088/202303/160088-20230304235753261-2085536884.png" alt=""></p>
+<p>&nbsp;</p>
+<p>运行情况良好，除了消息没有全部入队列 ，没有出现异常情况</p>
+<p>&nbsp;<img src="https://img2023.cnblogs.com/blog/160088/202303/160088-20230304235752126-248599250.png" alt=""></p>
+<p>&nbsp;</p>
+<p>消费比较慢，本机器CPU和内存各项指标正常，没有异常。</p>
+<p>&nbsp;</p>
+<p>搞一个异常情况出现unack，最大队列长度限制，是不算unack数量的，如下图所示</p>
+<p>&nbsp;</p>
+<p>&nbsp;<img src="https://img2023.cnblogs.com/blog/160088/202303/160088-20230304235752392-2133019694.png" alt=""></p>
+<p>&nbsp;<img src="https://img2023.cnblogs.com/blog/160088/202303/160088-20230305002528590-1494027892.png" alt=""></p>
+<p>异常之后，此观察MQ监控管理后台</p>
+<p>&nbsp;<img src="https://img2023.cnblogs.com/blog/160088/202303/160088-20230305002528337-28019281.png" alt=""></p>
+<p>生产者不停一直在生产消息，运行30分钟，观察生产者应用也是正常的的，就是消息入不了队列。</p>
+<p>&nbsp;<img src="https://img2023.cnblogs.com/blog/160088/202303/160088-20230305002528299-55981909.png" alt=""></p>
+<p>&nbsp;<img src="https://img2023.cnblogs.com/blog/160088/202303/160088-20230305002528673-630896784.png" alt=""></p>
+<p>&nbsp;<img src="https://img2023.cnblogs.com/blog/160088/202303/160088-20230305002528311-1881137715.png" alt=""></p>
+<p>&nbsp;</p>
+<p><strong>5、&nbsp; </strong><strong>检查实际的业务端代码</strong></p>
+<p>&nbsp;</p>
+<p>再看我们业务系统消费端代码，消费端各种不规范写法都有，以下例举几个典型</p>
+<p>1、手动签收有ACK，但是没有try-catch-finally结构，消费端业务代码如下：</p>
+<p>&nbsp;<img src="https://img2023.cnblogs.com/blog/160088/202303/160088-20230305002529393-1786653113.png" alt=""></p>
+<p>&nbsp;</p>
+<p>2、有try-catch-finally结构，但是deliverTag是一个固定值0，一样的会出问题。</p>
+<p>&nbsp;<img src="https://img2023.cnblogs.com/blog/160088/202303/160088-20230305002528716-1949624786.png" alt=""></p>
+<p>&nbsp;</p>
+<p>3、自动签收确认的，大量消息的时候，容易搞死消费端应用。</p>
+<p>&nbsp;<img src="https://img2023.cnblogs.com/blog/160088/202303/160088-20230305002528602-261075254.png" alt=""></p>
+<br clear="all">
+<p align="left">&nbsp;</p>
+<p>&nbsp;</p>
+<p><strong>6、&nbsp;&nbsp;&nbsp;
+</strong><strong>总结</strong></p>
+<ul>
+<li><strong>生产环境不建议使用自动ack模式</strong>，这样会使QOS无法生效。</li>
+<li>在使用手动ack的时候，需要非常注意消息签收，业务代码使用try-catch-finally处理结构，防止业务代码异常时无法签收。</li>
+<li>规范约束mq客户端代码，正确的使用Rabbitmq配置。</li>
+<li>不同业务项目设置不同的vhost可以隔离一些影响，提升rabbitmq资源使用。</li>
+<li>考虑设置<a href="https://www.rabbitmq.com/dlx.html" rel="noopener">dead-letter-exchange</a>，当设置了 <strong>requeue=false</strong>时，可以放入<strong>dead-letter-exchange</strong>，可以快速排查定位问题。</li>
+<li>Exchange和队列的最大长度限制可以是限制消息的数量（参数：x-max-length），或者是消息的总字节数（总字节数表示的是所有的消息体的字节数，忽略消息的属性和任何头部信息），又或者两者都进行了限制，两者取小值生效，只有<strong>处于</strong><strong>ready</strong><strong>状态的消息被计数</strong>，<strong>未被确认的消息不会被计数</strong>受到limit的限制。最大队列设置可以限制生产端，但会造成消息丢失风险，最大消息数量限制，不能完全解决队列阻塞问题。</li>
+<li>尽量使用Direct-exchange，Direct 类型的 Exchange 投递消息是最快的。
+<ul>
+<li>Direct：处理路由键，需要将一个队列绑定到交换机上，要求该消息与一个特定的路由键完全匹配。这是一个完整的匹配。如果一个队列绑定到该交换机上要求路由键为“A”，则只有路由键为“A”的消息才被转发，不会转发路由键为"B"，只会转发路由键为“A”；</li>
+<li>Topic：将路由键和某模式进行匹配。此时队列需要绑定要一个模式上。符号“#”匹配一个或多个词，符号“*”只能匹配一个词；</li>
+<li>Fanout：不处理路由键。只需要简单的将队列绑定到交换机上。一个发送到该类型交换机的消息都会被广播到与该交换机绑定的所有队列上；</li>
+<li>Headers：不处理路由键，而是根据发送的消息内容中的 headers 属性进行匹配。在绑定 Queue 与 Exchange 时指定一组键值对；当消息发送到 RabbitMQ 时会取到该消息的 headers 与 Exchange 绑定时指定的键值对进行匹配；如果完全匹配则消息会路由到该队列，否则不会路由到该队列。</li>
+
+
+</ul>
+
+
+</li>
+
+
+</ul>
+<p>&nbsp;</p>
+<p>写在最后，RabbitMQ集群做为整个平台关键部件，它的好处自然不用再说，但是它也不是万金油，一旦岩机影响很大，后果比较严重。怎么用好它？我们有必要正确深入的认识并使用它，首先得摆好正确的姿势（写正确的客户端代码、严谨的配置），不能随意，否则后果很严重。希望经过此故障经验教训能与君共勉，同时也希望我的总结能够给大家一点帮助和启发，权当抛砖引玉。</p>
+</div>
+<div id="MySignature" role="contentinfo">
+    
+<div>本文来自博客园，作者：<a href="https://www.cnblogs.com/cgli/" target="_blank">陈国利</a>，转载请注明原文链接：<a href="https://www.cnblogs.com/cgli/p/17179590.html" target="_blank">https://www.cnblogs.com/cgli/p/17179590.html</a></div>
+<div>本文版权归作者和博客园共有，欢迎转载，但未经作者同意必须在文章页面给出原文连接，否则保留追究法律责任的权利。</div>
+<div>如果您觉得文章对您有帮助，可以点击文章右下角"推荐"或关注本人博客。您的鼓励是作者坚持原创和持续写作的最大动力！</div>
+</div>
+<div class="clear"></div>
+<div id="blog_post_info_block" role="contentinfo">
+    <div id="blog_post_info"></div>
+    <div class="clear"></div>
+    <div id="post_next_prev"></div>
+</div>
+	<div class="postDesc">posted on 
+<span id="post-date" data-last-update-days="446.4270960722882" data-date-created="BlogServer.Application.Dto.BlogPost.BlogPostDto" data-date-updated="2023-03-05 00:26">2023-03-05 00:26</span>&nbsp;
+<a href="https://www.cnblogs.com/cgli">陈国利</a>&nbsp;
+阅读(<span id="post_view_count">48531</span>)&nbsp;
+评论(<span id="post_comment_count">10</span>)&nbsp;
+<a href="https://i.cnblogs.com/EditPosts.aspx?postid=17179590" rel="nofollow">编辑</a>&nbsp;
+<a href="javascript:void(0)" onclick="AddToWz(17179590);return false;">收藏</a>&nbsp;
+<a href="javascript:void(0)" onclick="reportManager.report({ currentUserId: '', targetType: 'blogPost', targetId: '17179590', targetLink: 'https://www.cnblogs.com/cgli/p/17179590.html', title: 'RabbitMQ真实生产故障问题还原与分析' })">举报</a>
+</div>
+</div>
+
+
+<script>
+    var cb_entryId = 17179590, cb_entryCreatedDate = '2023-03-05 00:26', cb_postType = 1, cb_postTitle = 'RabbitMQ真实生产故障问题还原与分析';
+    var allowComments = true, cb_blogId = 76119, cb_blogApp = 'cgli', cb_blogUserGuid = '998b0351-bcc3-df11-ac81-842b2b196315';
+    mermaidRender.render()
+    markdown_highlight()
+    zoomManager.apply("#cnblogs_post_body img:not(.code_img_closed):not(.code_img_opened)");    
+</script>
+<a id="!comments"></a>
+<div id="blog-comments-placeholder"></div>
+<div id="comment_form" class="commentform">
+    <a name="commentform"></a>
+    <div id="divCommentShow"></div>
+    <div id="comment_nav">
+            <a class="comment-nav-left forpc" href="https://cnblogs.vip/" target="_blank">会员力量，点亮园子希望</a>
+        <div class="comment-nav-right">
+            <span id="span_refresh_tips"></span><a href="#" onclick="return RefreshPage();">刷新页面</a><a href="#top">返回顶部</a>
+        </div>
+    </div>
+    <div id="comment_form_container"></div>
+    <div class="ad_text_commentbox" id="ad_text_under_commentbox"></div>
+        <div id="cnblogs_ch"></div>
+    <div id="opt_under_post"></div>
+        <div id="cnblogs_c1" class="under-post-card">
+            <a href="https://www.finclip.com?channel=cnblog2024" rel="nofollow" target="_blank" onclick="countCreativeClicks('C1-凡泰极客')">
+                <img src="https://img2024.cnblogs.com/blog/35695/202405/35695-20240517155930267-114888508.jpg" onload="countCreativeImpressions('C1-凡泰极客')" alt="" />
+                <span id="c1_impression" style="display:none"></span>
+            </a>
+        </div>
+    <div id="under_post_card1"></div>
+    <div id="under_post_card2"></div>
+    <div id="HistoryToday" class="under-post-card"></div>
+    <script type="text/javascript">
+        var commentManager = new blogCommentManager();
+        commentManager.renderComments(0);
+        fixPostBody();
+        window.footnoteTipManager.generateFootnoteTips();
+
+            window.tocManager.displayDisableTocTips = false;
+            window.tocManager.generateToc();
+            
+                setTimeout(function() { countViews(cb_blogId, cb_entryId); }, 50);
+            
+            deliverT2();
+            deliverC1C2();
+            loadNewsAndKb();
+            
+                LoadPostCategoriesTags(cb_blogId, cb_entryId);
+            
+            LoadPostInfoBlock(cb_blogId, cb_entryId, cb_blogApp, cb_blogUserGuid);
+            GetPrevNextPost(cb_entryId, cb_blogId, cb_entryCreatedDate, cb_postType);
+            loadOptUnderPost();
+            GetHistoryToday(cb_blogId, cb_blogApp, cb_entryCreatedDate);
+                </script>
+</div>
+
+</div>
+
+
+</div>
+<div id="leftcontent">
+	
+		<DIV id="leftcontentcontainer">
+			<div id="sidebar_news" class="newsItem">
+    <!--done-->
+<div class="newsItem">
+	<div id="blog-news">    
+    <div id="sidebar_news_content">
+    </div>
+</div>
+<script>loadBlogNews();</script>
+</div>
+
+ 
+</div>
+<div id="sidebar_c3"></div>
+			<div id="calendar"><div id="blog-calendar" style="display:none"></div></div>                
+                    <script>loadBlogDefaultCalendar();</script><br>
+			<div id="blog-sidecolumn"></div>
+                    <script>loadBlogSideColumn();</script></DIV>
+	
+</div>
+<!--done-->
+<div class="footer">
+	Powered by: <a href="http://www.cnblogs.com">博客园</a>
+	Copyright &copy; 2024 陈国利
+<br /><span id="poweredby">Powered by .NET 8.0 on Kubernetes</span>
+
+</div>
+
+
+
+
+
+
+
+    <div id="page_end_html">
+        <script type="text/javascript"> 
+document.body.oncopy = function () {
+setTimeout( function () {
+var text = clipboardData.getData("text");
+if (text) {
+text = text + "本文来自博客园-陈国利：  原文地址："+location.href; 
+clipboardData.setData("text",text);
+}
+}, 100 )
+}
+</script>
+    </div>
+
+    <input type="hidden" id="antiforgery_token" value="CfDJ8ONv0caE5GtEh3YJ5j088kl3yPkGm3A8Z5zoKMzkouRDLKgUqUbbh8vscw1itDhKr9ffMOCkA5GsJWV0KL2390pVa00AOuGbfPgRN5YoqvH1uwqPhw3Txj366_CPN2lIwC_XIxX_qflLXZEXyUN3Sg4" />
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-M95P3TTWJZ"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-M95P3TTWJZ');
+</script>
+<script defer src="https://hm.baidu.com/hm.js?866c9be12d4a814454792b1fd0fed295"></script>
+</body>
+</html>

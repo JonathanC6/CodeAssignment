@@ -1,0 +1,796 @@
+﻿<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="referrer" content="never" />
+    <meta name="description" content="今日，群友提问，如何实现这么一个 Loading 效果： 这个确实有点意思，但是这是 CSS 能够完成的？ 没错，这个效果中的核心气泡效果，其实借助 CSS 中的滤镜，能够比较轻松的实现，就是所需的元素可能多点。参考我们之前的： 使用纯 CSS 实现超酷炫的粘性气泡效果 巧用 CSS 实现酷炫的充电" />
+    <meta property="og:description" content="今日，群友提问，如何实现这么一个 Loading 效果： 这个确实有点意思，但是这是 CSS 能够完成的？ 没错，这个效果中的核心气泡效果，其实借助 CSS 中的滤镜，能够比较轻松的实现，就是所需的元素可能多点。参考我们之前的： 使用纯 CSS 实现超酷炫的粘性气泡效果 巧用 CSS 实现酷炫的充电" />
+    <meta http-equiv="Cache-Control" content="no-transform" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>涨姿势了，有意思的气泡 Loading 效果 - ChokCoco - 博客园</title>
+    <link rel="canonical" href="https://www.cnblogs.com/coco1s/p/17312405.html" />
+    <link rel="shortcut icon" id="favicon" href="//assets.cnblogs.com/favicon.svg?v=2" type="image/svg+xml" />
+    
+    <link rel="stylesheet" href="/css/blog-common.min.css?v=JnYHs5HAUCOVmwbxBNuH-ED7ggVDfqtff-pdhyndpr8" />
+    
+
+    
+        <link id="highlighter-theme-cnblogs" type="text/css" rel="stylesheet" href="/css/hljs/cnblogs.css?v=5J1NDtbnnIr2Rc2SdhEMlMxD4l9Eydj88B31E7_NhS4" />
+    <link type="text/css" rel="stylesheet" href="https://www.cnblogs.com/coco1s/custom.css?v=SCJ0VP&#x2B;Hc05CAeo1nDstxoEELrY=" />
+    
+    <link id="mobile-style" media="only screen and (max-width: 767px)" type="text/css" rel="stylesheet" href="/css/mobile-common.min.css?v=F2e9dMGzAUzDRZU-W-4qVsoLMeDjGqD2cUFxFY5EcWc" />
+    
+    <link type="application/rss+xml" rel="alternate" href="https://www.cnblogs.com/coco1s/rss" />
+    <link type="application/rsd+xml" rel="EditURI" href="https://www.cnblogs.com/coco1s/rsd.xml" />
+    <link type="application/wlwmanifest+xml" rel="wlwmanifest" href="https://www.cnblogs.com/coco1s/wlwmanifest.xml" />
+    <script>
+        var currentBlogId = 177636;
+        var currentBlogApp = 'coco1s';
+        var isLogined = false;
+        var isBlogOwner = false;
+        var skinName = 'ThinkInside';
+        var visitorUserId = '';
+        var hasCustomScript = true;
+        window.cb_enable_mathjax = true;
+        window.mathEngine = 0;
+        window.codeHighlightEngine = 1;
+        window.enableCodeLineNumber = false;
+        window.codeHighlightTheme = 'cnblogs';
+        window.darkModeCodeHighlightTheme = 'vs2015';
+        window.isDarkCodeHighlightTheme = false;
+        window.isDarkModeCodeHighlightThemeDark = true;
+        window.isDisableCodeHighlighter = false;
+        window.enableCodeThemeTypeFollowSystem = false;
+        window.enableMacStyleCodeBlock = false;
+    </script>
+        <script>
+            window.currentPostId = 17312405;
+            window.currentPostDateAdded = '2023-04-13 10:10';
+        </script>
+    <script src="https://assets.cnblogs.com/scripts/jquery-3.3.1.min.js"></script>
+    <script src="https://cdn-www.cnblogs.com/js/blog-common.min.js?v=e7iDdKE0ie8Fi0lKgiYt7eXqsQNrVeJmcEHX6zqQWKc"></script>
+        <script>updateCustomBlogReferrer();</script>
+    
+</head>
+<body class="skin-thinkinside no-navbar mathjax2">
+    <a name="top"></a>
+    <div id="top_nav" class="navbar forpc navbar-custom">
+        <nav id="nav_main" class="navbar-main">
+            <ul id="nav_left" class="navbar-list navbar-left">
+                <li class="navbar-branding">
+                    <a href="https://www.cnblogs.com/" title="开发者的网上家园" role="banner">
+                        <img src="//assets.cnblogs.com/logo.svg" alt="博客园Logo" />
+                    </a>
+                </li>
+                <li><a href="https://cnblogs.vip/">会员</a></li>
+                <li><a href="https://cnblogs.vip/store">周边</a></li>
+                <li>
+                    <a href="https://news.cnblogs.com/" onclick="countClicks('nav', 'skin-navbar-news')">新闻</a>
+                </li>
+                <li>
+                    <a href="https://q.cnblogs.com/" onclick="countClicks('nav', 'skin-navbar-q')">博问</a>
+                </li>
+                    <li>
+                        <a href="https://www.cnblogs.com/cmt/p/18172236" target="_blank">融资</a>
+                    </li>
+                <li><a href="https://market.cnblogs.com" target="_blank">云市场</a></li>
+            </ul>
+            <ul id="nav_right" class="navbar-list navbar-right">
+                <li>
+                    <form id="zzk_search" class="navbar-search dropdown" action="https://zzk.cnblogs.com/s" method="get" role="search">
+                        <input name="w" id="zzk_search_input" placeholder="代码改变世界" type="search" tabindex="3" autocomplete="off" />
+                        <button id="zzk_search_button" onclick="window.navbarSearchManager.triggerActiveOption()">
+                            <img id="search_icon" class="focus-hidden" src="//assets.cnblogs.com/icons/search.svg" alt="搜索" />
+                            <img class="hidden focus-visible" src="//assets.cnblogs.com/icons/enter.svg" alt="搜索" />
+                        </button>
+                        <ul id="navbar_search_options" class="dropdown-menu quick-search-menu">
+                            <li tabindex="0" class="active" onclick="zzkSearch(event, document.getElementById('zzk_search_input').value)">
+                                <div class="keyword-wrapper">
+                                    <img src="//assets.cnblogs.com/icons/search.svg" alt="搜索" />
+                                    <div class="keyword"></div>
+                                </div>
+                                <span class="search-area">所有博客</span>
+                            </li>
+                                    <li tabindex="1" onclick="zzkBlogSearch(event, 'coco1s', document.getElementById('zzk_search_input').value)">
+                                        <div class="keyword-wrapper">
+                                            <img src="//assets.cnblogs.com/icons/search.svg" alt="搜索" />
+                                            <div class="keyword"></div>
+                                        </div>
+                                        <span class="search-area">当前博客</span>
+                                    </li>
+                        </ul>
+                    </form>
+                </li>
+                <li id="navbar_login_status" class="navbar-list">
+                    <a class="navbar-user-info navbar-blog" href="https://i.cnblogs.com/EditPosts.aspx?opt=1" alt="写随笔" title="写随笔">
+                        <img id="new_post_icon" class="navbar-icon" src="//assets.cnblogs.com/icons/newpost.svg" alt="写随笔" />
+                    </a>
+                    <a id="navblog-myblog-icon" class="navbar-user-info navbar-blog" href="https://passport.cnblogs.com/GetBlogApplyStatus.aspx" alt="我的博客" title="我的博客">
+                        <img id="myblog_icon" class="navbar-icon" src="//assets.cnblogs.com/icons/myblog.svg" alt="我的博客" />
+                    </a>
+                    <a class="navbar-user-info navbar-message navbar-icon-wrapper" href="https://msg.cnblogs.com/" alt="短消息" title="短消息">
+                        <img id="msg_icon" class="navbar-icon" src="//assets.cnblogs.com/icons/message.svg" alt="短消息" />
+                        <span id="msg_count" style="display: none"></span>
+                    </a>
+                    <a id="navbar_lite_mode_indicator" data-current-page="blog" style="display: none" href="javascript:void(0)" alt="简洁模式" title="简洁模式启用，您在访问他人博客时会使用简洁款皮肤展示">
+                        <img class="navbar-icon" src="//assets.cnblogs.com/icons/lite-mode-on.svg" alt="简洁模式" />
+                    </a>
+                    <div id="user_info" class="navbar-user-info dropdown">
+                        <a class="dropdown-button" href="https://home.cnblogs.com/">
+                            <img id="user_icon" class="navbar-avatar" src="//assets.cnblogs.com/icons/avatar-default.svg" alt="用户头像" />
+                        </a>
+                        <div class="dropdown-menu">
+                            <a id="navblog-myblog-text" href="https://passport.cnblogs.com/GetBlogApplyStatus.aspx">我的博客</a>
+                            <a href="https://home.cnblogs.com/">我的园子</a>
+                            <a href="https://account.cnblogs.com/settings/account">账号设置</a>
+                            <a href="javascript:void(0)" id="navbar_lite_mode_toggle" title="简洁模式会使用简洁款皮肤显示所有博客">
+    简洁模式 <img id="navbar_lite_mode_on" src="/images/lite-mode-check.svg" class="hide" /><span id="navbar_lite_mode_spinner" class="hide">...</span>
+</a>
+                            <a href="javascript:void(0)" onclick="account.logout();">退出登录</a>
+                        </div>
+                    </div>
+                    <a class="navbar-anonymous" href="https://account.cnblogs.com/signup">注册</a>
+                    <a class="navbar-anonymous" href="javascript:void(0);" onclick="account.login()">登录</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    <div id="page_begin_html">
+        <!--<link rel="stylesheet" type="text/css" href="http://res.cocococo.com/newStyle.css" />-->
+<script>
+$('#sideBar').find('iframe').parent().remove();
+$('#sideBar>div').not('#sideBarMain').remove();
+</script>
+<script>
+if (!!$('#EntryTag').text()) {
+	var
+		firstMeta = $('meta').eq(0),
+		keywords = $('#EntryTag').text().substr(3),
+		metakeywords = "",
+		description = $('#cb_post_title_url').text(),
+		metaDescription = "";
+
+		firstMeta.after(metakeywords);
+		firstMeta.after(metaDescription);
+}
+</script>
+    </div>
+
+    <!--done-->
+<div id="home">
+<div id="header">
+	<div id="blogTitle">
+        <a id="lnkBlogLogo" href="https://www.cnblogs.com/coco1s/"><img id="blogLogo" src="/skins/custom/images/logo.gif" alt="返回主页" /></a>		
+		
+<!--done-->
+<h1><a id="Header1_HeaderTitle" class="headermaintitle HeaderMainTitle" href="https://www.cnblogs.com/coco1s">ChokCoco</a>
+</h1>
+<h2>经不住流年似水, 逃不过此间少年</h2>
+
+
+
+
+		
+	</div><!--end: blogTitle 博客的标题和副标题 -->
+	<div id="navigator">
+		
+<ul id="navList">
+<li><a id="blog_nav_sitehome" class="menu" href="https://www.cnblogs.com/">
+博客园</a>
+</li>
+<li>
+<a id="blog_nav_myhome" class="menu" href="https://www.cnblogs.com/coco1s/">
+首页</a>
+</li>
+<li>
+
+<a id="blog_nav_newpost" class="menu" href="https://i.cnblogs.com/EditPosts.aspx?opt=1">
+新随笔</a>
+</li>
+<li>
+<a id="blog_nav_contact" class="menu" href="https://msg.cnblogs.com/send/ChokCoco">
+联系</a></li>
+<li>
+<a id="blog_nav_rss" class="menu" href="javascript:void(0)" data-rss="https://www.cnblogs.com/coco1s/rss/">
+订阅</a>
+<!--<partial name="./Shared/_XmlLink.cshtml" model="Model" /></li>--></li>
+<li>
+<a id="blog_nav_admin" class="menu" href="https://i.cnblogs.com/">
+管理</a>
+</li>
+</ul>
+
+
+		<div class="blogStats">
+			<div id="blog_stats_place_holder"><script>loadBlogStats();</script></div>
+		</div><!--end: blogStats -->
+	</div><!--end: navigator 博客导航栏 -->
+</div><!--end: header 头部 -->
+<div id="main">
+	<div id="mainContent">
+	<div class="forFlow">
+		<div id="post_detail">
+    <!--done-->
+    <div id="topics">
+        <div class="post">
+            <h1 class = "postTitle">
+                <a id="cb_post_title_url" class="postTitle2 vertical-middle" href="https://www.cnblogs.com/coco1s/p/17312405.html" title="发布于 2023-04-13 10:10">
+    <span role="heading" aria-level="2">涨姿势了，有意思的气泡 Loading 效果</span>
+    
+
+</a>
+
+            </h1>
+            <div class="clear"></div>
+            <div class="postBody">
+                <div id="cnblogs_post_body" class="blogpost-body cnblogs-markdown">
+<p>今日，群友提问，如何实现这么一个 Loading 效果：</p>
+<p><img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/c4c50b7728c84a199d924a317279ada2~tplv-k3u1fbpfcp-watermark.image?" alt="" loading="lazy"></p>
+<p>这个确实有点意思，但是这是 CSS 能够完成的？</p>
+<p>没错，这个效果中的核心气泡效果，其实借助 CSS 中的滤镜，能够比较轻松的实现，就是所需的元素可能多点。参考我们之前的：</p>
+<ul>
+<li><a href="https://github.com/chokcoco/iCSS/issues/188" target="_blank" rel="noopener">使用纯 CSS 实现超酷炫的粘性气泡效果</a></li>
+<li><a href="https://github.com/chokcoco/iCSS/issues/75" target="_blank" rel="noopener">巧用 CSS 实现酷炫的充电动画</a></li>
+</ul>
+<h2 id="圆弧的实现">圆弧的实现</h2>
+<p>首先，我们可能需要实现这样一段圆弧：</p>
+<p><img src="https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/08176e9548f641f1845623eb5b7ee22c~tplv-k3u1fbpfcp-watermark.image?" alt="" loading="lazy"></p>
+<p>这里需要用到的技术是：</p>
+<p>角向渐变 <code>conic-gradient()</code> + <code>mask</code> 以及两个伪元素。图片示意如下：</p>
+<p><img src="https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/bc48fcdcb18346c6aac5bc38071f1995~tplv-k3u1fbpfcp-watermark.image?" alt="" loading="lazy"></p>
+<p>核心代码如下图：</p>
+<pre><code class="language-HTML">&lt;div class="g-container"&gt;
+  &lt;div class="g-circle"&gt;&lt;/div&gt;
+&lt;/div&gt;
+</code></pre>
+<pre><code class="language-CSS">:root {
+    --headColor: hsl(130, 75%, 75%);
+    --endColor: hsl(60, 75%, 40%);
+}
+.g-container {
+    position: relative;
+    background: #000;
+}
+.g-circle {
+    position: relative;
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    background: conic-gradient(
+        var(--headColor) 0, 
+        var(--headColor) 10%,
+        hsl(120, 75%, 70%), 
+        hsl(110, 75%, 65%), 
+        hsl(100, 75%, 60%),
+        hsl(90, 75%, 55%), 
+        hsl(80, 75%, 50%),
+        hsl(70, 75%, 45%),
+        var(--endColor) 30%,
+        var(--endColor) 35%,
+        transparent 35%
+    );
+    mask: radial-gradient(transparent, transparent 119px, #000 120px, #000 120px, #000 100%);
+    
+    &amp;::before,
+    &amp;::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        width: 30px;
+        height: 30px;
+        background: var(--headColor);
+        top: 0;
+        left: 135px;
+        border-radius: 50%;
+    }
+    
+    &amp;::after {
+        background: var(--endColor);
+        left: unset;
+        top: 214px;
+        right: 26px;
+    }
+}
+</code></pre>
+<p>这样，我们就得到了这样一个图形：</p>
+<p><img src="https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/940469a6685341d0bae707dbb35bf9cb~tplv-k3u1fbpfcp-watermark.image?" alt="" loading="lazy"></p>
+<h2 id="气泡的实现">气泡的实现</h2>
+<p>接下来，我们来实现尾部气泡向外扩散的效果。</p>
+<p>由于这里涉及了多个气泡的不同运动动画，多个标签元素肯定是少不了了。</p>
+<p>因此，接下来我们要做的事情：</p>
+<ol>
+<li>我们需要多一组元素，将其绝对定位到上述圆环的头部或者尾部</li>
+<li>给每个子元素随机设置多个大小不一的圆，颜色保持一致</li>
+<li>给每个子元素随机设置不同方向的，向外扩散的位移动画</li>
+<li>给每个子元素随机设置负的 <code>animation-delay</code>，造成动画上的先后顺序，并以此形成整个无限循环的气泡扩散动画</li>
+</ol>
+<p>这里，由于有许多小气泡的动画，这个数量，我设置成了 100。那肯定是不能一个一个手写它们的动画代码，需要借助 SASS/LESS 等预处理器的循环、随机等函数。</p>
+<p>核心代码如下：</p>
+<pre><code class="language-HTML">&lt;div class="g-container"&gt;
+  &lt;div class="g-circle"&gt;&lt;/div&gt;
+  &lt;ul class="g-bubbles"&gt;
+    &lt;li class="g-bubble"&gt;&lt;/li&gt;
+    // ... 共 100 个 bubble 元素 
+    &lt;li class="g-bubble"&gt;&lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/div&gt;
+</code></pre>
+<pre><code class="language-CSS">// 上面圆环的代码，保持一致，下面只补充气泡动画的代码
+.g-bubbles {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    border-radius: 50px;
+    top: 100px;
+    left: 235px;
+    background: var(--headColor);
+}
+
+.g-bubble {
+    position: absolute;
+    border-radius: 50%;
+    background-color: inherit;
+}
+
+@for $i from 1 through 100 { 
+    .g-bubble:nth-child(#{$i}) {
+        --rotate: calc(#{random(360)} * 1deg);
+        --dis: calc(#{random(100)} * 1px);
+        --width: calc(3px + #{random(25)} * 1px);
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: var(--width);
+        height: var(--width);
+        animation: move #{(random(1500) + 1500) / 1000}s ease-in-out -#{random(3000) / 1000}s infinite;
+    }
+}
+
+@keyframes move {
+    0% {
+        transform: translate(-50%, -50%) rotate(0deg);
+    }
+    75% {
+        opacity: .9;
+    }
+    100% {
+        transform: rotateZ(var(--rotate)) translate(-50%, var(--dis));
+        opacity: .4;
+    }
+}
+</code></pre>
+<p>核心在于 <code>@for $i from 1 through 100 { }</code> 这段 SASS 代码内部，我们实现了上面说的 (2)(3)(4) 的功能点！</p>
+<p>这样，我们就得到了这样一个效果，在尾部有大量气泡动画，不断向外扩散的效果：</p>
+<p><img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/96cbec77158143bfbfb52c839fbc5fd0~tplv-k3u1fbpfcp-watermark.image?" alt="" loading="lazy"></p>
+<h2 id="借助滤镜实现粘性气泡效果">借助滤镜实现粘性气泡效果</h2>
+<p>OK，到这里整个效果基本就做完了。当然，也是剩下最后最重要的一步，需要让多个气泡之间产生一种粘性融合的效果。</p>
+<p>这个技巧在此前非常多篇文章中，也频繁提及过，就是利用 <code>filter: contrast()</code> 滤镜与 <code>filter: blur()</code> 滤镜。</p>
+<p>如果你还不了解这个技巧，可以戳我的这篇文章看看：<a href="https://github.com/chokcoco/iCSS/issues/30" target="_blank" rel="noopener">你所不知道的 CSS 滤镜技巧与细节</a></p>
+<p>简述下该技巧：</p>
+<p>单独将两个滤镜拿出来，它们的作用分别是：</p>
+<ol>
+<li><code>filter: blur()</code>： 给图像设置高斯模糊效果。</li>
+<li><code>filter: contrast()</code>： 调整图像的对比度。</li>
+</ol>
+<p>但是，当他们“合体”的时候，产生了奇妙的融合现象。</p>
+<p><img src="https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/7bd1c75d00214f54a3d322b9a0693cad~tplv-k3u1fbpfcp-watermark.image?" alt="" loading="lazy"></p>
+<p>仔细看两圆相交的过程，在边与边接触的时候，会产生一种边界融合的效果，通过对比度滤镜把高斯模糊的模糊边缘给干掉，利用高斯模糊实现融合效果。</p>
+<p>基于此，我们再简单改造下我们的 CSS 代码，所需要加的代码量非常少：</p>
+<ol>
+<li>加上滤镜 blur() 和 contrast() ，形成融合粘性效果</li>
+<li>加上整个圆环的旋转即可效果</li>
+<li>加上滤镜 hue-rotate()，实现色彩的变换动画</li>
+</ol>
+<pre><code class="language-CSS">.g-container {
+    // ... 保持一致
+    background: #000;
+    filter: blur(3px) contrast(5);
+    animation: rotate 4s infinite linear;
+}
+@keyframes rotate {
+    100% {
+        transform: rotate(360deg);
+        filter: blur(3px) contrast(5) hue-rotate(360deg);
+    }
+}
+</code></pre>
+<p>就这样，我们就大致还原了题图的效果：</p>
+<p><img src="https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/4e4945a062b5445cbe98786b5a26aa93~tplv-k3u1fbpfcp-watermark.image?" alt="" loading="lazy"></p>
+<p>完整的代码，你可以戳这里：<a href="https://codepen.io/Chokcoco/pen/xxybQYY?editors=0100" target="_blank" rel="noopener">CodePen Demo -- Pure CSS Loading Animation</a></p>
+<h2 id="修复违和感">修复违和感</h2>
+<p>当然，上面的效果，乍一看还行，仔细看，违和感很重。</p>
+<p>原因在于，扩散出来的小球也跟着半圆环一起进行了旋转动画，看上去就有点奇怪。</p>
+<p>正确的做法应该是，圆环尾部的气泡应该是原地发散消失的。</p>
+<p>那么，怎么能够做到气泡效果，一直发生在圆环的尾部，同时消失的时候又不跟着整个圆环一起进行旋转呢？我们想要的最终效果，应该是这样：</p>
+<p><img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/6402d79346a54727aff29db156c44d9f~tplv-k3u1fbpfcp-watermark.image?" alt="" loading="lazy"></p>
+<p>这里，我们可以拆解一下。想象，如果去掉圆环的旋转，其实我们只需要实现这样一个效果即可：</p>
+<p><img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/63bd0134d14f4c7a8b12f9552d6a8f82~tplv-k3u1fbpfcp-watermark.image?" alt="" loading="lazy"></p>
+<p>整个动画的核心就转变成了如何实现这么一个效果。看似复杂，其实也很好做。</p>
+<p>首先，我们重新改造一下上述的 <code>.g-bubbles</code>。</p>
+<ol>
+<li>生成 N 个一样大小的小球元素，定位在整个容器的中间</li>
+</ol>
+<pre><code class="language-HTML">&lt;div class="g-container"&gt;
+  &lt;div class="g-circle"&gt;&lt;/div&gt;
+  &lt;ul class="g-bubbles"&gt;
+    &lt;li class="g-bubble"&gt;&lt;/li&gt;
+    // ... 共 200 个 bubble 元素 
+    &lt;li class="g-bubble"&gt;&lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/div&gt;
+</code></pre>
+<pre><code class="language-CSS">.g-bubbles {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    transform: translate(-50%, -50%);
+    left: 50%;
+    top: 50%;
+    border-radius: 50px;
+}
+.g-bubble {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: hsl(60, 75%, 40%);
+}
+</code></pre>
+<p>得到这么一个效果，所有圆形小点，都暂时汇聚在容器的中心：</p>
+<p><img src="https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/a074fda893be49c29b5bea4aeb971a67~tplv-k3u1fbpfcp-watermark.image?" alt="" loading="lazy"></p>
+<p>这里需要简单解释一下：</p>
+<p><img src="https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/847bad3bdf254d42ba795ce08ef4d66a~tplv-k3u1fbpfcp-watermark.image?" alt="" loading="lazy"></p>
+<p>其次，我们借助 SASS，按照元素的顺序，把它们顺序排列到圆环轨迹之上：</p>
+<pre><code class="language-CSS">$count: 200;
+@for $i from 1 through $count { 
+    .g-bubble:nth-child(#{$i}) {
+        --rotate: calc(#{360 / $count} * #{$i} * 1deg);
+        transform: 
+            rotateZ(var(--rotate)) 
+            translate(135px, 0);
+        opacity: 1;
+    }
+}
+</code></pre>
+<p>由于我们设置了 div 小球的个数为 200 个，这样，我们就得到了一圈由 200 个圆形小球形成的圆环：</p>
+<p><img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/9f5cd58074bd472d92fce56e08486061~tplv-k3u1fbpfcp-watermark.image?" alt="" loading="lazy"></p>
+<p>接下来这一步非常重要，我们设定一个动画：</p>
+<ol>
+<li>让每个小球在动画的 <code>75% ~ 100%</code> 阶段做透明度从 1 到 0 的变换，而 <code>0% ~ 75%</code> 的阶段保持透明度为 0</li>
+<li>让 200 个 div 依次进行这个动画效果（利用负的 animation-delay，从 -0 到 -4000ms），整体上就能形成逐渐消失的效果</li>
+</ol>
+<pre><code class="language-CSS">@for $i from 1 through $count { 
+    .g-bubble:nth-child(#{$i}) {
+        --rotate: calc(#{360 / $count} * #{$i} * 1deg);
+        --delayTime: calc(4000 * #{$i / $count} * -1ms);
+        transform: 
+            rotateZ(var(--rotate)) 
+            translate(135px, 0);
+        opacity: 1;
+        animation: showAndHide 4000ms linear var(--delayTime) infinite;
+    }
+}
+@keyframes showAndHide {
+    0% {
+        opacity: 0;
+    }
+    75% {
+        opacity: 0;
+    }
+    75.1% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+}
+</code></pre>
+<p>这样，我们就得到了一个圆形小球气泡围绕圆环渐次消失的效果：</p>
+<p><img src="https://p6-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/ae42726870384b129fb7fcd32ac7f207~tplv-k3u1fbpfcp-watermark.image?" alt="" loading="lazy"></p>
+<p>配合上整个圆环，效果就会是这样：</p>
+<p><img src="https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/793bfef4dd184cb1a648990ce3929afa~tplv-k3u1fbpfcp-watermark.image?" alt="" loading="lazy"></p>
+<p>很接近了，但是没有随机的感觉，气泡也没有散开的动画。解决的方案：</p>
+<ol>
+<li>所以我们需要让气泡在执行透明度变化的同时，进行一个随机的发散位移</li>
+<li>小圆形气泡的大小也可以带上一点随机，同时，在动画过程逐渐缩小</li>
+</ol>
+<p>当然，整个动画的基础，还是在容器设置了 滤镜 blur() 和 contrast() 的加持之下的，这样，我们给气泡再补上随机动画散开及缩放的动画：</p>
+<pre><code class="language-CSS">@for $i from 1 through $count { 
+    .g-bubble:nth-child(#{$i}) {
+        --rotate: calc(#{360 / $count} * #{$i} * 1deg);
+        --delayTime: calc(4000 * #{$i / $count} * -1ms);
+        --scale: #{0.4 + random(10) / 10};
+        --x: #{-100 + random(200)}px;
+        --y: #{-100 + random(200)}px;
+        transform: 
+            rotateZ(var(--rotate)) 
+            translate(135px, 0);
+        opacity: 1;
+        animation: showAndHide 4000ms linear var(--delayTime) infinite;
+    }
+}
+
+@keyframes showAndHide {
+    0% {
+        transform: 
+            rotateZ(var(--rotate)) 
+            translate(135px, 0);
+        opacity: 0;
+    }
+    75% {
+        opacity: 0;
+    }
+    75.1% {
+        transform: 
+            rotateZ(var(--rotate)) 
+            translate(135px, 0)
+            scale(var(--scale));
+        opacity: 1;
+    }
+    100% {
+        transform: 
+            rotateZ(var(--rotate)) 
+            translate(calc(135px + var(--x)), var(--y))
+            scale(.2);
+        opacity: 0;
+    }
+}
+</code></pre>
+<p>只看一圈的气泡圆形，我们能得到了这样的效果：</p>
+<p><img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/3d7dbb8efefd4f44b25207d098779a20~tplv-k3u1fbpfcp-watermark.image?" alt="" loading="lazy"></p>
+<p>配合上圆环的效果：</p>
+<p><img src="https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/8f1fa7f2657c41e5881ea3e5443eab43~tplv-k3u1fbpfcp-watermark.image?" alt="" loading="lazy"></p>
+<p>配合上父容器的 <code>filter: hue-rotate()</code> 动画，就能实现颜色的动态变换，得到我们最终想要的效果：</p>
+<p><img src="https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/fadf3f7b06aa461db00f1b84f141e4eb~tplv-k3u1fbpfcp-watermark.image?" alt="" loading="lazy"></p>
+<p>这样，没有了第一版本的违和感，整个效果也显得比较自然。</p>
+<p>完整的代码，你可以戳这里：<a href="https://codepen.io/Chokcoco/pen/zYmvzdB" target="_blank" rel="noopener">CodePen Demo -- Pure CSS Loading Animation</a></p>
+<h2 id="最后">最后</h2>
+<p>好了，本文到此结束，希望对你有帮助 😃</p>
+<p>如果还有什么疑问或者建议，可以多多交流，原创文章，文笔有限，才疏学浅，文中若有不正之处，万望告知。</p>
+
+</div>
+<div class="clear"></div>
+<div id="blog_post_info_block" role="contentinfo">
+    <div id="blog_post_info"></div>
+    <div class="clear"></div>
+    <div id="post_next_prev"></div>
+</div>
+            </div>
+            <div class="postDesc">posted @ 
+<span id="post-date" data-last-update-days="407.02153900872105" data-date-created="BlogServer.Application.Dto.BlogPost.BlogPostDto" data-date-updated="2023-04-13 10:10">2023-04-13 10:10</span>&nbsp;
+<a href="https://www.cnblogs.com/coco1s">ChokCoco</a>&nbsp;
+阅读(<span id="post_view_count">12055</span>)&nbsp;
+评论(<span id="post_comment_count">27</span>)&nbsp;
+<a href="https://i.cnblogs.com/EditPosts.aspx?postid=17312405" rel="nofollow">编辑</a>&nbsp;
+<a href="javascript:void(0)" onclick="AddToWz(17312405);return false;">收藏</a>&nbsp;
+<a href="javascript:void(0)" onclick="reportManager.report({ currentUserId: '', targetType: 'blogPost', targetId: '17312405', targetLink: 'https://www.cnblogs.com/coco1s/p/17312405.html', title: '涨姿势了，有意思的气泡 Loading 效果' })">举报</a>
+</div>
+        </div>
+	    
+	    
+    </div><!--end: topics 文章、评论容器-->
+</div>
+<script>
+    var cb_entryId = 17312405, cb_entryCreatedDate = '2023-04-13 10:10', cb_postType = 1, cb_postTitle = '涨姿势了，有意思的气泡 Loading 效果';
+    var allowComments = true, cb_blogId = 177636, cb_blogApp = 'coco1s', cb_blogUserGuid = '97b0660a-69a1-e311-8d02-90b11c0b17d6';
+    mermaidRender.render()
+    markdown_highlight()
+    zoomManager.apply("#cnblogs_post_body img:not(.code_img_closed):not(.code_img_opened)");    
+</script>
+<a id="!comments"></a>
+<div id="blog-comments-placeholder"></div>
+<div id="comment_form" class="commentform">
+    <a name="commentform"></a>
+    <div id="divCommentShow"></div>
+    <div id="comment_nav">
+            <a class="comment-nav-left forpc" href="https://cnblogs.vip/" target="_blank">会员力量，点亮园子希望</a>
+        <div class="comment-nav-right">
+            <span id="span_refresh_tips"></span><a href="#" onclick="return RefreshPage();">刷新页面</a><a href="#top">返回顶部</a>
+        </div>
+    </div>
+    <div id="comment_form_container"></div>
+    <div class="ad_text_commentbox" id="ad_text_under_commentbox"></div>
+        <div id="cnblogs_ch"></div>
+    <div id="opt_under_post"></div>
+        <div id="cnblogs_c1" class="under-post-card">
+            <a href="https://www.finclip.com?channel=cnblog2024" rel="nofollow" target="_blank" onclick="countCreativeClicks('C1-凡泰极客')">
+                <img src="https://img2024.cnblogs.com/blog/35695/202405/35695-20240517155930267-114888508.jpg" onload="countCreativeImpressions('C1-凡泰极客')" alt="" />
+                <span id="c1_impression" style="display:none"></span>
+            </a>
+        </div>
+    <div id="under_post_card1"></div>
+    <div id="under_post_card2"></div>
+    <div id="HistoryToday" class="under-post-card"></div>
+    <script type="text/javascript">
+        var commentManager = new blogCommentManager();
+        commentManager.renderComments(0);
+        fixPostBody();
+        window.footnoteTipManager.generateFootnoteTips();
+
+            window.tocManager.displayDisableTocTips = false;
+            window.tocManager.generateToc();
+            
+                setTimeout(function() { countViews(cb_blogId, cb_entryId); }, 50);
+            
+            deliverT2();
+            deliverC1C2();
+            loadNewsAndKb();
+            
+                LoadPostCategoriesTags(cb_blogId, cb_entryId);
+            
+            LoadPostInfoBlock(cb_blogId, cb_entryId, cb_blogApp, cb_blogUserGuid);
+            GetPrevNextPost(cb_entryId, cb_blogId, cb_entryCreatedDate, cb_postType);
+            loadOptUnderPost();
+            GetHistoryToday(cb_blogId, cb_blogApp, cb_entryCreatedDate);
+                </script>
+</div>
+
+	</div><!--end: forFlow -->
+	</div><!--end: mainContent 主体内容容器-->
+	<div id="sideBar">
+		<div id="sideBarMain">
+			<div id="sidebar_news" class="newsItem">
+    <h3 class="catListTitle">公告</h3>
+<div id="blog-news">    
+    <div id="sidebar_news_content">
+    </div>
+</div>
+<script>loadBlogNews();</script>
+
+ 
+</div>
+<div id="sidebar_c3"></div>
+			<div id="blog-calendar" style="display:none"></div><script>loadBlogDefaultCalendar();</script>			
+			<div id="leftcontentcontainer">
+				<div id="blog-sidecolumn"></div>
+                    <script>loadBlogSideColumn();</script>
+			</div>			
+		</div><!--end: sideBarMain -->
+	</div><!--end: sideBar 侧边栏容器 -->
+	<div class="clear"></div>
+	</div><!--end: main -->
+	<div class="clear"></div>
+	<div id="footer">
+		<!--done-->
+Copyright &copy; 2024 ChokCoco
+<br /><span id="poweredby">Powered by .NET 8.0 on Kubernetes</span>
+
+
+
+	</div><!--end: footer -->
+</div><!--end: home 自定义的最大容器 -->
+
+
+
+    <div id="page_end_html">
+        <script>
+var href = location.href;
+
+if(/https/.test(href)) {
+     document.querySelectorAll('iframe').forEach(val => { 
+	val.src = 'https:' + val.src.split(':')[1];
+    });
+}
+
+var l = document.createElement('link');
+l.rel = "shortcut icon";
+l.href = "http://images.cnblogs.com/cnblogs_com/coco1s/965277/o_favicon.png";
+document.getElementsByTagName("head")[0].appendChild(l);
+
+</script>
+<div id="rocket"></div>
+<script>
+var cnzz_protocol = (("https:" == document.location.protocol) ? "https://" : "http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1259286380'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s4.cnzz.com/z_stat.php%3Fid%3D1259286380%26online%3D1%26show%3Dline' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script>
+var i = 0,
+	deIframe = setInterval(function(){
+		i++;
+		$('#sideBar').find('iframe').parent().remove();
+		$('#sideBar>div').not('#sideBarMain').remove();
+		if(i == 10){
+			clearInterval(deIframe);
+		}
+	}, 200);
+</script>
+<script>
+var reward = (function(){
+	function dataInsert(){
+var data = '<div class="g-gongzhonghao">'
+    +    '<p><strong><span style="font-size: 14px; font-family: verdana, geneva;">想 Get 到最有意思的 CSS 资讯，千万不要错过我的 iCSS 公众号 😄 ：</span></strong></p>'
+    +    '<p><span style="font-size: 14px; font-family: verdana, geneva;"><a rel="nofollow noopener"  href="https://images.cnblogs.com/cnblogs_com/coco1s/965277/o_201030023049qrcode.png" target="_blank"><img src="https://images.cnblogs.com/cnblogs_com/coco1s/881614/o_20031002540054919342-6d0dfd00-4ef8-11e9-9ee8-fbae9241d89e.png" alt="image" width="180" height="144"></a></span></p>'
+    + '</div>'
+    + '<div class="m-reward">' 
+							+ '<div class="m-desc">如果觉得文章对您有用，请随意打赏。您的支持将鼓励我继续创作！</div>'
+							+ '<div class="reward-btn">打赏支持</div>'
+							+ '</div>'
+							+ '<div class="reward-wrap">'
+							+ '<div class="reward-btn-close">+</div>'
+							+ '<h2>(^_^)打个赏喝个咖啡(^_^)</h2>'
+							+ '<div class="wechat">'
+							+ '<img src="https://images.cnblogs.com/cnblogs_com/coco1s/881614/o_weixin.png" alt="微信支付" />'
+							+ '</div>'
+							+ '<div class="zhifubao">'
+							+ '<img src="https://images.cnblogs.com/cnblogs_com/coco1s/881614/o_zhifubao.png" alt="支付宝支付" />'
+							+ '</div>	'
+							+ '</div>';
+
+		if($('#cnblogs_post_body')){
+			$('#cnblogs_post_body').append(data);		
+			eventBind();
+		}					
+	}
+
+	function eventBind(){
+		$('.reward-btn').on('click', function(event) {
+			$('.reward-wrap').fadeIn(300);
+		});
+
+		$('.reward-btn-close').on('click', function(event) {
+			$('.reward-wrap').fadeOut(500);
+		});
+	}
+	
+	return{
+		init:function(){
+			dataInsert();
+		}
+	}
+})();
+reward.init();
+</script>
+<script>
+/** 侧边栏回到顶部 */
+var rocket = $('#rocket');
+
+$(window).on('scroll', debounce(slideTopSet, 300));
+
+function debounce(func, wait) {
+	var timeout;
+	return function() {
+		clearTimeout(timeout);
+		timeout = setTimeout(func, wait);
+	};
+};
+function slideTopSet() {
+	var top = $(document).scrollTop();
+
+	if (top > 200) {
+		rocket.addClass('show');
+	} else {
+		rocket.removeClass('show');
+	}
+}
+$(document).on('click', '#rocket', function(event) {
+	rocket.addClass('move');
+	$('body, html').animate({
+		scrollTop: 0
+	}, 800);
+});
+$(document).on('animationEnd', function() {
+	setTimeout(function() {
+		rocket.removeClass('move');
+	}, 400);
+
+});
+$(document).on('webkitAnimationEnd', function() {
+	setTimeout(function() {
+		rocket.removeClass('move');
+	}, 400);
+});
+</script>
+    </div>
+
+    <input type="hidden" id="antiforgery_token" value="CfDJ8ONv0caE5GtEh3YJ5j088klH-1-JNeAuBTQtSRgOzwQ1hYVcTtEwz-9K38Q7GjYZ8NU-a-By3rmECAHSUHWevCgpef71xPxIPTwsjkyCrsCyOakaYnfZpBiM7NHiCxmZtPpgNeEPW0eZC51j3jLoAV0" />
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-M95P3TTWJZ"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-M95P3TTWJZ');
+</script>
+<script defer src="https://hm.baidu.com/hm.js?866c9be12d4a814454792b1fd0fed295"></script>
+</body>
+</html>

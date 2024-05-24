@@ -1,0 +1,863 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <metaname ="renderer" content="webkit">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=2.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+    <title>武汉大学</title><meta name="pageType" content="1">
+<meta name="pageTitle" content="武汉大学">
+
+
+<META Name="SiteName" Content="武汉大学" />
+<META Name="SiteDomain" Content="www.whu.edu.cn" />
+
+    <link rel="shortcut icon" href="favicon.ico" /> 
+    <!-- Bootstrap -->
+    <link href="ch_template/css/bootstrap.min.css" rel="stylesheet">
+    <link href="ch_template/css/main.css" rel="stylesheet">
+    <link href="ch_template/css/css.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="ch_template/js/html5shiv.min.js"></script>
+      <script src="ch_template/js/respond.min.js"></script>
+    <![endif]-->
+    
+
+    
+  <!--Announced by Visual SiteBuilder 9-->
+<link rel="stylesheet" type="text/css" href="_sitegray/_sitegray_d.css" />
+<script language="javascript" src="_sitegray/_sitegray.js"></script>
+<!-- CustomerNO:7765626265723230747f475750515742000300014351 -->
+<link rel="stylesheet" type="text/css" href="index.vsb.css" />
+<script type="text/javascript" src="/system/resource/js/counter.js"></script>
+<script type="text/javascript">_jsq_(1009,'/index.jsp',-1,1236753891)</script>
+</head>
+<!--[if IE 8]><body class="ie8"><![endif]--> 
+<!--[if !IE]><body><![endif]-->
+    <nav class="navbar navbar-default navbar-top" role="navigation">
+      <div class="container">
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div>
+          <script language="javascript" src="/system/resource/js/dynclicks.js"></script><script language="javascript" src="/system/resource/js/openlink.js"></script><ul class="nav navbar-nav navbar-link">
+    <LI><a href="yhtd2/xs.htm" title="学生" onclick="_addDynClicks(&#34;wburl&#34;, 1236753891, 5647)">学生</a></li>
+    <LI><a href="yhtd2/jg.htm" title="教工" onclick="_addDynClicks(&#34;wburl&#34;, 1236753891, 5648)">教工</a></li>
+    <LI><a href="yhtd2/xy.htm" title="校友" onclick="_addDynClicks(&#34;wburl&#34;, 1236753891, 5649)">校友</a></li>
+    <LI><a href="yhtd2/ks.htm" title="考生" onclick="_addDynClicks(&#34;wburl&#34;, 1236753891, 5650)">考生</a></li>
+    <LI><a href="yhtd2/fk.htm" title="访客" onclick="_addDynClicks(&#34;wburl&#34;, 1236753891, 5651)">访客</a></li>
+</UL>
+             <ul class="nav navbar-nav">
+<li><a href="https://zhlj.whu.edu.cn" target="_blank" onclick="_addDynClicks(&#34;wburl&#34;, 1236753891, 83555)"><span class="glyphicon glyphicon-home"></span> 智慧珞珈</a></li>
+
+<li><a href="https://email.whu.edu.cn/" target="_blank" onclick="_addDynClicks(&#34;wburl&#34;, 1236753891, 83556)"><span class="glyphicon glyphicon-envelope"></span> 邮箱系统</a></li>
+
+<li><a href="http://oa2.whu.edu.cn/" target="_blank" onclick="_addDynClicks(&#34;wburl&#34;, 1236753891, 83557)"><span class="glyphicon glyphicon-list-alt"></span> 办公系统</a></li>
+</ul>
+          <ul class="nav navbar-nav navbar-right rightTop">
+    <LI><a href="http://en.whu.edu.cn" class="text-uppercase" target="_blank" title="" onclick="_addDynClicks(&#34;wburl&#34;, 1236753891, 5673)">English</a></li>
+</UL>
+          
+
+
+<script language="javascript" src="/system/resource/js/base64.js"></script><script language="javascript" src="/system/resource/js/jquery/jquery-latest.min.js"></script><script language="javascript" src="/system/resource/vue/vue.js"></script><script language="javascript" src="/system/resource/vue/bluebird.min.js"></script><script language="javascript" src="/system/resource/vue/axios.js"></script><script language="javascript" src="/system/resource/vue/polyfill.js"></script><script language="javascript" src="/system/resource/vue/token.js"></script><LINK href="/system/resource/vue/static/element/index.css" type="text/css" rel="stylesheet"><script language="javascript" src="/system/resource/vue/static/element/index.js"></script><script language="javascript" src="/system/resource/vue/static/public.js"></script><style>
+    #appu3 .qwss{
+        height: 31px;
+        font-size: 12px;
+        min-width: 190px;
+        max-width: 600px;
+        width: 60%;
+        margin-top: -15px;
+        outline: none;
+        padding-left: 10px;
+        border-radius: 2px;
+        border: 1px solid #e4e7ed;}
+    #appu3 .tj{
+        padding-left: 6px;
+        letter-spacing: 5px;
+        color: white;
+        min-width: 53px;
+        max-width: 150px;
+        height: 32px;
+        border: 0;
+        border-radius: 2px;
+        background-color: #1890FF;
+        position: relative;
+        top: 1px;
+        width: 20%;
+        margin-top: -15px;}
+</style>
+<div id="divu3" class="navbar-form navbar-right hidden-sm"></div>
+<script type="text/html" id="htmlu3">
+    <div id="appu3" class="input-group">
+        <div v-if="!isError">
+            <input type="text" class="form-control" placeholder="全文搜索" autocomplete=off v-model=query.keyWord @keyup.enter="onSubmit">
+            <span class="input-group-btn">
+         <button class="btn btn-default" type="submit" v-on:click="onSubmit()"><span class="icon icon-search"></span></button>
+      </span>
+           
+        </div>
+        <div v-if="isError" style="color: #b30216; font-size:18px;text-align: center;padding:20px;">
+            应用维护中！
+        </div>
+    </div>
+</script>
+<script>
+    $("#divu3").html($("#htmlu3").text());
+</script>
+<script>
+    var appOwner = "1236753891";
+    var token = "tourist";
+    var urlPrefix = "/aop_component/";
+
+    jQuery.support.cors = true;
+    $.ajaxSetup({
+        beforeSend: function (request, settings) {
+            request.setRequestHeader("Authorization", token);
+            request.setRequestHeader("owner", appOwner);
+        }
+    });
+
+    new Vue({
+        el: "#appu3",
+        data: function () {
+            return {
+                query: {
+                    keyWord: "",//搜索关键词
+                    owner: appOwner,
+                    token: token,
+                    urlPrefix: urlPrefix,
+                    lang:"i18n_zh_CN"
+                },
+                isError: false
+            }
+        },
+        mounted: function () {
+            var _this = this;
+            // _this.init();
+        },
+        methods: {
+            init: function(){
+                $.ajax({
+                    url: "/aop_component//webber/search/test",
+                    type: "get",
+                    success: function (response) {
+                        if (response.code == "0000") {
+                        } else if (response.code == "220") {
+                            _this.isError = true;
+                            console.log(response);
+                        } else if (!response.code) {
+                            _this.isError = true;
+                            console.log(response);
+                        }
+                    },
+                    error: function (response) {
+                        _this.isError = true;
+                    }
+                });
+            },
+            onSubmit: function (e) {
+                var url = "/views/search/modules/resultpc/soso.html";
+                if ("10" == "1" || "10" == "2") {
+                    url = "" + url;
+                }
+                var _this = this;
+                var query = _this.query;
+                if (url.indexOf("?") > -1) {
+                    url = url.split("?")[0];
+                }
+                if (query.keyWord) {
+                    var query = new Base64().encode(JSON.stringify(query));
+                    window.open(url + "?query=" + query);
+                } else {
+                    alert("请填写搜索内容")
+                }
+            },
+        }
+    })
+</script>
+        </div><!-- /.navbar-collapse -->
+      </div>
+    </nav>
+    <nav class="navbar navbar-main" role="navigation">
+      <div class="container">
+                    <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+                    <!--<a class="logo" href="http://www.whu.edu.cn/"><img src="images/toplog1.png" alt=""> </a>-->
+          <a class="logo" href="http://www.whu.edu.cn/"><img src="images/toplog1.png" alt="" width="245"> </a>
+        </div>
+        <!-- Collect the nav links, forms, and other content for toggling -->
+<div class="collapse navbar-collapse navbar-ex1-collapse">
+  <ul class="nav navbar-nav navbar-right">
+    <li class="visible-xs visible-sm"><a href="index.htm"><span class="glyphicon glyphicon-home"></span> 回到首页</a></li>
+    <li class="dropdown">
+      <a data-toggle="dropdown" role="button" aria-expanded="false" href="xxgk/xxjj.htm">学校概况</a>
+      <ul class="dropdown-menu" role="menu">
+        <li><a href="xxgk/xxjj.htm">学校简介</a></li>
+        <li><a href="xxgk/wdbs.htm">武大标识</a></li>
+        <li><a href="xxgk/bnxs.htm">百年校史</a></li>
+        <li><a href="xxgk/wdzc.htm">武大章程</a></li>
+        <li><a href="xxgk/lrld.htm">历任领导</a></li>
+        <li><a href="xxgk/xrld.htm">现任领导</a></li>
+        <li><a href="xxgk/jcxy.htm">杰出校友</a></li>
+        <li><a href="xxgk/ljyx/n2024/jan.htm">珞珈映像</a></li>
+        <li><a href="xxgk/tjgl.htm">统计概览</a></li>
+        <li><a href="http://map.whu.edu.cn" target="_blank">校园导览</a></li>
+      </ul>
+    </li>
+    <li class="dropdown">
+      <a data-toggle="dropdown" role="button" aria-expanded="false" href="jgsz/yxsz.htm">机构设置</a>
+      <ul class="dropdown-menu" role="menu">
+        <li><a href="jgsz/yxsz.htm">院系设置</a></li>
+        <li><a href="jgsz/znbm.htm">职能部门</a></li>
+        <li><a href="jgsz/zjqtzz.htm">群团组织</a></li>
+        <li><a href="jgsz/zsdw.htm">直属单位</a></li>
+        <li><a href="jgsz/fsyy.htm">附属医院</a></li>
+        <li><a href="jgsz/jyxdw.htm">经营性单位</a></li>
+      </ul>
+    </li>
+    <li class="dropdown">
+      <a data-toggle="dropdown" role="button" aria-expanded="false" href="szdw.htm">师资队伍</a>
+      <ul class="dropdown-menu" role="menu">
+        <li><a href="szdw/lyys.htm">两院院士</a></li>
+        <li><a href="szdw/rwskzsjs.htm">人文社科资深教授</a></li>
+        <li><a href="szdw/gjjxms.htm">国家教学名师</a></li>
+        <li><a href="szdw/gjjq.htm">国家杰青</a></li>
+      </ul>
+    </li>
+    <li class="dropdown">
+      <a data-toggle="dropdown" role="button" aria-expanded="false" href="rcpy.htm">人才培养</a>
+      <ul class="dropdown-menu" role="menu">
+        <li><a href="rcpy/bksjy.htm">本科生教育</a></li>
+        <li><a href="rcpy/yjsjy.htm">研究生教育</a></li>
+        <li><a href="rcpy/gjjy.htm">国际教育</a></li>
+        <li><a href="http://zzgl.whu.edu.cn" target="_blank">学生资助</a></li>
+        <li><a href="rcpy/jxjy.htm">继续教育</a></li>
+      </ul>
+    </li>
+    <li class="dropdown">
+      <a data-toggle="dropdown" role="button" aria-expanded="false" href="kxyj.htm">科学研究</a>
+      <ul class="dropdown-menu" role="menu">
+        <li><a href="kxyj/jh2011.htm">2011计划</a></li>
+        <li><a href="kxyj/dxkjcyjy.htm">多学科交叉研究院</a></li>
+        <li><a href="kxyj/kyjg.htm">科研机构</a></li>
+        <li><a href="kxyj/xsqk.htm">学术期刊</a></li>
+      </ul>
+    </li>
+    <li class="dropdown">
+      <a data-toggle="dropdown" role="button" aria-expanded="false" href="shfw.htm">社会服务</a>
+      <ul class="dropdown-menu" role="menu">
+        <li><a href="shfw/zwyjjg.htm">驻外研究机构</a></li>
+        <li><a href="shfw/kjcgzhpt.htm">科技成果转化平台</a></li>
+        <li><a href="shfw/zdcxyfzx.htm">重点产学研发中心</a></li>
+        <li><a href="shfw/zdkjqy.htm">重点科技企业</a></li>
+        <li><a href="http://gxpt.whu.edu.cn/genee02/">大型仪器共享平台</a></li>
+      </ul>
+    </li>
+    <li class="dropdown">
+      <a data-toggle="dropdown" role="button" aria-expanded="false" href="hzjl.htm">交流合作</a>
+      <ul class="dropdown-menu" role="menu">
+        <li><a href="http://oir.whu.edu.cn/" target="_blank">国际交流</a></li>
+        <li><a href="hzjl/kzxy.htm">孔子学院</a></li>
+        <li><a href="hzjl/ksdkdx.htm">昆山杜克大学</a></li>
+        <li><a href="hzjl/htjd.htm">汉推基地</a></li>
+      </ul>
+    </li>
+    <li class="dropdown">
+      <a data-toggle="dropdown" role="button" aria-expanded="false" href="whsh.htm">文化生活</a>
+      <ul class="dropdown-menu" role="menu">
+        <li><a href="whsh/zqjzq.htm">早期建筑群</a></li>
+        <li><a href="http://gh.whu.edu.cn" target="_blank">工会活动</a></li>
+        <li><a href="whsh/xshd.htm">学生活动</a></li>
+        <li><a href="http://museum.whu.edu.cn" target="_blank">博物馆</a></li>
+        <li><a href="whsh/wtcg.htm">文体场馆</a></li>
+      </ul>
+    </li>
+  </ul>
+</div><!-- /.navbar-collapse -->
+      </div>
+    </nav>
+    <div class="container">
+      <div id="mycarousel" class="carousel slide myslide">
+        <!-- Indicators -->
+        <ol class="carousel-indicators"></ol>
+
+        <!-- Wrapper for slides -->
+        <div class="carousel-inner" role="listbox"></div>
+      </div>
+    </div>
+    <div class="container">
+      <div class="row">
+       <script language="javascript" src="/system/resource/js/centerCutImg.js"></script><script language="javascript" src="/system/resource/js/ajax.js"></script> <div class="col-sm-12">
+   <p class="page-header">
+     头条新闻 <small class="text-green text-uppercase">headline</small>
+     <a href="http://news.whu.edu.cn/" target="_blank" class="text-grey pull-right font14"><span class="icon icon-c"></span> 武大新闻网</a>
+   </p>
+ </div>
+ <div class="col-sm-12 col-md-4">
+   <div class="panel panel-success">
+         <div class="panel-header img-ctrl">
+       <a href="http://news.whu.edu.cn/info/1006/459727.htm" target="_blank" title="张平文率团访问肯尼亚、埃及和摩洛哥" onclick="_addDynClicks('wbnews','1236753891', 180194) "><img src="/__local/B/89/2A/27802F9C815CF1CF0E71A3A6EC2_453B0D86_2A593.jpg" class="img-width" alt="张平文率团访问肯尼亚、埃及和摩洛哥"></a>
+       <span style="display:none;">/__local/B/89/2A/27802F9C815CF1CF0E71A3A6EC2_453B0D86_2A593.jpg</span>
+     </div>
+     <div class="panel-body" style="padding-bottom:8px;">
+        <h5 class="media-heading text-nowrap"><a href="http://news.whu.edu.cn/info/1006/459727.htm" target="_blank" title="张平文率团访问肯尼亚、埃及和摩洛哥" onclick="_addDynClicks('wbnews','1236753891', 180194) ">张平文率团访问肯尼亚、埃及和摩洛哥</a></h5>
+        <div class="text-grey f1">推动我校与相关机构及高校的务实合作，构建对非合作新格局，拓展国际合作新空间</div>
+     </div>
+   </div>
+ </div>
+ 
+
+ <div class="col-sm-6 col-md-4">
+  <div class="panel panel-success ctrl-xs">
+    <div class="panel-body">
+       <ul class="list-unstyled list-news">
+         <li>
+           <div class="media">
+             <a class="pull-left" href="http://news.whu.edu.cn/info/1002/459767.htm" target="_blank" title="武汉大学与中国极地研究中心签署合作协议" onclick="_addDynClicks('wbnews','1236753891', 180184) ">
+               <div class="imgCon"><img width="120" src="/__local/A/85/72/D81EC64211EA2ADDD9D8449AA89_9CEDACED_5A1CD.jpeg" alt=""></div>
+             </a>
+             <div class="media-body">
+               <h5 class="media-heading text-nowrap"><a href="http://news.whu.edu.cn/info/1002/459767.htm" target="_blank" title="武汉大学与中国极地研究中心签署合作协议" onclick="_addDynClicks('wbnews','1236753891', 180184) ">武汉大学与中国极地研究中心签署合作协议</a></h5>
+               <p class="text-grey">双方将在人才培养、科学研究和科学考察等多个领域进一步发挥互补优势，为极地强国战略作出新的更大贡献</p>
+             </div>
+           </div>
+         </li>
+         <li>
+           <div class="media">
+             <a class="pull-left" href="http://news.whu.edu.cn/info/1002/459587.htm" target="_blank" title="学校党委理论学习中心组（扩大）围绕党纪学习教育举行专题辅导报告会" onclick="_addDynClicks('wbnews','1236753891', 180004) ">
+               <div class="imgCon"><img width="120" src="/__local/E/ED/A7/62CD59F40D51320AE2D8B837EFC_ADA61D05_29257.jpeg" alt=""></div>
+             </a>
+             <div class="media-body">
+               <h5 class="media-heading text-nowrap"><a href="http://news.whu.edu.cn/info/1002/459587.htm" target="_blank" title="学校党委理论学习中心组（扩大）围绕党纪学习教育举行专题辅导报告会" onclick="_addDynClicks('wbnews','1236753891', 180004) ">学校党委理论学习中心组（扩大）围绕党纪学习教育举行专题辅导报告会</a></h5>
+               <p class="text-grey">万清祥作题为《力学笃行坚守底线——准确把握“六项纪律”的主旨要义和规定要求》的专题辅导报告</p>
+             </div>
+           </div>
+         </li>
+         <li class="last">
+           <div class="media">
+             <a class="pull-left" href="http://news.whu.edu.cn/info/1013/459487.htm" target="_blank" title="武汉大学与中国新闻社签署战略合作协议" onclick="_addDynClicks('wbnews','1236753891', 179914) ">
+               <div class="imgCon"><img width="120" src="/__local/9/CD/2D/C4820B194C61A25297A97A7A208_2EABD611_4105F.jpg" alt=""></div>
+             </a>
+             <div class="media-body">
+               <h5 class="media-heading text-nowrap"><a href="http://news.whu.edu.cn/info/1013/459487.htm" target="_blank" title="武汉大学与中国新闻社签署战略合作协议" onclick="_addDynClicks('wbnews','1236753891', 179914) ">武汉大学与中国新闻社签署战略合作协议</a></h5>
+               <p class="text-grey">共同探索加强国际传播合作</p>
+             </div>
+           </div>
+         </li>
+       </ul>
+    </div>
+  </div>
+</div>
+
+
+<div class="col-sm-6 col-md-4">
+  <div class="panel panel-success ctrl-xs">
+    <div class="panel-body">
+       <ul class="list-unstyled list-news">
+         <li>
+           <div class="media">
+             <a class="pull-left" href="http://news.whu.edu.cn/info/1002/459617.htm" title="珞珈三号02星成功发射入轨" target="_blank" onclick="_addDynClicks('wbnews','1236753891', 180034) ">
+               <div class="imgCon"><img width="120" src="/__local/F/25/32/A68F65DB3F0C667285140546EBE_4EECB869_1DDF4.jpg" alt=""></div>
+             </a>
+             <div class="media-body">
+               <h5 class="media-heading text-nowrap"><a href="http://news.whu.edu.cn/info/1002/459617.htm" title="珞珈三号02星成功发射入轨" target="_blank" onclick="_addDynClicks('wbnews','1236753891', 180034) ">珞珈三号02星成功发射入轨</a></h5>
+               <p class="text-grey">5月21日中午12时15分，珞珈三号科学试验卫星02星搭载快舟十一号（KZ-11）固体运载成功升空并顺利进入预定轨道</p>
+             </div>
+           </div>
+         </li>
+         <li>
+           <div class="media">
+             <a class="pull-left" href="http://news.whu.edu.cn/info/1015/459457.htm" title="我校举办“数智文科：机遇与挑战”学术论坛" target="_blank" onclick="_addDynClicks('wbnews','1236753891', 179934) ">
+               <div class="imgCon"><img width="120" src="/__local/9/87/D4/6A161ABA7367C8F9BAB83A3EFC0_2A96576A_1CAE3.jpeg" alt=""></div>
+             </a>
+             <div class="media-body">
+               <h5 class="media-heading text-nowrap"><a href="http://news.whu.edu.cn/info/1015/459457.htm" title="我校举办“数智文科：机遇与挑战”学术论坛" target="_blank" onclick="_addDynClicks('wbnews','1236753891', 179934) ">我校举办“数智文科：机遇与挑战”学术论坛</a></h5>
+               <p class="text-grey">纪念习近平总书记“5.17”重要讲话发表八周年，不断推动数智与人文的双向赋能</p>
+             </div>
+           </div>
+         </li>
+         <li class="last">
+           <div class="media">
+             <a class="pull-left" href="http://news.whu.edu.cn/info/1002/459087.htm" title="武汉大学学习传达习近平总书记对思政课建设作出的重要指示精神" target="_blank" onclick="_addDynClicks('wbnews','1236753891', 179604) ">
+               <div class="imgCon"><img width="120" src="/__local/D/5E/FD/55DDDA402282F3D45D46F4878F3_4B4E272F_25CCB.jpeg" alt=""></div>
+             </a>
+             <div class="media-body">
+               <h5 class="media-heading text-nowrap"><a href="http://news.whu.edu.cn/info/1002/459087.htm" title="武汉大学学习传达习近平总书记对思政课建设作出的重要指示精神" target="_blank" onclick="_addDynClicks('wbnews','1236753891', 179604) ">武汉大学学习传达习近平总书记对思政课建设作出的重要指示精神</a></h5>
+               <p class="text-grey">​学习传达习近平总书记对学校思政课建设作出的重要指示及新时代学校思政课建设推进会精神</p>
+             </div>
+           </div>
+         </li>
+       </ul>
+    </div>
+  </div>
+</div><script>_showDynClickBatch(['dynclicks_u6_180194','dynclicks_u6_180184','dynclicks_u6_180034','dynclicks_u6_180004','dynclicks_u6_179934','dynclicks_u6_179914','dynclicks_u6_179604'],[180194,180184,180034,180004,179934,179914,179604],"wbnews", 1236753891)</script>
+
+      </div>
+      <div class="row">
+        <div class="col-sm-4">
+  <p class="page-header bb1">
+    珞珈新闻 <small class="text-green text-uppercase">news</small>
+    <a href="http://news.whu.edu.cn" target="_blank" class="pull-right text-grey font14"><span class="icon icon-more"></span> 更多</a>
+  </p>
+  <div class="panel">
+    <div>
+       <ul class="list-unstyled list">
+     <li>
+           <a href="http://news.whu.edu.cn/info/1013/459797.htm" target="_blank" title="袁玉峰调研国际交流部" onclick="_addDynClicks('wbnews','1236753891', 180224) ">袁玉峰调研国际交流部</a>
+         </li>
+     <li>
+           <a href="http://news.whu.edu.cn/info/1007/459737.htm" target="_blank" title="热血激昂，“腾飞”远航（组图）" onclick="_addDynClicks('wbnews','1236753891', 180164) ">热血激昂，“腾飞”远航（组图）</a>
+         </li>
+     <li>
+           <a href="http://news.whu.edu.cn/info/1013/459717.htm" target="_blank" title="中南民族大学一行来校交流本科人才培养工作" onclick="_addDynClicks('wbnews','1236753891', 180144) ">中南民族大学一行来校交流本科人才培养工作</a>
+         </li>
+     <li>
+           <a href="http://paper.people.com.cn/rmrb/html/2024-05/23/nw.D110000renmrb_20240523_2-13.htm" target="_blank" title="【人民日报】李汶泽：为文化馆增添更多生活范（新语）" onclick="_addDynClicks('wbnews','1236753891', 180124) ">【人民日报】李汶泽：为文化馆增添更多生活范（新语）</a>
+         </li>
+     <li>
+           <a href="http://news.whu.edu.cn/info/1007/459777.htm" target="_blank" title="武汉大学在2024中国机器人暨RoboCup世界杯中国赛中斩获3项全国一等奖" onclick="_addDynClicks('wbnews','1236753891', 180204) ">武汉大学在2024中国机器人暨RoboCup世界杯中国赛中斩获3项全国一等奖</a>
+         </li>
+     <li>
+           <a href="http://news.whu.edu.cn/info/1007/459687.htm" target="_blank" title="武汉大学阳光组女子排球队夺得全国排球联赛冠军" onclick="_addDynClicks('wbnews','1236753891', 180114) ">武汉大学阳光组女子排球队夺得全国排球联赛冠军</a>
+         </li>
+     <li>
+           <a href="http://news.whu.edu.cn/info/1013/459677.htm" target="_blank" title="2024年度产业工作研讨会举行" onclick="_addDynClicks('wbnews','1236753891', 180104) ">2024年度产业工作研讨会举行</a>
+         </li>
+     <li>
+           <a href="https://epaper.gmw.cn/gmrb/html/2024-05/23/nw.D110000gmrb_20240523_1-11.htm" target="_blank" title="【光明日报】傅才武：“史学是永无止境的远航”" onclick="_addDynClicks('wbnews','1236753891', 180064) ">【光明日报】傅才武：“史学是永无止境的远航”</a>
+         </li>
+       </ul>
+    </div>
+  </div>
+</div><script>_showDynClickBatch(['dynclicks_u7_180224','dynclicks_u7_180164','dynclicks_u7_180144','dynclicks_u7_180124','dynclicks_u7_180204','dynclicks_u7_180114','dynclicks_u7_180104','dynclicks_u7_180064'],[180224,180164,180144,180124,180204,180114,180104,180064],"wbnews", 1236753891)</script>
+
+        <div class="col-sm-4">
+   <p class="page-header bb1">
+     学术动态 <small class="text-green text-uppercase">academic</small>
+     <a href="http://news.whu.edu.cn/kydt.htm" target="_blank" class="pull-right text-grey font14"><span class="icon icon-more"></span> 更多</a>
+   </p>
+   <div class="panel">
+     <div>
+        <ul class="list-unstyled list">
+     <li>
+       <a href="http://news.whu.edu.cn/info/1015/459787.htm" target="_blank" title="张晖课题组在高级氧化水处理领域取得新进展" onclick="_addDynClicks('wbnews','1236753891', 180214) ">张晖课题组在高级氧化水处理领域取得新进展</a>
+     </li>
+     <li>
+       <a href="http://news.whu.edu.cn/info/1015/459757.htm" target="_blank" title="【珞珈讲坛】叶林院士谈基于熔丝沉积的连续纤维复合材料增材制造" onclick="_addDynClicks('wbnews','1236753891', 180174) ">【珞珈讲坛】叶林院士谈基于熔丝沉积的连续纤维复合材料增材制造</a>
+     </li>
+     <li>
+       <a href="https://epaper.hubeidaily.net/pc/content/202405/23/content_274618.html" target="_blank" title="【湖北日报】沈壮海 司文超：以新气象新作为 开创新时代思政教育新局面" onclick="_addDynClicks('wbnews','1236753891', 180084) ">【湖北日报】沈壮海 司文超：以新气象新作为 开创新时代思政教育新局面</a>
+     </li>
+     <li>
+       <a href="http://news.whu.edu.cn/info/1015/459657.htm" target="_blank" title="第二届科技计量与科技管理青年论坛召开" onclick="_addDynClicks('wbnews','1236753891', 180074) ">第二届科技计量与科技管理青年论坛召开</a>
+     </li>
+     <li>
+       <a href="http://news.whu.edu.cn/info/1015/459637.htm" target="_blank" title="陈海嵩课题组创新引入中国环境治理模式新视角" onclick="_addDynClicks('wbnews','1236753891', 180054) ">陈海嵩课题组创新引入中国环境治理模式新视角</a>
+     </li>
+     <li>
+       <a href="https://epaper.gmw.cn/gmrb/html/2024-05/22/nw.D110000gmrb_20240522_1-14.htm" target="_blank" title="【光明日报】汪树东：探寻生态文学创作的基本维度" onclick="_addDynClicks('wbnews','1236753891', 180044) ">【光明日报】汪树东：探寻生态文学创作的基本维度</a>
+     </li>
+     <li>
+       <a href="https://epaper.gmw.cn/gmrb/html/2024-05/20/nw.D110000gmrb_20240520_1-14.htm" target="_blank" title="【光明日报】刘礼堂 单思伟：长江中游史前文化格局及其演进之路" onclick="_addDynClicks('wbnews','1236753891', 179984) ">【光明日报】刘礼堂 单思伟：长江中游史前文化格局及其演进之路</a>
+     </li>
+     <li>
+       <a href="http://news.whu.edu.cn/info/1015/459557.htm" target="_blank" title="【珞珈讲坛】宁琦教授谈文明交流互鉴中的外语人才跨文化能力培养" onclick="_addDynClicks('wbnews','1236753891', 179974) ">【珞珈讲坛】宁琦教授谈文明交流互鉴中的外语人才跨文化能力培养</a>
+     </li>
+        </ul>
+     </div>
+   </div>
+ </div><script>_showDynClickBatch(['dynclicks_u8_180214','dynclicks_u8_180174','dynclicks_u8_180084','dynclicks_u8_180074','dynclicks_u8_180054','dynclicks_u8_180044','dynclicks_u8_179984','dynclicks_u8_179974'],[180214,180174,180084,180074,180054,180044,179984,179974],"wbnews", 1236753891)</script>
+
+        <div class="col-sm-4">
+  <p class="page-header bb1">
+    通知公告 <small class="text-green text-uppercase">info</small>
+    <a href="tzgg.htm" target="_blank" class="pull-right text-grey font14"><span class="icon icon-more"></span> 更多</a>
+  </p>
+  <div class="panel">
+    <div>
+       <ul class="list-unstyled list">
+         <li>
+          <a href="info/1118/174554.htm" title="武汉大学“弘毅博士后”计划2024年全球招募公告" target="_blank">武汉大学“弘毅博士后”计划2024年全球招募公告</a>
+         </li>
+         <li>
+          <a href="info/1118/177244.htm" title="关于开展“拾忆校报·书画传情”征文活动的通知" target="_blank">关于开展“拾忆校报·书画传情”征文活动的通知</a>
+         </li>
+         <li>
+          <a href="ch_template/tzggContent.jsp?urltype=news.NewsContentUrl&wbtreeid=1118&wbnewsid=179074" title="关于组织参加第十九届“挑战杯”全国大学生课外学术科技作品竞赛2024年度“揭榜挂帅”专项赛的通知" target="_blank">关于组织参加第十九届“挑战杯”全国大学生课外学术科技作品竞赛2024年度“揭榜挂帅”专项赛的通知</a>
+         </li>
+         <li>
+          <a href="info/1118/179314.htm" title="关于举办中国国际大学生创新大赛（2024）武汉大学选拔赛的通知" target="_blank">关于举办中国国际大学生创新大赛（2024）武汉大学选拔赛的通知</a>
+         </li>
+         <li>
+          <a href="info/1118/179674.htm" title="珞珈讲坛第431讲预告" target="_blank">珞珈讲坛第431讲预告</a>
+         </li>
+         <li>
+          <a href="info/1118/179794.htm" title="珞珈讲坛第432讲预告" target="_blank">珞珈讲坛第432讲预告</a>
+         </li>
+         <li>
+          <a href="info/1118/179264.htm" title="冷冻超薄切片机(Leica EM UC7/FC7)试运行公告" target="_blank">冷冻超薄切片机(Leica EM UC7/FC7)试运行公告</a>
+         </li>
+         <li>
+          <a href="info/1118/179274.htm" title="高压冷冻仪（LEICA EM ICE）试运行公告" target="_blank">高压冷冻仪（LEICA EM ICE）试运行公告</a>
+         </li>
+       </ul>
+    </div>
+  </div>
+</div><script>_showDynClickBatch(['dynclicks_u9_174554','dynclicks_u9_177244','dynclicks_u9_179074','dynclicks_u9_179314','dynclicks_u9_179674','dynclicks_u9_179794','dynclicks_u9_179264','dynclicks_u9_179274'],[174554,177244,179074,179314,179674,179794,179264,179274],"wbnews", 1236753891)</script>
+
+      </div>
+      <div class="row">
+<div class="col-sm-12">
+  <p class="page-header bb1">
+    专题网站 <small class="text-green text-uppercase">topics</small>
+    <a href="ztwz.htm" target="_blank" class="pull-right text-grey font14"><span class="icon icon-more"></span> 更多</a>
+  </p>
+  <div class="panel">    
+    <div class="row">
+      <div class="col-xs-6 col-sm-3">
+        <div class="media">
+          <a href="http://zyhxxx.whu.edu.cn/" target="_blank" title="学习习近平总书记重要回信精神专题网站">
+            <img class="media-object" src="/__local/2/64/7A/842E4BEC35295EC74BAA44AC89F_566ED1CC_B20A.jpg" alt="学习习近平总书记重要回信精神专题网站">
+          </a>
+          <div class="media-body">
+            <h5 class="text-center mediatitle"><a href="http://zyhxxx.whu.edu.cn/" target="_blank" title="学习习近平总书记重要回信精神专题网站" onclick="_addDynClicks('wbnews','1236753891', 172024) ">学习习近平总书记重要回信精神专题网站</a></h5>
+          </div>
+        </div>
+      </div>
+      <div class="col-xs-6 col-sm-3">
+        <div class="media">
+          <a href="https://djxxjy.whu.edu.cn/" target="_blank" title="党纪学习教育专题网">
+            <img class="media-object" src="/__local/D/1B/9A/50686A4B9AFBE7CDD842E757D0C_57C46B29_CA4E.jpg" alt="党纪学习教育专题网">
+          </a>
+          <div class="media-body">
+            <h5 class="text-center mediatitle"><a href="https://djxxjy.whu.edu.cn/" target="_blank" title="党纪学习教育专题网" onclick="_addDynClicks('wbnews','1236753891', 179114) ">党纪学习教育专题网</a></h5>
+          </div>
+        </div>
+      </div>
+      <div class="col-xs-6 col-sm-3">
+        <div class="media">
+          <a href="http://ztjy2023.whu.edu.cn/index.htm" target="_blank" title="学习贯彻习近平新时代中国特色社会主义思想主题教育专题网">
+            <img class="media-object" src="/__local/4/4C/F8/97D950A3153DBE51213D9F232F2_7AFC80B3_295A.jpg" alt="学习贯彻习近平新时代中国特色社会主义思想主题教育专题网">
+          </a>
+          <div class="media-body">
+            <h5 class="text-center mediatitle"><a href="http://ztjy2023.whu.edu.cn/index.htm" target="_blank" title="学习贯彻习近平新时代中国特色社会主义思想主题教育专题网" onclick="_addDynClicks('wbnews','1236753891', 22980) ">学习贯彻习近平新时代中国特色社会主义思想主题教育专题网</a></h5>
+          </div>
+        </div>
+      </div>
+      <div class="col-xs-6 col-sm-3">
+        <div class="media">
+          <a href="https://shpg.whu.edu.cn" target="_blank" title="武汉大学本科教育教学审核评估网">
+            <img class="media-object" src="/__local/0/6F/5B/032833BB5156C95333262997D43_C9C6F600_DC1F.png" alt="武汉大学本科教育教学审核评估网">
+          </a>
+          <div class="media-body">
+            <h5 class="text-center mediatitle"><a href="https://shpg.whu.edu.cn" target="_blank" title="武汉大学本科教育教学审核评估网" onclick="_addDynClicks('wbnews','1236753891', 180094) ">武汉大学本科教育教学审核评估网</a></h5>
+          </div>
+        </div>
+      </div>
+    </div>
+   </div>
+  </div>
+</div><script>_showDynClickBatch(['dynclicks_u10_172024','dynclicks_u10_179114','dynclicks_u10_22980','dynclicks_u10_180094'],[172024,179114,22980,180094],"wbnews", 1236753891)</script>
+
+    </div>
+    <div class="bottom">
+      <div class="container">
+        <div class="row">
+                       
+          <div class="col-sm-4 col-md-3 col-lg-4 text-center">
+            <!--<p class="mb30"><a href="index.htm"><img src="ch_template/img/logo1522.png" alt=""></a></p>-->
+            <p class="mb30"><a href="index.htm"><img src="images/logobottom2.png" alt="" style="max-width: 39%"></a></p>
+          </div>
+
+          <div class="col-sm-8 col-md-5 col-lg-5">
+  <div class="row">
+    
+   <div class="col-xs-4">
+     <UL class="list-unstyled list">
+            <LI><a href="http://fzghb.whu.edu.cn/xswyh/index.htm" target="_blank" title="学术委员会" onclick="_addDynClicks(&#34;wburl&#34;, 1236753891, 5757)">学术委员会</a></li>
+        <LI><a href="http://rsb.whu.edu.cn/xiaowai.htm" target="_blank" title="" onclick="_addDynClicks(&#34;wburl&#34;, 1236753891, 5658)">人才招聘</a></li>
+        <LI><a href="http://info.whu.edu.cn/" target="_blank" title="" onclick="_addDynClicks(&#34;wburl&#34;, 1236753891, 5656)">信息公开</a></li>
+        <LI><a href="http://aoff.whu.edu.cn/" target="_blank" title="" onclick="_addDynClicks(&#34;wburl&#34;, 1236753891, 5663)">阳光招生</a></li>
+        <LI><a href="https://zhlj.whu.edu.cn/pc/index" target="_blank" title="智慧珞珈" onclick="_addDynClicks(&#34;wburl&#34;, 1236753891, 84052)">智慧珞珈</a></li>
+     </UL>
+    </div>
+
+   <div class="col-xs-4">
+     <UL class="list-unstyled list">
+        <LI><a href="http://alumni.whu.edu.cn" target="_blank" title="" onclick="_addDynClicks(&#34;wburl&#34;, 1236753891, 5653)">校友总会</a></li>
+        <LI><a href="http://www.lib.whu.edu.cn" target="_blank" title="" onclick="_addDynClicks(&#34;wburl&#34;, 1236753891, 5652)">图书馆</a></li>
+        <LI><a href="http://zb.whu.edu.cn" target="_blank" title="" onclick="_addDynClicks(&#34;wburl&#34;, 1236753891, 5657)">招投标信息</a></li>
+        <LI><a href="http://zzgl.whu.edu.cn/" target="_blank" title="" onclick="_addDynClicks(&#34;wburl&#34;, 1236753891, 5664)">学生资助</a></li>
+        <LI><a href="https://vpn.whu.edu.cn" target="_blank" title="" onclick="_addDynClicks(&#34;wburl&#34;, 1236753891, 5659)">VPN通道</a></li>
+     </UL>
+   </div>
+
+   <div class="col-xs-4">
+     <UL class="list-unstyled list">
+        <LI><a href="ldxx.htm" target="_blank" title="xzxx@whu.edu.cn" onclick="_addDynClicks(&#34;wburl&#34;, 1236753891, 5655)">领导信箱</a></li>
+        <LI><a href="https://www.dukekunshan.edu.cn/zh-hans/" target="_blank" title="昆山杜克大学" onclick="_addDynClicks(&#34;wburl&#34;, 1236753891, 84051)">昆山杜克大学</a></li>
+        <LI><a href="http://edf.whu.edu.cn" target="_blank" title="" onclick="_addDynClicks(&#34;wburl&#34;, 1236753891, 5654)">基金会</a></li>
+        <LI><a href="http://service.whu.edu.cn" target="_blank" title="" onclick="_addDynClicks(&#34;wburl&#34;, 1236753891, 5672)">综合事务服务</a></li>
+     </UL>
+    </div>
+
+  </div>
+</div>
+               <div class="col-sm-12 col-md-4 col-lg-3 text-center">
+<ul class="list-inline pt30">
+<li class="toggleCode">
+                <p>
+                  <!--http://newmedia.whu.edu.cn/wechatwelcome-->
+                  <a href="javascript:;" target="_blank" onclick="_addDynClicks(&#34;wbimage&#34;, 1236753891, 71320)">
+                    <span class="icon icon-wechat"></span>
+                  </a>
+                </p>
+                <p>官方微信</p>
+                <div class="codeSpan"><img src="ch_template/img/code-wx.jpg" alt="官方微信"></div>
+              </li>
+              
+<li class="toggleCode">
+                <p>
+                  <!--http://newmedia.whu.edu.cn/wechatwelcome-->
+                  <a href="http://weibo.com/wuhandaxue" target="_blank" onclick="_addDynClicks(&#34;wbimage&#34;, 1236753891, 71319)">
+                    <span class="icon icon-sina"></span>
+                  </a>
+                </p>
+                <p>官方微博</p>
+                <div class="codeSpan"><img src="ch_template/img/code-yd2.png" alt="官方微博"></div>
+              </li>
+              
+<li class="toggleCode">
+                <p>
+                  <!--http://newmedia.whu.edu.cn/wechatwelcome-->
+                  <a href="http://i.whu.edu.cn/" target="_blank" onclick="_addDynClicks(&#34;wbimage&#34;, 1236753891, 71318)">
+                    <span class="icon icon-app"></span>
+                  </a>
+                </p>
+                <p>智慧珞珈</p>
+                <div class="codeSpan"><img src="ch_template/img/code-yd2.png" alt="智慧珞珈"></div>
+              </li>
+              
+ </ul> </div>
+        </div>
+      </div>
+    </div>
+    <!-- 版权内容请在本组件"内容配置-版权"处填写 -->
+ <NAV class="navbar navbar-default navbar-top footer" role="navigation">
+<DIV class="container">
+<DIV class="row">
+<DIV class="col-sm-12 col-md-8">
+<UL class="nav navbar-nav">
+<LI><A><SPAN class="cp">版权所有：武汉大学　地址：湖北省武汉市武昌区八一路299号　邮编：430072&nbsp;&nbsp;&nbsp;接访电话：027-68752059</SPAN>　<span class="ba"> <SPAN onclick="window.open('https://beian.miit.gov.cn')">鄂ICP备05003330号</span><SPAN onclick="window.open('http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=42010602000219')">鄂公网安备42010602000219</SPAN> </SPAN></A></LI></UL></DIV>
+<DIV class="col-sm-12 col-md-4">
+<UL class="nav navbar-nav navbar-link pull-right">
+<LI><A href="mailto:wlxxs@whu.edu.cn" target="_blank">联系我们 </A></LI>
+<LI><A href="wldh.htm" target="_blank">网站地图 </A></LI>
+<LI><A href="http://nic.whu.edu.cn/" target="_blank">信息中心 </A></LI></UL></DIV></DIV></DIV></NAV>
+<style type="text/css">
+@media screen and (max-width:1199px) {
+.navbar-top .navbar-nav>li>a .cp{
+ line-height: 25px!important;}
+}
+</style>
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="ch_template/js/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="ch_template/js/bootstrap.min.js"></script>
+    <script>
+    // $(".navbar-ex1-collapse").on('click', function(event) {
+    //   event.preventDefault();
+    //   event.stopPropagation();
+    //   $(this).collapse('hide');
+    // });
+    $(".toggleCode").each(function(){
+      var code = $(this).find('.codeSpan');
+      $(this).hover(function() {
+        code.show();
+      }, function() {
+        code.hide();
+      });
+    })
+    $('.navbar-nav > li.dropdown').hover(function (event) {
+        event.preventDefault();
+        $('ul.dropdown-menu', this).stop(true, true).slideDown('fast');
+        $(this).addClass('open');
+        event.stopPropagation();
+    }, function (event) {
+        event.preventDefault();
+        $('ul.dropdown-menu', this).stop(true, true).slideUp('fast');
+        $(this).removeClass('open');
+        event.stopPropagation();
+    });
+    </script>
+
+            <script>
+    var sliderSource = [
+          {
+        img:"images/2024052101.jpg",
+        txt:"“珞珈三号02星”卫星成功发射",
+        url:"http://news.whu.edu.cn/info/1002/459617.htm"
+      },
+      {
+        img:"images/2024052201.jpg",
+        txt:"武汉大学女子排球队夺冠",
+        url:"http://news.whu.edu.cn/info/1007/459687.htm"
+      },
+      {
+        img:"images/2024050801.jpg",
+        txt:"高考倒计时 | 相约珞珈山",
+        url:"#"
+      },
+      {
+        img:"images/2024042901.jpg",
+        txt:"北京市丰台区人民政府、武汉大学签署《共建北京市丰台珞珈创新研究院合作协议》",
+        url:"http://news.whu.edu.cn/info/1002/457337.htm"
+      },
+      {
+        img:"images/2024042802.jpg",
+        txt:"武汉大学第九届民族文化节举行",
+        url:"http://news.whu.edu.cn/info/1007/457237.htm"
+      }
+    ];
+
+    var slider = function(options,d){
+      var defaults = {
+        elmt:"",
+        pause:6000,
+        speed:1500
+      }
+      var settings = $.extend(true,{},defaults,options);
+      var timer,_this=this;
+      init();
+      $(window).resize(function(event) {
+        clearInterval(timer);
+        cacheDom();
+        _this.$wrap.css({'margin-left': 0});
+        render(d);
+        setSlide();
+      });
+      function init(){
+        cacheDom();
+        render(d);
+        setSlide();
+        bindEvt();
+      }
+      function cacheDom(){
+        _this.$slider = $('#'+settings.elmt),
+        _this.$indicator = _this.$slider.find('.carousel-indicators'),
+        _this.$wrap = _this.$slider.find('.carousel-inner'),
+        _this.$item = _this.$wrap.children('.item'),
+        //_this.$width = _this.$slider.width(),
+        _this.$width = $('.container').width();
+        _this.$page = 1;
+      }
+      function render(d){
+        _this.$wrap.empty();
+        _this.$indicator.empty();
+        for (var i = 0; i < d.length; i++) {
+          var html = '<div class="item">'
+                      +'  <img src="'+d[i].img+'" alt="...">'
+                      +'  <div class="carousel-caption">'
+                      +'    <a href="'+d[i].url+'">'+d[i].txt+'</a>'
+                      +'  </div>'
+                      +'</div>';
+          _this.$wrap.append(html);
+          var li = '<li></li>';
+          _this.$indicator.append(li);
+        };
+        var fhtml = '<div class="item">'
+                    +'  <img src="'+d[0].img+'" alt="...">'
+                    +'  <div class="carousel-caption">'
+                    +'    <a href="'+d[0].url+'">'+d[0].txt+'</a>'
+                    +'  </div>'
+                    +'</div>';
+        _this.$wrap.append(fhtml);
+        _this.$wrap.css('width', _this.$wrap.width()*_this.$wrap.children().length);
+        _this.$wrap.children('.item').css('width', _this.$width);
+        _this.$wrap.children('.item').eq(0).show();
+        _this.$indicator.children().eq(0).addClass('active');
+      }
+      function bindEvt(){
+        // _this.$wrap.hover(function() {
+        //   clearInterval(timer);
+        // }, function() {
+        //   setSlide();
+        // });
+        _this.$indicator.children().on('click', function(event) {
+          event.preventDefault();
+          var i = $(this).index();
+          if (!_this.$wrap.is(':animated')) {
+            moveTo(i+1);
+          };
+        });
+      }
+      function setSlide(){
+        timer = setInterval(function(){
+          if (_this.$page<d.length) {
+            _this.$wrap.animate({'margin-left': -_this.$width*_this.$page}, settings.speed);
+            _this.$page++;
+          }else{
+            _this.$wrap.animate({
+              'margin-left': -_this.$width*d.length
+              },
+              settings.speed, function() {
+                _this.$wrap.css({'margin-left': 0});
+            });
+            _this.$page=1;
+          };
+          _this.$indicator.children().removeClass('active').eq(_this.$page-1).addClass('active');
+        // console.log(_this.$page);
+        }, settings.pause);
+      }
+      function moveTo(idx){
+          clearInterval(timer);
+          _this.$indicator.children().removeClass('active').eq(idx-1).addClass('active');
+
+          _this.$wrap.animate({'margin-left': -_this.$width*(idx-1)}, settings.speed, function(){
+            _this.$page=idx;
+            setSlide();
+          });
+      }
+    }
+
+
+    new slider({
+      pause:6000,
+      elmt:"mycarousel"
+      },sliderSource);
+     
+      
+    </script>
+    
+    <script>
+    function hengshuping(){ 
+          if(window.orientation==180||window.orientation==0){ 
+                window.location.href=window.location.href;
+           } 
+        if(window.orientation==90||window.orientation==-90){ 
+                window.location.href=window.location.href;       
+            } 
+    }
+    
+    if(window.addEventListener){
+        window.addEventListener("onorientationchange" in window ? "orientationchange" : "resize", hengshuping, false);
+    }else if(window.attachEvent){
+        window.attachEvent("onorientationchange" in window ? "orientationchange" : "resize", hengshuping);
+    }
+        
+    //window.addEventListener("onorientationchange" in window ? "orientationchange" : "resize", hengshuping, false);
+    </script>
+  </body>
+</html>
+
+
+
+
+

@@ -1,0 +1,806 @@
+﻿<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="referrer" content="origin-when-cross-origin" />
+    <meta name="description" content="## 前言 最近，我在微信公众号和博客园分享了一篇关于[.NET微服务系统迁移至.NET 6.0的故事](https://www.cnblogs.com/InCerry/p/microservice-migration-net-6.html)的文章，引起了许多读者的关注。其中，许多人对基于 Open" />
+    <meta property="og:description" content="## 前言 最近，我在微信公众号和博客园分享了一篇关于[.NET微服务系统迁移至.NET 6.0的故事](https://www.cnblogs.com/InCerry/p/microservice-migration-net-6.html)的文章，引起了许多读者的关注。其中，许多人对基于 Open" />
+    <meta http-equiv="Cache-Control" content="no-transform" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>.NET无侵入自动化探针原理和主流实现 - InCerry - 博客园</title>
+    <link rel="canonical" href="https://www.cnblogs.com/InCerry/p/about-dotnet-auto-apm-instru-impl.html" />
+    <link rel="shortcut icon" id="favicon" href="//assets.cnblogs.com/favicon.svg?v=2" type="image/svg+xml" />
+    
+    <link rel="stylesheet" href="/css/blog-common.min.css?v=JnYHs5HAUCOVmwbxBNuH-ED7ggVDfqtff-pdhyndpr8" />
+    
+
+    
+        <link media="(prefers-color-scheme: light)" id="highlighter-theme-prism" type="text/css" rel="stylesheet" href="/css/prismjs/prism.css?v=h_qtq9bUnXbOOwP4EcbLtYM9Mk3iQQcHZAZ-Jz5y0WQ" />
+        <link media="(prefers-color-scheme: dark)" id="highlighter-theme-prism-vsc-dark-plus-dark" type="text/css" rel="stylesheet" href="/css/prismjs/prism-vsc-dark-plus.css?v=f2ZeA9AxtEJP5RONULW-Ml3SLo0h7uUAnuodHVyvDo8" />
+    <link type="text/css" rel="stylesheet" href="https://www.cnblogs.com/InCerry/custom.css?v=T63LLKLnaH2jHJt0Zpx&#x2B;4Hyf5RM=" />
+    <link type="text/css" rel="stylesheet" href="/css/fonts/Consolas.min.css" />
+    <link id="mobile-style" media="only screen and (max-width: 767px)" type="text/css" rel="stylesheet" href="/css/mobile-common.min.css?v=F2e9dMGzAUzDRZU-W-4qVsoLMeDjGqD2cUFxFY5EcWc" />
+    
+    <link type="application/rss+xml" rel="alternate" href="https://www.cnblogs.com/InCerry/rss" />
+    <link type="application/rsd+xml" rel="EditURI" href="https://www.cnblogs.com/InCerry/rsd.xml" />
+    <link type="application/wlwmanifest+xml" rel="wlwmanifest" href="https://www.cnblogs.com/InCerry/wlwmanifest.xml" />
+    <script>
+        var currentBlogId = 295634;
+        var currentBlogApp = 'InCerry';
+        var isLogined = false;
+        var isBlogOwner = false;
+        var skinName = 'Custom';
+        var visitorUserId = '';
+        var hasCustomScript = true;
+        window.cb_enable_mathjax = false;
+        window.mathEngine = 0;
+        window.codeHighlightEngine = 2;
+        window.enableCodeLineNumber = true;
+        window.codeHighlightTheme = 'prism';
+        window.darkModeCodeHighlightTheme = 'prism-vsc-dark-plus';
+        window.isDarkCodeHighlightTheme = false;
+        window.isDarkModeCodeHighlightThemeDark = true;
+        window.isDisableCodeHighlighter = false;
+        window.enableCodeThemeTypeFollowSystem = true;
+        window.enableMacStyleCodeBlock = false;
+    </script>
+        <script>
+            window.currentPostId = 17324718;
+            window.currentPostDateAdded = '2023-04-17 09:02';
+        </script>
+    <script src="https://assets.cnblogs.com/scripts/jquery-3.3.1.min.js"></script>
+    <script src="https://cdn-www.cnblogs.com/js/blog-common.min.js?v=e7iDdKE0ie8Fi0lKgiYt7eXqsQNrVeJmcEHX6zqQWKc"></script>
+        <script>updateCustomBlogReferrer();</script>
+    
+</head>
+<body class="skin-custom no-navbar">
+    <a name="top"></a>
+    <div id="top_nav" class="navbar forpc navbar-custom">
+        <nav id="nav_main" class="navbar-main">
+            <ul id="nav_left" class="navbar-list navbar-left">
+                <li class="navbar-branding">
+                    <a href="https://www.cnblogs.com/" title="开发者的网上家园" role="banner">
+                        <img src="//assets.cnblogs.com/logo.svg" alt="博客园Logo" />
+                    </a>
+                </li>
+                <li><a href="https://cnblogs.vip/">会员</a></li>
+                <li><a href="https://cnblogs.vip/store">周边</a></li>
+                <li>
+                    <a href="https://news.cnblogs.com/" onclick="countClicks('nav', 'skin-navbar-news')">新闻</a>
+                </li>
+                <li>
+                    <a href="https://q.cnblogs.com/" onclick="countClicks('nav', 'skin-navbar-q')">博问</a>
+                </li>
+                    <li>
+                        <a href="https://www.cnblogs.com/cmt/p/18172236" target="_blank">融资</a>
+                    </li>
+                <li><a href="https://market.cnblogs.com" target="_blank">云市场</a></li>
+            </ul>
+            <ul id="nav_right" class="navbar-list navbar-right">
+                <li>
+                    <form id="zzk_search" class="navbar-search dropdown" action="https://zzk.cnblogs.com/s" method="get" role="search">
+                        <input name="w" id="zzk_search_input" placeholder="代码改变世界" type="search" tabindex="3" autocomplete="off" />
+                        <button id="zzk_search_button" onclick="window.navbarSearchManager.triggerActiveOption()">
+                            <img id="search_icon" class="focus-hidden" src="//assets.cnblogs.com/icons/search.svg" alt="搜索" />
+                            <img class="hidden focus-visible" src="//assets.cnblogs.com/icons/enter.svg" alt="搜索" />
+                        </button>
+                        <ul id="navbar_search_options" class="dropdown-menu quick-search-menu">
+                            <li tabindex="0" class="active" onclick="zzkSearch(event, document.getElementById('zzk_search_input').value)">
+                                <div class="keyword-wrapper">
+                                    <img src="//assets.cnblogs.com/icons/search.svg" alt="搜索" />
+                                    <div class="keyword"></div>
+                                </div>
+                                <span class="search-area">所有博客</span>
+                            </li>
+                                    <li tabindex="1" onclick="zzkBlogSearch(event, 'InCerry', document.getElementById('zzk_search_input').value)">
+                                        <div class="keyword-wrapper">
+                                            <img src="//assets.cnblogs.com/icons/search.svg" alt="搜索" />
+                                            <div class="keyword"></div>
+                                        </div>
+                                        <span class="search-area">当前博客</span>
+                                    </li>
+                        </ul>
+                    </form>
+                </li>
+                <li id="navbar_login_status" class="navbar-list">
+                    <a class="navbar-user-info navbar-blog" href="https://i.cnblogs.com/EditPosts.aspx?opt=1" alt="写随笔" title="写随笔">
+                        <img id="new_post_icon" class="navbar-icon" src="//assets.cnblogs.com/icons/newpost.svg" alt="写随笔" />
+                    </a>
+                    <a id="navblog-myblog-icon" class="navbar-user-info navbar-blog" href="https://passport.cnblogs.com/GetBlogApplyStatus.aspx" alt="我的博客" title="我的博客">
+                        <img id="myblog_icon" class="navbar-icon" src="//assets.cnblogs.com/icons/myblog.svg" alt="我的博客" />
+                    </a>
+                    <a class="navbar-user-info navbar-message navbar-icon-wrapper" href="https://msg.cnblogs.com/" alt="短消息" title="短消息">
+                        <img id="msg_icon" class="navbar-icon" src="//assets.cnblogs.com/icons/message.svg" alt="短消息" />
+                        <span id="msg_count" style="display: none"></span>
+                    </a>
+                    <a id="navbar_lite_mode_indicator" data-current-page="blog" style="display: none" href="javascript:void(0)" alt="简洁模式" title="简洁模式启用，您在访问他人博客时会使用简洁款皮肤展示">
+                        <img class="navbar-icon" src="//assets.cnblogs.com/icons/lite-mode-on.svg" alt="简洁模式" />
+                    </a>
+                    <div id="user_info" class="navbar-user-info dropdown">
+                        <a class="dropdown-button" href="https://home.cnblogs.com/">
+                            <img id="user_icon" class="navbar-avatar" src="//assets.cnblogs.com/icons/avatar-default.svg" alt="用户头像" />
+                        </a>
+                        <div class="dropdown-menu">
+                            <a id="navblog-myblog-text" href="https://passport.cnblogs.com/GetBlogApplyStatus.aspx">我的博客</a>
+                            <a href="https://home.cnblogs.com/">我的园子</a>
+                            <a href="https://account.cnblogs.com/settings/account">账号设置</a>
+                            <a href="javascript:void(0)" id="navbar_lite_mode_toggle" title="简洁模式会使用简洁款皮肤显示所有博客">
+    简洁模式 <img id="navbar_lite_mode_on" src="/images/lite-mode-check.svg" class="hide" /><span id="navbar_lite_mode_spinner" class="hide">...</span>
+</a>
+                            <a href="javascript:void(0)" onclick="account.logout();">退出登录</a>
+                        </div>
+                    </div>
+                    <a class="navbar-anonymous" href="https://account.cnblogs.com/signup">注册</a>
+                    <a class="navbar-anonymous" href="javascript:void(0);" onclick="account.login()">登录</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    <div id="page_begin_html">
+        <script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?730719b462db1019cb20b77ae832b7bd";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+    </div>
+
+    <!--done-->
+<div id="home">
+<div id="header">
+	<div id="blogTitle">
+        <a id="lnkBlogLogo" href="https://www.cnblogs.com/InCerry/"><img id="blogLogo" src="/skins/custom/images/logo.gif" alt="返回主页" /></a>		
+		
+<!--done-->
+<h1><a id="Header1_HeaderTitle" class="headermaintitle HeaderMainTitle" href="https://www.cnblogs.com/InCerry">InCerry</a>
+</h1>
+<h2></h2>
+
+
+
+
+		
+	</div><!--end: blogTitle 博客的标题和副标题 -->
+	<div id="navigator">
+		
+<ul id="navList">
+<li><a id="blog_nav_sitehome" class="menu" href="https://www.cnblogs.com/">
+博客园</a>
+</li>
+<li>
+<a id="blog_nav_myhome" class="menu" href="https://www.cnblogs.com/InCerry/">
+首页</a>
+</li>
+<li>
+
+<a id="blog_nav_newpost" class="menu" href="https://i.cnblogs.com/EditPosts.aspx?opt=1">
+新随笔</a>
+</li>
+<li>
+<a id="blog_nav_contact" class="menu" href="https://msg.cnblogs.com/send/InCerry">
+联系</a></li>
+<li>
+<a id="blog_nav_rss" class="menu" href="javascript:void(0)" data-rss="https://www.cnblogs.com/InCerry/rss/">
+订阅</a>
+<!--<partial name="./Shared/_XmlLink.cshtml" model="Model" /></li>--></li>
+<li>
+<a id="blog_nav_admin" class="menu" href="https://i.cnblogs.com/">
+管理</a>
+</li>
+</ul>
+
+
+		<div class="blogStats">
+			<div id="blog_stats_place_holder"><script>loadBlogStats();</script></div>
+		</div><!--end: blogStats -->
+	</div><!--end: navigator 博客导航栏 -->
+</div><!--end: header 头部 -->
+<div id="main">
+	<div id="mainContent">
+	<div class="forFlow">
+		<div id="post_detail">
+    <!--done-->
+    <div id="topics">
+        <div class="post">
+            <h1 class = "postTitle">
+                <a id="cb_post_title_url" class="postTitle2 vertical-middle" href="https://www.cnblogs.com/InCerry/p/about-dotnet-auto-apm-instru-impl.html" title="发布于 2023-04-17 09:02">
+    <span role="heading" aria-level="2">.NET无侵入自动化探针原理和主流实现</span>
+    
+
+</a>
+
+            </h1>
+            <div class="clear"></div>
+            <div class="postBody">
+                <div id="cnblogs_post_body" class="blogpost-body cnblogs-markdown">
+<h2 id="前言">前言</h2>
+<p>最近，我在微信公众号和博客园分享了一篇关于<a href="https://www.cnblogs.com/InCerry/p/microservice-migration-net-6.html" target="_blank" rel="noopener">.NET微服务系统迁移至.NET 6.0的故事</a>的文章，引起了许多读者的关注。其中，许多人对基于 OpenTelemetry .NET 的观测指标和无侵入自动化探针颇感兴趣。事实上，我已计划抽出时间，与大家分享这方面的内容。</p>
+<p>巧合的是，在二月末，我收到了来自 OpenTelemetry 中国社区的蒋志伟大佬的邀请，希望我能就 .NET 实现无侵入自动化探针的方法进行分享。因为关于Java等其他语言的自动化探针实现原理已有大量文章，但.NET领域却鲜有介绍，而社区对此也很感兴趣。</p>
+<p>然而，因为 .NET 无侵入自动化探针的实现原理相当复杂，理解和完全掌握原理有很大差别。为确保文章质量和严谨性，撰写过程耗时较长，因此现在才能与大家见面。</p>
+<h2 id="apm探针">APM探针</h2>
+<p>当我们提到 .NET 的 APM 时，许多人首先会想到 SkyWalking 。这是因为 <a href="https://github.com/SkyAPM/SkyAPM-dotnet" target="_blank" rel="noopener">SkyAPM-dotnet</a> 是第一个支持.NET应用程序的开源非商业 APM 探针实现，目前很多 .NET 项目都采用了它。在此，我们要特别感谢刘浩杨等社区领袖的辛勤付出。</p>
+<p>除了 SkyWalking 之外， <a href="https://www.datadoghq.com/apm/" target="_blank" rel="noopener">Datadog APM</a> 也是一款功能强大的商业应用性能监测工具，旨在帮助开发人员跟踪、优化并排查应用程序中的性能问题。Datadog APM 适用于多种编程语言和框架，包括 .NET 。通过使用 Datadog 丰富的功能和可视化仪表板，我们能够轻松地识别并改进性能瓶颈。</p>
+<p>另一个比较知名的选择是 <a href="https://github.com/open-telemetry/opentelemetry-dotnet-contrib" target="_blank" rel="noopener">OpenTelemetry-dotnet-contrib</a> ，这是 CNCF-OpenTelemetry 的 .NET 应用程序 APM 探针实现。虽然它的推出时间比 SkyAPM 和 Datadog APM 稍晚，但由于其开放的标准和开源的实现，许多 .NET 项目也选择使用它。</p>
+<p>关于 APM 探针的实现原理，我们主要分为两类来介绍：平台相关指标和组件相关指标。接下来，我们将讨论如何采集这两类指标。</p>
+<h3 id="平台相关指标采集">平台相关指标采集</h3>
+<p>那么APM探针都是如何采集 .NET 平台相关指标呢？其实采集这些指标在 .NET 上是非常简单的，因为.NET提供了相关的API接口，我们可以直接获得这些指标，这里指的平台指标是如 CPU 占用率、线程数量、GC 次数等指标。</p>
+<p>比如在 SkyAPM-dotne t项目中，我们可以查看 SkyApm.Core 项目中的 <a href="https://github.com/SkyAPM/SkyAPM-dotnet/tree/main/src/SkyApm.Core/Common" target="_blank" rel="noopener">Common</a> 文件夹，文件夹中就有诸如里面有 CPU 指标、GC 指标等平台相关指标采集实现帮助类。</p>
+<p><img src="https://incerry-blog-imgs.oss-cn-hangzhou.aliyuncs.com/image-dotnet%e6%97%a0%e4%be%b5%e5%85%a5%e8%87%aa%e5%8a%a8%e5%8c%96%e6%8e%a2%e9%92%88%e5%ae%9e%e7%8e%b0-230312112210234.png" alt="" loading="lazy"></p>
+<p>同样，在 OpenTelemetry-dotnet-contrib 项目中，我们可以在 <a href="https://github.com/open-telemetry/opentelemetry-dotnet-contrib/blob/main/src/OpenTelemetry.Instrumentation.Process/ProcessMetrics.cs" target="_blank" rel="noopener">Process</a> 和 <a href="https://github.com/open-telemetry/opentelemetry-dotnet-contrib/blob/main/src/OpenTelemetry.Instrumentation.Runtime/RuntimeMetrics.cs" target="_blank" rel="noopener">Runtime</a> 文件夹中，查看进程和运行时等平台相关指标采集的实现。<br>
+<img src="https://incerry-blog-imgs.oss-cn-hangzhou.aliyuncs.com/image-dotnet%e6%97%a0%e4%be%b5%e5%85%a5%e8%87%aa%e5%8a%a8%e5%8c%96%e6%8e%a2%e9%92%88%e5%ae%9e%e7%8e%b0-230312113732635.png" alt="" loading="lazy"><br>
+<img src="https://incerry-blog-imgs.oss-cn-hangzhou.aliyuncs.com/image-dotnet%e6%97%a0%e4%be%b5%e5%85%a5%e8%87%aa%e5%8a%a8%e5%8c%96%e6%8e%a2%e9%92%88%e5%ae%9e%e7%8e%b0-230312113818720.png" alt="" loading="lazy"></p>
+<p>这些都是简单的 API 调用，有兴趣的同学可以自行查看代码，本文就不再赘述这些内容。</p>
+<h3 id="组件相关指标采集">组件相关指标采集</h3>
+<p>除了平台相关指标采集，还有组件相关的指标，这里所指的组件相关指标拿 ASP.NET Core 应用程序举例，我们接口秒并发是多少、一个请求执行了多久，在这个请求执行的时候访问了哪些中间件( Redis 、MySql 、Http 调用、RPC 等等)，访问中间件时传递的参数(Redis 命令、Sql 语句、请求响应体等等)是什么，访问中间件花费了多少时间。</p>
+<p>在 SkyAPM-dotnet 项目中，我们可以直接在<code>src</code>目录找到这些组件相关指标采集的实现代码。<br>
+<img src="https://incerry-blog-imgs.oss-cn-hangzhou.aliyuncs.com/image-dotnet%e6%97%a0%e4%be%b5%e5%85%a5%e8%87%aa%e5%8a%a8%e5%8c%96%e6%8e%a2%e9%92%88%e5%ae%9e%e7%8e%b0-230312114601322.png" alt="" loading="lazy"></p>
+<p>同样在 OpenTelemetry-dotnet-contrib 项目中，我们也可以在<code>src</code>目录找到这些组件相关指标采集代码。<br>
+<img src="https://incerry-blog-imgs.oss-cn-hangzhou.aliyuncs.com/image-dotnet%e6%97%a0%e4%be%b5%e5%85%a5%e8%87%aa%e5%8a%a8%e5%8c%96%e6%8e%a2%e9%92%88%e5%ae%9e%e7%8e%b0-230312114830388.png" alt="" loading="lazy"></p>
+<p>如果看过这两个APM探针实现的朋友应该都知道，组件指标采集是非常依赖<a href="https://learn.microsoft.com/en-us/dotnet/core/diagnostics/diagnosticsource-diagnosticlistener" target="_blank" rel="noopener"><code>DiagnosticSource</code></a>技术。.NET官方社区一直推荐的的方式是组件开发者自己在组件的关键路径进行埋点，使用<code>DiagnosticSource</code>的方式将事件传播出去，然后其它监测软件工具可以订阅<code>DiagnosticListener</code>来获取组件运行状态。</p>
+<p>就拿 ASP.NET Core 来举例，组件源码中有<code>[HostingApplicationDiagnostics.cs](https://github.com/dotnet/aspnetcore/blob/main/src/Hosting/Hosting/src/Internal/HostingApplicationDiagnostics.cs)</code>这样一个类，这个类中定义了 Hosting 在请求处理过程中的几个事件。</p>
+<pre><code class="language-cs">internal const string ActivityName = "Microsoft.AspNetCore.Hosting.HttpRequestIn";
+private const string ActivityStartKey = ActivityName + ".Start";
+private const string ActivityStopKey = ActivityName + ".Stop";
+</code></pre>
+<p>当 Hosting 开始处理请求时，会检测当前是否有监听者监听这些事件，如果有的话就会写入事件，事件也会携带当前的一些上下文信息，代码如下所示：<br>
+<img src="https://incerry-blog-imgs.oss-cn-hangzhou.aliyuncs.com/image-dotnet%e6%97%a0%e4%be%b5%e5%85%a5%e8%87%aa%e5%8a%a8%e5%8c%96%e6%8e%a2%e9%92%88%e5%ae%9e%e7%8e%b0-230312145130479.png" alt="" loading="lazy"><br>
+<img src="https://incerry-blog-imgs.oss-cn-hangzhou.aliyuncs.com/image-dotnet%e6%97%a0%e4%be%b5%e5%85%a5%e8%87%aa%e5%8a%a8%e5%8c%96%e6%8e%a2%e9%92%88%e5%ae%9e%e7%8e%b0-230312145153593.png" alt="" loading="lazy"></p>
+<p>以 SkyAPM-dotnet 举例，有对应的<a href="https://github.com/SkyAPM/SkyAPM-dotnet/blob/main/src/SkyApm.Diagnostics.AspNetCore/HostingDiagnosticProcessor.cs" target="_blank" rel="noopener"><code>HostingTracingDiagnosticProcessor.cs</code></a>监听事件，然后获取上下文信息记录 APM 埋点信息，代码如下所示：<br>
+<img src="https://incerry-blog-imgs.oss-cn-hangzhou.aliyuncs.com/image-dotnet%e6%97%a0%e4%be%b5%e5%85%a5%e8%87%aa%e5%8a%a8%e5%8c%96%e6%8e%a2%e9%92%88%e5%ae%9e%e7%8e%b0-230312144531294.png" alt="" loading="lazy"></p>
+<p>这种方式的优点有：</p>
+<ul>
+<li>高效和高性能：<code>DiagnosticSource</code> 是 .NET 平台自带的框架，使用它硬编码可以享受到编译器和 JIT 相关优化可以避免一些性能开销。组件开发者可以控制事件传递的频率和内容，以达到最佳的性能和资源利用率。</li>
+<li>灵活：通过使用 <code>DiagnosticSource</code>，组件开发者可以灵活地定义自己的事件模型，并按需发布事件。这意味着可以轻松地定制自己的监测需求，而不必担心过多的日志数据产生过大的开销。</li>
+<li>可扩展性：使用<code>DiagnosticSource</code>可以让组件的监测需求随着时间的推移而演变，而不必担心日志系统的限制。开发者可以根据自己的需要添加新的事件类型，以适应不断变化的监测需求。</li>
+<li>易用性：<code>DiagnosticSource</code>的 API 简单易用，订阅事件数据也很容易。这使得使用它进行组件监测变得非常容易，并且可以快速地集成到现有的监测系统中。</li>
+<li>可移植性：<code>DiagnosticSource</code>可以在多个平台上运行，包括 Windows、Linux 和 macOS 等。这意味着可以使用相同的事件模型来监测不同的应用程序和服务，从而简化了监测系统的设计和管理。</li>
+</ul>
+<p>不过这种方式的缺点也很明显，就是<strong>必须由组件开发者显式的添加事件代码</strong>，探针的开发者也因此束手束脚，这就导致一些没有进行手动埋点的三方组件都无法添加事件监听，所以现阶段 SkyAPM-dotnet 支持的第三方组件还不是很丰富。</p>
+<p>那么其实只要解决<strong>如何为没有进行手动埋点的组件库加入埋点</strong>就能解决 SkyAPM-dotnet 支持第三方组件多样性的问题。</p>
+<h2 id="net方法注入">.NET方法注入</h2>
+<p>从上一节我们可以知道，目前制约APM支持组件不够丰富的原因之一就是很多组件库都没有进行可观测性的适配，没有在关键路径进行埋点。</p>
+<p>那么要解决这个问题其实很简单，我们只需要修改组件库关键路径代码给加上一些埋点就可以了，那应该如何给这些第三方库的代码加点料呢？聊到这个问题我们需要知道一个 .NET 程序是怎么从源代码变得可以运行的。</p>
+<p>通常情况下，一个 .NET 程序从源码到运行会经过两次编译（忽略 ReadyToRun 、NativeAOT 、分层编译等情况）。如下图所示：<br>
+<img src="https://incerry-blog-imgs.oss-cn-hangzhou.aliyuncs.com/image-dotnet%e6%97%a0%e4%be%b5%e5%85%a5%e8%87%aa%e5%8a%a8%e5%8c%96%e6%8e%a2%e9%92%88%e5%ae%9e%e7%8e%b0-230312150306935.png" alt="" loading="lazy"></p>
+<p>第一次是使用编译器将 C#/F#/VB/Python/PHP 源码使用 Roslyn 等对应语言编译器编译成 CIL（Common Intermediate Language，公共中间语言）。第二次使用 RuyJit 编译器将 CIL 编译为对应平台的机器码，以 C# 语言举了个例子，如下图所示：<br>
+<img src="https://incerry-blog-imgs.oss-cn-hangzhou.aliyuncs.com/image-dotnet%e6%97%a0%e4%be%b5%e5%85%a5%e8%87%aa%e5%8a%a8%e5%8c%96%e6%8e%a2%e9%92%88%e5%ae%9e%e7%8e%b0-230312164434217.png" alt="" loading="lazy"></p>
+<p>方法注入也一般是发生在这两次编译前后，一个是在 Roslyn 静态编译期间进行方法注入，期间目标 .NET 程序并没有运行，所以这种 .NET 程序未运行的方法注入我们叫它<strong>编译时静态注入</strong>。而在 RuyJit 期间 .NET程序已经在运行，这时进行方法注入我们叫它<strong>运行时动态注入</strong>。下表中列出了比较常见方法注入方式：</p>
+<table>
+<thead>
+<tr>
+<th>框架</th>
+<th>类型</th>
+<th>实现原理</th>
+<th>优点</th>
+<th>缺点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>metalama</td>
+<td>静态注入</td>
+<td>重写Roslyn编译器，运行时插入代码</td>
+<td>源码修改难度低，兼容性好</td>
+<td>目前该框架不开源，只能修改源码，不能修改已编译好的代码，会增加编译耗时</td>
+</tr>
+<tr>
+<td>Mono.Cecil、Postsharp</td>
+<td>静态注入</td>
+<td>加载编译后的<code>*.dll</code>文件，修改和替换生成后的CIL代码</td>
+<td>兼容性好</td>
+<td>使用难度高，需要熟悉 CIL ，会增加编译耗时，会增加程序体积</td>
+</tr>
+<tr>
+<td>Harmony</td>
+<td>动态注入</td>
+<td>创建一个方法签名与原方法一致的方法，修改Jit后原方法汇编，插入jmp跳转到重写后方法</td>
+<td>高性能，使用难度低</td>
+<td>泛型、分层编译支持不友好</td>
+</tr>
+<tr>
+<td>CLR Profile API</td>
+<td>动态注入</td>
+<td>调用CLR接口重写方法IL代码</td>
+<td>功能强大，公开的API支持</td>
+<td>实现困难，需要熟悉 CIL ，稍有不慎导致程序崩溃</td>
+</tr>
+</tbody>
+</table>
+<p>综合各种优缺点现阶段APM使用最多的是 CLR Profile API 的方式进行方法注入，比如 Azure AppInsights、DataDog、Elastic等.NET探针都是使用这种方式。</p>
+<h2 id="基于clr-profile-api-实现apm探针原理">基于CLR Profile API 实现APM探针原理</h2>
+<h3 id="clr-profile-api-简介">CLR Profile API 简介</h3>
+<p>在下面的章节中和大家聊一聊基于 CLR Profile API 是如何实现方法注入，以及 CLR Profile API 是如何使用的。</p>
+<p>聊到 CLR 探查器，我们首先就得知道 CLR 是什么，CLR（Common Language Runtime，公共语言运行时），可以理解为是托管运行 .NET 程序的平台，它提供了基础类库、线程、JIT 、GC 等语言运行的环境（如下图所示），它功能和 Java 的 JVM 有相似之处，但定位有所不同。</p>
+<p><img src="https://incerry-blog-imgs.oss-cn-hangzhou.aliyuncs.com/image-dotnet%e6%97%a0%e4%be%b5%e5%85%a5%e8%87%aa%e5%8a%a8%e5%8c%96%e6%8e%a2%e9%92%88%e5%ae%9e%e7%8e%b0-230311180711106.png" alt="" loading="lazy"></p>
+<p>.NET 程序、CLR 和操作系统的关系如下图所示：</p>
+<p><img src="https://incerry-blog-imgs.oss-cn-hangzhou.aliyuncs.com/image-dotnet%e6%97%a0%e4%be%b5%e5%85%a5%e8%87%aa%e5%8a%a8%e5%8c%96%e6%8e%a2%e9%92%88%e5%ae%9e%e7%8e%b0-230311195526179.png" alt="" loading="lazy"></p>
+<p>那么 CLR 探查器是什么东西呢？根据<a href="https://learn.microsoft.com/zh-cn/dotnet/framework/unmanaged-api/profiling/profiling-overview" target="_blank" rel="noopener">官方文档</a>的描述，CLR 探查器和相关API的支持从 .NET Framework 1.0就开始提供，它是一个工具，可以使用它来监视另一个 .NET 应用程序的执行情况，它也是一个( .dll )动态链接库，CLR 在启动运行时加载探查器，CLR 会将一些事件发送给探查器，另外探查器也可以通过 Profile API 向 CLR 发送命令和获取运行时信息。下方是探查器和 CLR 工作的简单交互图：<br>
+<img src="https://incerry-blog-imgs.oss-cn-hangzhou.aliyuncs.com/image-dotnet%e6%97%a0%e4%be%b5%e5%85%a5%e8%87%aa%e5%8a%a8%e5%8c%96%e6%8e%a2%e9%92%88%e5%ae%9e%e7%8e%b0-230311200117596.png" alt="" loading="lazy"></p>
+<p><code>ICorProfilerCallback</code>提供的事件非常多，常用的主要是下方提到这几类：</p>
+<ul>
+<li>CLR 启动和关闭事件</li>
+<li>应用程序域创建和关闭事件</li>
+<li>程序集加载和卸载事件</li>
+<li>模块加载和卸载事件</li>
+<li>COM vtable 创建和析构事件</li>
+<li>实时 (JIT) 编译和代码间距调整事件</li>
+<li>类加载和卸载事件</li>
+<li>线程创建和析构事件</li>
+<li>函数入口和退出事件</li>
+<li>异常</li>
+<li>托管和非托管代码执行之间的转换</li>
+<li>不同运行时上下文之间的转换</li>
+<li>有关运行时挂起的信息</li>
+<li>有关运行时内存堆和垃圾回收活动的信息<br>
+<code>ICorProfilerInfo</code>提供了很多查询和命令的接口，主要是下方提到的这几类：</li>
+</ul>
+<ul>
+<li>方法信息接口</li>
+<li>类型信息接口</li>
+<li>模块信息接口</li>
+<li>线程信息接口</li>
+<li>CLR 版本信息接口</li>
+<li>Callback 事件设置接口</li>
+<li>函数 Hook 接口</li>
+<li>还有 JIT 相关的接口<br>
+通过 CLR Profile API 提供的这些事件和信息查询和命令接口，我们就可以使用它来实现一个无需改动原有代码的 .NET 探针。</li>
+</ul>
+<h3 id="自动化探针执行过程">自动化探针执行过程</h3>
+<p>APM 使用 .NET Profiler API 对应用程序进行代码插桩方法注入，以监控方法调用和性能指标从而实现自动化探针。下面详细介绍这一过程：</p>
+<ol>
+<li>Profiler注册：在启动应用程序时，.NET Tracer 作为一个分析器（profiler）向 CLR（Common Language Runtime）注册。这样可以让它在整个应用程序生命周期内监听和操纵执行流程。</li>
+<li>JIT编译拦截：当方法被即时编译（JIT）时，Profiler API 发送事件通知。.NET Tracer 捕获这些事件，如JITCompilationStarted，从而有机会在方法被编译之前修改其 IL（Intermediate Language）代码。</li>
+<li>代码修改插桩：通过操纵IL代码，.NET Tracer 在关键方法的入口和退出点插入跟踪逻辑。这种操作对原始应用程序是透明的，不需要修改源代码。跟踪逻辑通常包括记录方法调用数据、计时、捕获异常等。</li>
+<li>上下文传播：为了连接跨服务或异步调用的请求链，.NET Tracer 会将 Trace ID 和 Span ID在分布式系统中进行传递。这使得在复杂的微服务架构中追踪请求变得更加容易。</li>
+<li>数据收集：插桩后的代码在运行期间会产生跟踪数据，包括方法调用时间、执行路径、异常信息等。这些数据会被封装成跟踪和跨度（spans），并且通过 APM Agent 发送到 APM 平台进行后续分析和可视化。</li>
+</ol>
+<p>通过使用 .NET Profiler API 对应用程序进行方法注入插桩，APM 可以实现对 .NET 程序的详细性能监控，帮助开发者和运维人员发现并解决潜在问题。</p>
+<p>第一步，向 CLR 注册分析器的步骤是很简单的，CLR 要求分析器需要实现COM组件接口标准，微软的 COM（Component Object Model）接口是一种跨编程语言的二进制接口，用于实现在操作系统中不同软件组件之间的通信和互操作。通过 COM 接口，组件可以在运行时动态地创建对象、调用方法和访问属性，实现模块化和封装。COM 接口使得开发人员能够以独立、可复用的方式构建软件应用，同时还有助于降低维护成本和提高开发效率。COM 一般需要实现以下接口：</p>
+<ol>
+<li>接口（Interfaces）：COM 组件使用接口提供一套预定义的函数，这样其他组件就可以调用这些函数。每个接口都有一个唯一的接口标识（IID）。</li>
+<li>对象（Objects）：COM 对象是实现了一个或多个接口的具体实例。客户端代码通过对象暴露的接口与其进行交互。</li>
+<li>引用计数（Reference Counting）：COM 使用引用计数管理对象的生命周期。当一个客户端获取到对象的接口指针时，对象的引用计数加一；当客户端不再需要该接口时，引用计数减一。当引用计数减至零时，COM 对象会被销毁。</li>
+<li>查询接口（QueryInterface）：客户端可以通过 QueryInterface 函数获取 COM 对象所实现的特定接口。这个函数接收一个请求的接口 IID，并返回包含该接口指针的 HRESULT。</li>
+<li>类工厂（Class Factories）：为了创建对象实例，COM 使用类工厂。类工厂是实现了 IClassFactory 接口的对象，允许客户端创建新的对象实例。</li>
+</ol>
+<p>比如 <a href="https://github.com/open-telemetry/opentelemetry-dotnet-instrumentation/blob/main/src/OpenTelemetry.AutoInstrumentation.Native/class_factory.cpp" target="_blank" rel="noopener">OpenTelemetry</a> 中的<code>class_factory.cpp</code>就是声明了COM组件，其中包括了查询接口、引用计数以及创建实例对象等功能。</p>
+<p><img src="https://incerry-blog-imgs.oss-cn-hangzhou.aliyuncs.com/image-dotnet%e6%97%a0%e4%be%b5%e5%85%a5%e8%87%aa%e5%8a%a8%e5%8c%96%e6%8e%a2%e9%92%88%e5%ae%9e%e7%8e%b0-230411084706645.png" alt="" loading="lazy"></p>
+<p>然后我们只需要设置三个环境变量，如下所示：</p>
+<ul>
+<li><code>COR_ENABLE_PROFILING</code>：将其设置为<code>1</code>，表示启用 CLR 分析器。</li>
+<li><code>COR_PROFILER</code>: 设置分析器的COM组件ID，使 CLR 能正确的加载分析器。</li>
+<li><code>COR_PROFILER_PATH_32/64</code>: 设置分析器的路径，32位或者是64位应用程序。</li>
+</ul>
+<p>通过以上设置，CLR 就可以在启动时通过 COM 组件来调用分析器实现的函数，此时也代表着分析器加载完成。在 OpenTelemetry 和 data-dog 等 APM 中都有这样的设置。</p>
+<p><img src="https://incerry-blog-imgs.oss-cn-hangzhou.aliyuncs.com/image-dotnet%e6%97%a0%e4%be%b5%e5%85%a5%e8%87%aa%e5%8a%a8%e5%8c%96%e6%8e%a2%e9%92%88%e5%ae%9e%e7%8e%b0-230411085249096.png" alt="" loading="lazy"></p>
+<p><img src="https://incerry-blog-imgs.oss-cn-hangzhou.aliyuncs.com/image-dotnet%e6%97%a0%e4%be%b5%e5%85%a5%e8%87%aa%e5%8a%a8%e5%8c%96%e6%8e%a2%e9%92%88%e5%ae%9e%e7%8e%b0-230411085517744.png" alt="" loading="lazy"></p>
+<p>那后面的JIT编译拦截以及其它功能如何实现呢？我们举一个现实存在的例子，如果我们需要跟踪每一次 Reids 操作的时间和执行命令的内容，那么我们在应该修改<a href="https://github.com/StackExchange/StackExchange.Redis/blob/b159173c8d73356ebd4d75d73d714a974addb3e3/src/StackExchange.Redis/ConnectionMultiplexer.cs#L1869" target="_blank" rel="noopener"><code>StackExchange.Redis</code></a> <code>ExecuteAsyncImpl</code>方法，从<code>message</code>中读取执行命令的内容并记录整个方法耗时。</p>
+<p><img src="https://incerry-blog-imgs.oss-cn-hangzhou.aliyuncs.com/image-dotnet%e6%97%a0%e4%be%b5%e5%85%a5%e8%87%aa%e5%8a%a8%e5%8c%96%e6%8e%a2%e9%92%88%e5%ae%9e%e7%8e%b0-230408154249084.png" alt="" loading="lazy"></p>
+<p>那么APM如何实现对<code>Redis ExecuteAsyncImpl</code>进行注入的？可以打开<a href="https://github.com/DataDog/dd-trace-dotnet/tree/v2.27.0" target="_blank" rel="noopener">dd-trace-dotnet</a>仓库也可以打开<a href="https://github.com/open-telemetry/opentelemetry-dotnet-instrumentation" target="_blank" rel="noopener">opentelemetry-dotnet-instrumentation</a>仓库，这两者的方法注入实现原理都是一样的，只是代码实现上有一些细微的差别。这里我们还是以 dd-trace-dotnet 仓库代码为例。</p>
+<p>打开<code>tracer/src/Datadog.Trace/ClrProfiler/AutoInstrumentation</code>目录，里面所有的源码都是通过方法注入的方式来实现APM埋点，有非常多的组件埋点的实现，比如 MQ 、Redis 、 CosmosDb 、Couchbase 等等。</p>
+<p><img src="https://incerry-blog-imgs.oss-cn-hangzhou.aliyuncs.com/image-dotnet%e6%97%a0%e4%be%b5%e5%85%a5%e8%87%aa%e5%8a%a8%e5%8c%96%e6%8e%a2%e9%92%88%e5%ae%9e%e7%8e%b0-230408152808933.png" alt="" loading="lazy"></p>
+<p>打开 Redis 的文件夹，可以很容易找到 <a href="https://github.com/DataDog/dd-trace-dotnet/blob/v2.27.0/tracer/src/Datadog.Trace/ClrProfiler/AutoInstrumentation/Redis/StackExchange/ConnectionMultiplexerExecuteAsyncImplIntegration_2_6_45.cs" target="_blank" rel="noopener">Redis</a> 进行方法注入的源码，这相当于是一个 AOP 切面实现方法：</p>
+<pre><code class="language-cs">[InstrumentMethod(
+        AssemblyName = "StackExchange.Redis",
+        TypeName = "StackExchange.Redis.ConnectionMultiplexer",
+        MethodName = "ExecuteAsyncImpl",
+        ReturnTypeName = "System.Threading.Tasks.Task`1&lt;T&gt;",
+        ParameterTypeNames = new[] { "StackExchange.Redis.Message", "StackExchange.Redis.ResultProcessor`1[!!0]", ClrNames.Object, "StackExchange.Redis.ServerEndPoint" },
+        MinimumVersion = "1.0.0",
+        MaximumVersion = "2.*.*",
+        IntegrationName = StackExchangeRedisHelper.IntegrationName)]
+    [InstrumentMethod(
+        AssemblyName = "StackExchange.Redis.StrongName",
+        TypeName = "StackExchange.Redis.ConnectionMultiplexer",
+        MethodName = "ExecuteAsyncImpl",
+        ReturnTypeName = "System.Threading.Tasks.Task`1&lt;T&gt;",
+        ParameterTypeNames = new[] { "StackExchange.Redis.Message", "StackExchange.Redis.ResultProcessor`1[!!0]", ClrNames.Object, "StackExchange.Redis.ServerEndPoint" },
+        MinimumVersion = "1.0.0",
+        MaximumVersion = "2.*.*",
+        IntegrationName = StackExchangeRedisHelper.IntegrationName)]
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public class ConnectionMultiplexerExecuteAsyncImplIntegration
+    {
+        /// &lt;summary&gt;
+        /// OnMethodBegin callback
+        /// &lt;/summary&gt;
+        /// &lt;typeparam name="TTarget"&gt;Type of the target&lt;/typeparam&gt;
+        /// &lt;typeparam name="TMessage"&gt;Type of the message&lt;/typeparam&gt;
+        /// &lt;typeparam name="TProcessor"&gt;Type of the result processor&lt;/typeparam&gt;
+        /// &lt;typeparam name="TServerEndPoint"&gt;Type of the server end point&lt;/typeparam&gt;
+        /// &lt;param name="instance"&gt;Instance value, aka `this` of the instrumented method.&lt;/param&gt;
+        /// &lt;param name="message"&gt;Message instance&lt;/param&gt;
+        /// &lt;param name="resultProcessor"&gt;Result processor instance&lt;/param&gt;
+        /// &lt;param name="state"&gt;State instance&lt;/param&gt;
+        /// &lt;param name="serverEndPoint"&gt;Server endpoint instance&lt;/param&gt;
+        /// &lt;returns&gt;Calltarget state value&lt;/returns&gt;
+        internal static CallTargetState OnMethodBegin&lt;TTarget, TMessage, TProcessor, TServerEndPoint&gt;(TTarget instance, TMessage message, TProcessor resultProcessor, object state, TServerEndPoint serverEndPoint)
+            where TTarget : IConnectionMultiplexer
+            where TMessage : IMessageData
+        {
+            string rawCommand = message.CommandAndKey ?? "COMMAND";
+            StackExchangeRedisHelper.HostAndPort hostAndPort = StackExchangeRedisHelper.GetHostAndPort(instance.Configuration);
+
+            Scope scope = RedisHelper.CreateScope(Tracer.Instance, StackExchangeRedisHelper.IntegrationId, StackExchangeRedisHelper.IntegrationName, hostAndPort.Host, hostAndPort.Port, rawCommand);
+            if (scope is not null)
+            {
+                return new CallTargetState(scope);
+            }
+
+            return CallTargetState.GetDefault();
+        }
+
+        /// &lt;summary&gt;
+        /// OnAsyncMethodEnd callback
+        /// &lt;/summary&gt;
+        /// &lt;typeparam name="TTarget"&gt;Type of the target&lt;/typeparam&gt;
+        /// &lt;typeparam name="TResponse"&gt;Type of the response, in an async scenario will be T of Task of T&lt;/typeparam&gt;
+        /// &lt;param name="instance"&gt;Instance value, aka `this` of the instrumented method.&lt;/param&gt;
+        /// &lt;param name="response"&gt;Response instance&lt;/param&gt;
+        /// &lt;param name="exception"&gt;Exception instance in case the original code threw an exception.&lt;/param&gt;
+        /// &lt;param name="state"&gt;Calltarget state value&lt;/param&gt;
+        /// &lt;returns&gt;A response value, in an async scenario will be T of Task of T&lt;/returns&gt;
+        internal static TResponse OnAsyncMethodEnd&lt;TTarget, TResponse&gt;(TTarget instance, TResponse response, Exception exception, in CallTargetState state)
+        {
+            state.Scope.DisposeWithException(exception);
+            return response;
+        }
+    }
+</code></pre>
+<p>这段代码是一个用于监控和跟踪 StackExchange.Redis 库的 APM（应用性能监控）工具集成。它针对 <code>StackExchange.Redis.ConnectionMultiplexer</code> 类的 <code>ExecuteAsyncImpl</code> 方法进行了注入以收集执行过程中的信息。</p>
+<ol>
+<li>使用了两个 <code>InstrumentMethod</code> 属性，分别指定 <code>StackExchange.Redis</code> 和 <code>StackExchange.Redis.StrongName</code> 两个程序集。属性包括程序集名称、类型名、方法名、返回类型名等信息以及版本范围和集成名称。</li>
+<li><code>ConnectionMultiplexerExecuteAsyncImplIntegration</code> 类定义了 <code>OnMethodBegin</code> 和 <code>OnAsyncMethodEnd</code> 方法。这些方法在目标方法开始和结束时被调用。</li>
+<li><code>OnMethodBegin</code> 方法创建一个新的 <code>Tracing Scope</code>，其中包含了与执行的 Redis 命令相关的信息（如 <code>hostname</code>, <code>port</code>, <code>command</code> 等）。</li>
+<li><code>OnAsyncMethodEnd</code> 方法在命令执行结束后处理 <code>Scope</code>，在此过程中捕获可能的异常，并返回结果。</li>
+<li>而这个 <code>CallTargetState state</code> 中其实包含了上下文信息，有 Span Id 和 Trace Id ，就可以将其收集发送到 APM 后端进行处理。</li>
+</ol>
+<p>但是，仅仅只有声明了一个 AOP 切面类不够，我们还需将这个 AOP 切面类应用到 Redis SDK 原有的方法中，这又是如何做到的呢？那么我们就需要了解一下 CLR Profiler API 实现方法注入的原理了。</p>
+<h3 id="方法注入底层实现原理">方法注入底层实现原理</h3>
+<p>在不考虑 AOT 编译和分层编译特性，一个 .NET 方法一开始的目标地址都会指向 JIT 编译器，当方法开始执行时，先调用 JIT 编译器将 CIL 代码转换为本机代码，然后缓存起来，运行本机代码，后面再次访问这个方法时，都会走缓存以后得本机代码，流程如下所示：<br>
+<img src="https://incerry-blog-imgs.oss-cn-hangzhou.aliyuncs.com/image-dotnet%e6%97%a0%e4%be%b5%e5%85%a5%e8%87%aa%e5%8a%a8%e5%8c%96%e6%8e%a2%e9%92%88%e5%ae%9e%e7%8e%b0-230312194818216.png" alt="" loading="lazy"></p>
+<h4 id="拦截jit编译">拦截JIT编译</h4>
+<p>由于方法一般情况下只会被编译一次，一种方法注入的方案就是在 JIT 编译前替换掉对应方法的 MethodBody ，这个在 CLR Profile API 中提供的一个关键的回调。</p>
+<ul>
+<li><strong><a href="https://learn.microsoft.com/zh-cn/dotnet/framework/unmanaged-api/profiling/icorprofilercallback-jitcompilationstarted-method" target="_blank" rel="noopener"><code>JITCompilationStarted</code></a></strong>:通知探查器，即时编译器已经开始编译方法。<br>
+我们只需要订阅这个事件，就可以在方法编译开始时将对应的 MethodBody 修改成我们想要的样子，在里面进行 AOP 埋点即可。在JITCompilationStarted事件中重写方法IL的流程大致如下：</li>
+</ul>
+<ol>
+<li>捕获<code>JITCompilationStarted</code>事件：当一个方法被即时编译（JIT）时，CLR（Common Language Runtime）会触发<code>JITCompilationStarted</code>事件。通过使用 Profiler API ，分析器可以订阅这个事件并得到一个回调。</li>
+<li>确定要修改的方法：在收到<code>JITCompilationStarted</code>事件回调时，分析器需要检查目标方法元数据，例如方法名称、参数类型和返回值类型等，来确定是否需要对该方法进行修改。</li>
+<li>获取方法的原始 IL 代码：如果确定要对目标方法进行修改，分析器需要首先获取该方法的原始 IL 代码。这可以通过使用Profiler API 提供的<code>GetILFunctionBody</code>方法来实现。</li>
+<li>分析和修改 IL 代码：接下来，分析器需要解析原始 IL 代码，找到适当的位置以插入新的跟踪逻辑。这通常包括方法的入口点（开始执行时）和退出点（返回或抛出异常）。分析器会生成一段新的 IL 代码，用于记录性能指标、捕获异常等。</li>
+<li>替换方法的 IL 代码：将新生成的 IL 代码插入到原始 IL 代码中，并使用<code>SetILFunctionBody</code>方法替换目标方法的IL代码。这样，在方法被JIT编译成本地代码时，新的跟踪逻辑也会被包含进去。</li>
+<li>继续JIT编译：完成IL代码重写后，分析器需要通知CLR继续JIT编译过程。编译后的本地代码将包含插入的跟踪逻辑，并在应用程序运行期间执行。</li>
+</ol>
+<p>我们来看看源码是如何实现的，打开 <a href="https://github.com/DataDog/dd-trace-dotnet" target="_blank" rel="noopener">dd-trace-dotnet</a> 开源仓库，回退到较早的发布版本，有一个 <a href="https://github.com/DataDog/dd-trace-dotnet/blob/v1.28.0/integrations.json" target="_blank" rel="noopener">integrations.json</a> 文件，在 dd-trace-dotnet 编译时会自动生成这个文件，当然也可以手动维护，在这个文件里配置了需要 AOP 切面的程序集名称、类和方法，在分析器启动时，就会加载 json 配置，告诉分析器应该注入那些方法。</p>
+<p><img src="https://incerry-blog-imgs.oss-cn-hangzhou.aliyuncs.com/image-dotnet%e6%97%a0%e4%be%b5%e5%85%a5%e8%87%aa%e5%8a%a8%e5%8c%96%e6%8e%a2%e9%92%88%e5%ae%9e%e7%8e%b0-230408160833707.png" alt="" loading="lazy"></p>
+<p>接下来，我们找到<a href="https://github.com/DataDog/dd-trace-dotnet/blob/v1.28.0/src/Datadog.Trace.ClrProfiler.Native/cor_profiler.cpp#L685" target="_blank" rel="noopener"><code>cor_profiler.cpp</code></a>文件并打开，这是实现 CLR 事件回调的代码，转到关于<code>JITCompilationStarted</code>事件的通知的处理的源码。<br>
+<img src="https://incerry-blog-imgs.oss-cn-hangzhou.aliyuncs.com/image-dotnet%e6%97%a0%e4%be%b5%e5%85%a5%e8%87%aa%e5%8a%a8%e5%8c%96%e6%8e%a2%e9%92%88%e5%ae%9e%e7%8e%b0-230405101240592.png" alt="" loading="lazy"></p>
+<p>由于代码较长，简单的说一下这个函数它做了什么，函数主要用于在 .NET JIT（Just-In-Time）编译过程中执行一系列操作，例如插入启动钩子、修改 IL（中间语言）代码以及替换方法等，以下是它的功能：</p>
+<ol>
+<li>函数检查&nbsp;<code>is_attached_</code>&nbsp;和&nbsp;<code>is_safe_to_block</code>&nbsp;变量，如果不满足条件，则直接返回。</li>
+<li>使用互斥锁保护模块信息，防止在使用过程中卸载模块。</li>
+<li>通过给定的&nbsp;<code>function_id</code>&nbsp;获取模块 ID 和函数 token。</li>
+<li>根据模块 ID 查找模块元数据。</li>
+<li>检查是否已在<code>CallTarget</code>模式下注入加载器。</li>
+<li>如果符合条件且加载器尚未注入，则在<code>AppDomain</code>中的第一个 JIT 编译方法中插入启动钩子。在最低程度上，必须添加<code>AssemblyResolve</code>事件，以便从磁盘找到&nbsp;<code>Datadog.Trace.ClrProfiler.Managed.dll</code>&nbsp;及其依赖项，因为它不再被提供为 NuGet 包。</li>
+<li>在桌面版 IIS 环境下，调用&nbsp;<code>AddIISPreStartInitFlags()</code>&nbsp;方法来设置预启动初始化标志。</li>
+<li>如果未启用<code>CallTarget</code>模式，将对<a href="https://github.com/DataDog/dd-trace-dotnet/blob/v1.28.0/integrations.json" target="_blank" rel="noopener">integrations.json</a>配置的方法进行插入和替换，并处理插入和替换调用。</li>
+<li>返回&nbsp;<code>S_OK</code>&nbsp;表示成功完成操作。</li>
+</ol>
+<p>其中有两个关键函数，可以对 .NET 方法进行插入和替换，分别是<code>ProcessInsertionCalls</code>和<code>ProcessReplacementCalls</code>。<br>
+<img src="https://incerry-blog-imgs.oss-cn-hangzhou.aliyuncs.com/image-dotnet%e6%97%a0%e4%be%b5%e5%85%a5%e8%87%aa%e5%8a%a8%e5%8c%96%e6%8e%a2%e9%92%88%e5%ae%9e%e7%8e%b0-230405160017938.png" alt="" loading="lazy"><br>
+其中<code>ProcessInsertionCalls</code>用于那些只需要在方法前部插入埋点的场景，假设我们有以下原始 C# 类：</p>
+<pre><code class="language-csharp">public class TargetClass
+{
+    public void TargetMethod()
+    {
+        Console.WriteLine("This is the original method.");
+    }
+}
+</code></pre>
+<p>现在，我们希望在<code>TargetMethod</code>的开头插入一个新的方法调用。让我们创建一个示例方法，并在<code>WrapperClass</code>中定义它：<br>
+修改后，插入<code>InsertedMethod</code>调用的<code>TargetMethod</code>将如下所示：</p>
+<pre><code class="language-csharp">public class TargetClass
+{
+    public void TargetMethod()
+    {
+        WrapperClass.InsertedMethod(); // 这是新插入的方法调用
+        Console.WriteLine("This is the original method.");
+    }
+}
+
+public class WrapperClass
+{
+    public static void InsertedMethod()
+    {
+        Console.WriteLine("This is the inserted method.");
+    }
+}
+</code></pre>
+<p>请注意，上述示例是为了解释目的而手动修改的，实际上这种修改是通过操作IL代码来完成的。在<code>CorProfiler::ProcessInsertionCalls</code>方法中，这些更改是在IL指令级别上进行的，不会直接影响源代码。</p>
+<p>修改方法的 IL 代码.NET官方提供了一个帮助类 ILRewriter ，ILRewriter 是一个用于操作C#程序中方法的中间语言（Intermediate Language，IL）代码的工具类。它会将方法的IL代码以链表的形式组织，让我们可以方便的修改IL代码，它通常用于以下场景：</p>
+<ol>
+<li>代码注入：在方法体中插入、删除或修改 IL 指令。</li>
+<li>代码优化：优化 IL 代码以提高性能。</li>
+<li>执行 AOP（面向切面编程）：通过动态操纵字节码实现横切关注点（如日志记录、性能度量等）。</li>
+</ol>
+<p>ILRewriter 类提供了一系列方法用于读取、修改和写回IL指令序列。例如，在上述<code>CorProfiler::ProcessInsertionCalls</code>方法中，我们使用 ILRewriter 对象导入IL代码，执行所需的更改（如插入新方法调用），然后将修改后的 IL 代码导出并应用到目标方法上。这样可以实现对程序行为的运行时修改，而无需直接更改源代码。</p>
+<p><img src="https://incerry-blog-imgs.oss-cn-hangzhou.aliyuncs.com/image-dotnet%e6%97%a0%e4%be%b5%e5%85%a5%e8%87%aa%e5%8a%a8%e5%8c%96%e6%8e%a2%e9%92%88%e5%ae%9e%e7%8e%b0-230405160613006.png" alt="" loading="lazy"></p>
+<p>另一个<code>ProcessReplacementCalls</code>方法就是将原有的方法调用实现一个 Proxy ，适用于那些需要捕获异常获取方法返回值的场景，这块代码比较复杂，假设我们有以下 C# 代码，其中我们想要替换<code>OriginalMethod()</code>的调用：</p>
+<pre><code class="language-csharp">public class TargetClass
+{
+    public int OriginalMethod(int a, int b)
+    {
+        return a * b;
+    }
+}
+
+public class CallerClass
+{
+    public void CallerMethod()
+    {
+        TargetClass target = new TargetClass();
+        int result = target.OriginalMethod(3, 4);
+        Console.WriteLine(result);
+    }
+}
+</code></pre>
+<p>在应用方法调用替换后，<code>CallerMethod()</code>将调用自定义的替换方法<code>WrapperMethod()</code>而不是<code>OriginalMethod()</code>。例如，我们可以使用以下替换方法：</p>
+<pre><code class="language-csharp">public class WrapperClass
+{
+    public static int WrapperMethod(TargetClass instance, int opCode, int mdToken, long moduleVersionId, int a, int b)
+    {
+        Console.WriteLine("Method call replaced.");
+        return instance.OriginalMethod(a, b);
+    }
+}
+</code></pre>
+<p>经过IL修改后，<code>CallerMethod()</code>看起来大致如下：</p>
+<pre><code class="language-csharp">public void CallerMethod()
+{
+    TargetClass target = new TargetClass();
+    int opCode = /* Original CALL or CALLVIRT OpCode */;
+    int mdToken = /* Metadata token for OriginalMethod */;
+    long moduleVersionId = /* Module version ID pointer */;
+    
+    // Call the wrapper method instead of the original method
+    int result = WrapperClass.WrapperMethod(target, opCode, mdToken, moduleVersionId, 3, 4);
+    
+    Console.WriteLine(result);
+}
+</code></pre>
+<p>现在<code>CallerMethod()</code>将调用<code>WrapperMethod()</code>，在这个例子中，我们记录了一条替换消息，然后继续调用<code>OriginalMethod()</code>。</p>
+<p>正如所述，通过捕获<code>JITCompilationStarted</code>事件并对中间语言（IL）进行改写，我们修改方法行为的基本原理。在 .NET Framework 4.5 之前的版本中，这种方式广泛应用于方法改写和植入埋点，从而实现 APM 的自动化探针。然而，此方法也存在以下一些不足之处：</p>
+<ol>
+<li>不支持动态更新：<code>JITCompilationStarted</code> 在方法被 JIT 编译之前触发，这意味着它只能在初次编译过程中修改 IL。</li>
+<li>更大的性能影响：由于<code>JITCompilationStarted</code>是一个全局事件，它会在每个需要 JIT 编译的方法被调用时触发。因此，如果在此事件中进行 IL 修改，可能会对整个应用程序产生更大的性能影响。</li>
+<li>无法控制执行时机：在<code>JITCompilationStarted</code>中重写 IL 时，您不能精确控制何时对某个方法应用更改。</li>
+<li>某些情况下，运行时可能选择跳过JIT编译过程，例如对于 NGEN（Native Image Generator，俗称AOT编译）生成的本地映像，此时无法捕获到<code>JITCompilationStarted</code>事件。</li>
+<li>在多线程环境下，可能会出现竞争条件，导致一些方法执行的是未更新的代码。</li>
+</ol>
+<p>但是我们也无法再其它时间进行重写，因为JIT一般情况下只会编译一次，JIT 已经完成编译以后修改方法 IL 不会再次 JIT ，修改也不会生效。在 .NET Framework 4.5 诞生之前，我们并未拥有更为优美的途径来实现 APM 自动化探测。然而，随着 .NET Framework 4.5 的降临，一条全新的路径终于展现在我们面前。</p>
+<h4 id="重新jit编译">重新JIT编译</h4>
+<p>上文中提到了捕获<code>JITCompilationStarted</code>事件时进行方法重写的种种缺点，于是在.NET 4.5中，新增了一个名为<a href="https://learn.microsoft.com/zh-cn/dotnet/framework/unmanaged-api/profiling/icorprofilerinfo4-requestrejit-method" target="_blank" rel="noopener"><code>RequestReJIT</code></a>的方法，它允许运行时动态地重新编译方法。<code>RequestReJIT</code>主要用于性能分析和诊断工具，在程序运行过程中，可以为指定的方法替换新的即时编译（JIT）代码，以便优化性能或修复bug。</p>
+<p><code>RequestReJIT</code>提供了一种强大的机制，使开发人员能够在不重启应用程序的情况下热更新代码逻辑。这在分析、监视及优化应用程序性能方面非常有用。它可以在程序运行时动态地替换指定方法的 JIT 代码，而无需关心方法是否已经被编译过。<code>RequestReJIT</code>减轻了多线程环境下的竞争风险，并且可以处理 NGEN 映像中的方法。通过提供这个强大的机制，<code>RequestReJIT</code>使得性能分析和诊断工具能够更有效地优化应用程序性能及修复bug。</p>
+<p>使用<code>RequestReJIT</code>重写方法IL的流程如下：</p>
+<ol>
+<li>Profiler 初始化：当.NET应用程序启动时，分析器（profiler）会利用Profiler API向CLR（Common Language Runtime）注册。这允许分析器在整个应用程序生命周期内监听和操纵代码执行流程。</li>
+<li>确定要修改的方法：分析器需要识别哪些方法需要进行修改。这通常是通过分析方法元数据（如方法名称、参数类型和返回值类型等）来判断的。</li>
+<li>为目标方法替换 IL 代码：首先，分析器获取目标方法的原始 IL 代码，并在适当位置插入新的跟踪逻辑。接着，使用 SetILFunctionBody 方法将修改后的 IL 代码设置为目标方法的新 IL 代码。</li>
+<li>请求重新 JIT 编译：使用<code>RequestReJIT</code>方法通知 CLR 重新编译目标方法。此时，CLR 会触发<code>ReJITCompilationStarted</code>事件。</li>
+<li>捕获<code>ReJITCompilationStarted</code>事件：分析器订阅<code>ReJITCompilationStarted</code>事件，在事件回调中获取到修改后的 IL 代码，订阅结束事件，分析器可以获取本次重新编译是否成功。</li>
+<li>生成新的本地代码：CLR 会根据修改后的 IL 代码重新进行 JIT 编译，生成新的本地代码。这样，新的 JIT 代码便包含了插入的跟踪逻辑。</li>
+<li>执行新的本地代码：之后，当目标方法被调用时，将执行新生成的本地代码。这意味着插入的跟踪逻辑会在应用程序运行期间起作用，从而收集性能数据和诊断信息。</li>
+</ol>
+<p>有了<code>RequestJIT</code>方法，我们可以在任何时间修改方法 IL 然后进行重新编译，无需拦截JIT执行事件，在新版的 dd-trace 触发方法注入放到了托管代码中，托管的 C# 代码直接调用非托管的分析器 C++ 代码进行方法注入，所以不需要单独在 json 文件中配置。</p>
+<p>取而代之的是<a href="https://github.com/DataDog/dd-trace-dotnet/blob/master/tracer/src/Datadog.Trace/Generated/net6.0/Datadog.Trace.SourceGenerators/Datadog.Trace.SourceGenerators.InstrumentationDefinitions.InstrumentationDefinitionsGenerator/InstrumentationDefinitions.g.cs" target="_blank" rel="noopener"><code>InstrumentationDefinitions.g.cs</code></a>文件，在编译时会扫描所有标记了<code>InstrumentMethod</code>特性的方法，然后自动生成这个类。</p>
+<p><img src="https://incerry-blog-imgs.oss-cn-hangzhou.aliyuncs.com/image-dotnet%e6%97%a0%e4%be%b5%e5%85%a5%e8%87%aa%e5%8a%a8%e5%8c%96%e6%8e%a2%e9%92%88%e5%ae%9e%e7%8e%b0-230408162315091.png" alt="" loading="lazy"></p>
+<p>当分析器启动时，会调用<a href="https://github.com/DataDog/dd-trace-dotnet/blob/1b6bbaa8f3d11ef8fc01c3b6ae9de37458bd9e61/tracer/src/Datadog.Trace/ClrProfiler/Instrumentation.cs#L81" target="_blank" rel="noopener"><code>Instrumentation.cs</code></a>类中<code>Initialize()</code>方法，在这个方法内部就会和分析器通讯，将需要进行方法注入的方法传递给分析器。<br>
+<img src="https://incerry-blog-imgs.oss-cn-hangzhou.aliyuncs.com/image-dotnet%e6%97%a0%e4%be%b5%e5%85%a5%e8%87%aa%e5%8a%a8%e5%8c%96%e6%8e%a2%e9%92%88%e5%ae%9e%e7%8e%b0-230408172610776.png" alt="" loading="lazy"></p>
+<p>因为需要和分析器进行通讯，所以需要在分析器中导出可供 C# 代码调用的函数，源码中是<a href="https://github.com/DataDog/dd-trace-dotnet/blob/v2.27.0/tracer/src/Datadog.Tracer.Native/interop.cpp" target="_blank" rel="noopener"><code>interop.cpp</code></a>导出了 C# 和 C++ 代码互操作的几个函数，同样在 C# 中也要使用<code>P/Invoke</code>技术来定义一个调用类。</p>
+<p><img src="https://incerry-blog-imgs.oss-cn-hangzhou.aliyuncs.com/image-dotnet%e6%97%a0%e4%be%b5%e5%85%a5%e8%87%aa%e5%8a%a8%e5%8c%96%e6%8e%a2%e9%92%88%e5%ae%9e%e7%8e%b0-230408172916880.png" alt="" loading="lazy"><br>
+<img src="https://incerry-blog-imgs.oss-cn-hangzhou.aliyuncs.com/image-dotnet%e6%97%a0%e4%be%b5%e5%85%a5%e8%87%aa%e5%8a%a8%e5%8c%96%e6%8e%a2%e9%92%88%e5%ae%9e%e7%8e%b0-230408173247344.png" alt="" loading="lazy"></p>
+<p>分析器接受到需要注入的方法信息以后，会将其加入到方法注入的队列中，然后会重写对应方法至下方这种形式：</p>
+<pre><code class="language-cs">/// &lt;摘要&gt;
+/// 用calltarget实现重写目标方法体。（这个函数是由ReJIT处理程序触发的）生成的代码结构：
+///
+/// - 为 TReturn（如果非 void 方法）、CallTargetState、CallTargetReturn/CallTargetReturn&lt;TReturn&gt; 和 Exception 添加局部变量
+/// - 初始化局部变量
+
+try
+{
+  try
+  {
+    try
+    {
+      - 使用对象实例（对于静态方法则为 null）和原始方法参数调用 BeginMethod
+      - 将结果存储到 CallTargetState 局部变量中
+    }
+    catch 当异常不是 Datadog.Trace.ClrProfiler.CallTarget.CallTargetBubbleUpException 时
+    {
+      - 调用 LogException(Exception)
+    }
+
+    - 执行原始方法指令
+      * 所有RET指令都替换为 LEAVE_S。对于非void方法，堆栈上的值首先存储在 TReturn 局部变量中。
+  }
+  catch (Exception)
+  {
+    - 将异常存储到 Exception 局部变量中
+    - 抛出异常
+  }
+}
+finally
+{
+  try
+  {
+    - 使用对象实例（对于静态方法则为null），TReturn局部变量（如果非 void 方法），CallTargetState局部变量和 Exception 局部变量调用 EndMethod
+    - 将结果存储到 CallTargetReturn/CallTargetReturn&lt;TReturn&gt; 局部变量中
+    - 如果是非void方法，将 CallTargetReturn&lt;TReturn&gt;.GetReturnValue() 存储到 TReturn 局部变量中
+  }
+  catch 当异常不是 Datadog.Trace.ClrProfiler.CallTarget.CallTargetBubbleUpException 时
+  {
+    - 调用 LogException(Exception)
+  }
+}
+
+- 如果非 void 方法，则加载 TReturn 局部变量
+- RET
+</code></pre>
+<p>最后请求<code>RequestReJIT</code>来重新编译进行 JIT 编译，完成了整个方法的注入。<br>
+<img src="https://incerry-blog-imgs.oss-cn-hangzhou.aliyuncs.com/image-dotnet%e6%97%a0%e4%be%b5%e5%85%a5%e8%87%aa%e5%8a%a8%e5%8c%96%e6%8e%a2%e9%92%88%e5%ae%9e%e7%8e%b0-230408180409767.png" alt="" loading="lazy"></p>
+<h2 id="总结">总结</h2>
+<p>以上就是目前 .NET 上 APM 主流的无侵入自动化探针的实现原理的简单科普，总体实现是很复杂的，里面还有诸多细节在本文中并未提到。然而，通过了解这些基本概念和技术原理，希望能为您提供一个较为清晰的认识，让您更好地理解 APM 无侵入式探针是如何在 .NET 平台工作的。</p>
+<p>如果大家对此话题有兴趣，并希望建立更深入、全面的了解，那么后续可以更新下一篇文章，在接下来的内容中，我们可以实现一个简单版本的 .NET 无侵入探针，并将深入探讨相关实现细节以及如何在实际场景中应用这些方法。</p>
+<h2 id="参考文献">参考文献</h2>
+<p><a href="https://learn.microsoft.com/zh-cn/dotnet/framework/unmanaged-api/profiling/" target="_blank" rel="noopener">.NET探查器文档</a></p>
+<p><a href="https://mp.weixin.qq.com/s/R3nl802hoDYilHNhvmeQYg" target="_blank" rel="noopener">深入Java自动化探针技术的原理和实践</a></p>
+<h2 id="作者介绍">作者介绍</h2>
+<p>InCerry，微软最有价值专家，现就职于同程旅行</p>
+<h2 id="net性能优化交流群">.NET性能优化交流群</h2>
+<p>相信大家在开发中经常会遇到一些性能问题，苦于没有有效的工具去发现性能瓶颈，或者是发现瓶颈以后不知道该如何优化。之前一直有读者朋友询问有没有技术交流群，但是由于各种原因一直都没创建，现在很高兴的在这里宣布，我创建了一个专门交流.NET性能优化经验的群组，主题包括但不限于：</p>
+<ul>
+<li>如何找到.NET性能瓶颈，如使用APM、dotnet tools等工具</li>
+<li>.NET框架底层原理的实现，如垃圾回收器、JIT等等</li>
+<li>如何编写高性能的.NET代码，哪些地方存在性能陷阱</li>
+</ul>
+<p>希望能有更多志同道合朋友加入，分享一些工作中遇到的.NET性能问题和宝贵的性能分析优化经验。<strong>目前一群已满，现在开放二群。</strong><br>
+如果提示已经达到200人，可以加我微信，我拉你进群: <strong>ls1075</strong><br>
+另外也创建了<strong>QQ群</strong>，群号: 687779078，欢迎大家加入。</p>
+
+</div>
+<div class="clear"></div>
+<div id="blog_post_info_block" role="contentinfo">
+    <div id="blog_post_info"></div>
+    <div class="clear"></div>
+    <div id="post_next_prev"></div>
+</div>
+            </div>
+            <div class="postDesc">posted @ 
+<span id="post-date" data-last-update-days="286.5118144353889" data-date-created="BlogServer.Application.Dto.BlogPost.BlogPostDto" data-date-updated="2023-08-11 22:24">2023-04-17 09:02</span>&nbsp;
+<a href="https://www.cnblogs.com/InCerry">InCerry</a>&nbsp;
+阅读(<span id="post_view_count">9989</span>)&nbsp;
+评论(<span id="post_comment_count">40</span>)&nbsp;
+<a href="https://i.cnblogs.com/EditPosts.aspx?postid=17324718" rel="nofollow">编辑</a>&nbsp;
+<a href="javascript:void(0)" onclick="AddToWz(17324718);return false;">收藏</a>&nbsp;
+<a href="javascript:void(0)" onclick="reportManager.report({ currentUserId: '', targetType: 'blogPost', targetId: '17324718', targetLink: 'https://www.cnblogs.com/InCerry/p/about-dotnet-auto-apm-instru-impl.html', title: '.NET无侵入自动化探针原理和主流实现' })">举报</a>
+</div>
+        </div>
+	    
+	    
+    </div><!--end: topics 文章、评论容器-->
+</div>
+<script>
+    var cb_entryId = 17324718, cb_entryCreatedDate = '2023-04-17 09:02', cb_postType = 1, cb_postTitle = '.NET无侵入自动化探针原理和主流实现';
+    var allowComments = true, cb_blogId = 295634, cb_blogApp = 'InCerry', cb_blogUserGuid = '1fe1f27e-1350-e611-9fc1-ac853d9f53cc';
+    mermaidRender.render()
+    markdown_highlight()
+    zoomManager.apply("#cnblogs_post_body img:not(.code_img_closed):not(.code_img_opened)");    
+</script>
+<a id="!comments"></a>
+<div id="blog-comments-placeholder"></div>
+<div id="comment_form" class="commentform">
+    <a name="commentform"></a>
+    <div id="divCommentShow"></div>
+    <div id="comment_nav">
+            <a class="comment-nav-left forpc" href="https://cnblogs.vip/" target="_blank">会员力量，点亮园子希望</a>
+        <div class="comment-nav-right">
+            <span id="span_refresh_tips"></span><a href="#" onclick="return RefreshPage();">刷新页面</a><a href="#top">返回顶部</a>
+        </div>
+    </div>
+    <div id="comment_form_container"></div>
+    <div class="ad_text_commentbox" id="ad_text_under_commentbox"></div>
+        <div id="cnblogs_ch"></div>
+    <div id="opt_under_post"></div>
+        <div id="cnblogs_c1" class="under-post-card">
+            <a href="https://www.finclip.com?channel=cnblog2024" rel="nofollow" target="_blank" onclick="countCreativeClicks('C1-凡泰极客')">
+                <img src="https://img2024.cnblogs.com/blog/35695/202405/35695-20240517155930267-114888508.jpg" onload="countCreativeImpressions('C1-凡泰极客')" alt="" />
+                <span id="c1_impression" style="display:none"></span>
+            </a>
+        </div>
+    <div id="under_post_card1"></div>
+    <div id="under_post_card2"></div>
+    <div id="HistoryToday" class="under-post-card"></div>
+    <script type="text/javascript">
+        var commentManager = new blogCommentManager();
+        commentManager.renderComments(0);
+        fixPostBody();
+        window.footnoteTipManager.generateFootnoteTips();
+
+            window.tocManager.displayDisableTocTips = false;
+            window.tocManager.generateToc();
+            
+                setTimeout(function() { countViews(cb_blogId, cb_entryId); }, 50);
+            
+            deliverT2();
+            deliverC1C2();
+            loadNewsAndKb();
+            
+                LoadPostCategoriesTags(cb_blogId, cb_entryId);
+            
+            LoadPostInfoBlock(cb_blogId, cb_entryId, cb_blogApp, cb_blogUserGuid);
+            GetPrevNextPost(cb_entryId, cb_blogId, cb_entryCreatedDate, cb_postType);
+            loadOptUnderPost();
+            GetHistoryToday(cb_blogId, cb_blogApp, cb_entryCreatedDate);
+                </script>
+</div>
+
+	</div><!--end: forFlow -->
+	</div><!--end: mainContent 主体内容容器-->
+	<div id="sideBar">
+		<div id="sideBarMain">
+			<div id="sidebar_news" class="newsItem">
+    <h3 class="catListTitle">公告</h3>
+<div id="blog-news">    
+    <div id="sidebar_news_content">
+    </div>
+</div>
+<script>loadBlogNews();</script>
+
+ 
+</div>
+<div id="sidebar_c3"></div>
+			<div id="blog-calendar" style="display:none"></div><script>loadBlogDefaultCalendar();</script>			
+			<div id="leftcontentcontainer">
+				<div id="blog-sidecolumn"></div>
+                    <script>loadBlogSideColumn();</script>
+			</div>			
+		</div><!--end: sideBarMain -->
+	</div><!--end: sideBar 侧边栏容器 -->
+	<div class="clear"></div>
+	</div><!--end: main -->
+	<div class="clear"></div>
+	<div id="footer">
+		<!--done-->
+Copyright &copy; 2024 InCerry
+<br /><span id="poweredby">Powered by .NET 8.0 on Kubernetes</span>
+
+
+
+	</div><!--end: footer -->
+</div><!--end: home 自定义的最大容器 -->
+
+
+
+    
+
+    <input type="hidden" id="antiforgery_token" value="CfDJ8ONv0caE5GtEh3YJ5j088knH_EuCJa8-XILlGuYPN8Jue5Coz6i0o5GWOWotCx1KH2Z5SGd16H_to3RPvmvr4JHmmmB4xusQLUK5X2ofAmsnZwVv0m6Ql2IcxHm4kIJFPsTOC3WrYxzb8z03Fr1QzBY" />
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-M95P3TTWJZ"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-M95P3TTWJZ');
+</script>
+<script defer src="https://hm.baidu.com/hm.js?866c9be12d4a814454792b1fd0fed295"></script>
+</body>
+</html>

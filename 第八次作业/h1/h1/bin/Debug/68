@@ -1,0 +1,981 @@
+﻿<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="referrer" content="origin-when-cross-origin" />
+    <meta name="description" content="DTM 首创的子事务屏障技术，使得开发者基于DTM 提供的SDK能够轻松开发出更可靠的分布式应用，彻底将开发人员从网络异常的处理中解放出来，再也不用担心空补偿、防悬挂、幂等等分布式问题。如果要进行分布式事务框架的选型，DTM 将是不二之选。" />
+    <meta property="og:description" content="DTM 首创的子事务屏障技术，使得开发者基于DTM 提供的SDK能够轻松开发出更可靠的分布式应用，彻底将开发人员从网络异常的处理中解放出来，再也不用担心空补偿、防悬挂、幂等等分布式问题。如果要进行分布式事务框架的选型，DTM 将是不二之选。" />
+    <meta http-equiv="Cache-Control" content="no-transform" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>分布式事务 | 使用DTM 的Saga 模式 - 「圣杰」 - 博客园</title>
+    <link rel="canonical" href="https://www.cnblogs.com/sheng-jie/p/17100467.html" />
+    <link rel="shortcut icon" id="favicon" href="//assets.cnblogs.com/favicon.svg?v=2" type="image/svg+xml" />
+    
+    <link rel="stylesheet" href="/css/blog-common.min.css?v=JnYHs5HAUCOVmwbxBNuH-ED7ggVDfqtff-pdhyndpr8" />
+    
+
+    <link id="MainCss" rel="stylesheet" href="/skins/simplememory/bundle-simplememory.min.css?v=SiaEEyuLLyqQ30U6p0_gAunDLOqZtbt7kF5APbDruVo" />
+        <link id="highlighter-theme-cnblogs" type="text/css" rel="stylesheet" href="/css/hljs/cnblogs.css?v=5J1NDtbnnIr2Rc2SdhEMlMxD4l9Eydj88B31E7_NhS4" />
+    <link type="text/css" rel="stylesheet" href="https://www.cnblogs.com/sheng-jie/custom.css?v=dI3&#x2B;bzKcn&#x2B;Xd3q1cAN6CrqbwRww=" />
+    
+    <link id="mobile-style" media="only screen and (max-width: 767px)" type="text/css" rel="stylesheet" href="/skins/SimpleMemory/bundle-simplememory-mobile.min.css?v=20avRjbdbr8kYqxlGwdQXCDadIqpdIPaT1DzHC6hI9w" />
+    
+    <link type="application/rss+xml" rel="alternate" href="https://www.cnblogs.com/sheng-jie/rss" />
+    <link type="application/rsd+xml" rel="EditURI" href="https://www.cnblogs.com/sheng-jie/rsd.xml" />
+    <link type="application/wlwmanifest+xml" rel="wlwmanifest" href="https://www.cnblogs.com/sheng-jie/wlwmanifest.xml" />
+    <script>
+        var currentBlogId = 326932;
+        var currentBlogApp = 'sheng-jie';
+        var isLogined = false;
+        var isBlogOwner = false;
+        var skinName = 'SimpleMemory';
+        var visitorUserId = '';
+        var hasCustomScript = true;
+        window.cb_enable_mathjax = true;
+        window.mathEngine = 0;
+        window.codeHighlightEngine = 1;
+        window.enableCodeLineNumber = true;
+        window.codeHighlightTheme = 'cnblogs';
+        window.darkModeCodeHighlightTheme = 'vs2015';
+        window.isDarkCodeHighlightTheme = false;
+        window.isDarkModeCodeHighlightThemeDark = true;
+        window.isDisableCodeHighlighter = false;
+        window.enableCodeThemeTypeFollowSystem = false;
+        window.enableMacStyleCodeBlock = false;
+    </script>
+        <script>
+            window.currentPostId = 17100467;
+            window.currentPostDateAdded = '2023-02-08 09:07';
+        </script>
+    <script src="https://assets.cnblogs.com/scripts/jquery-3.3.1.min.js"></script>
+    <script src="https://cdn-www.cnblogs.com/js/blog-common.min.js?v=e7iDdKE0ie8Fi0lKgiYt7eXqsQNrVeJmcEHX6zqQWKc"></script>
+        <script>updateCustomBlogReferrer();</script>
+    
+</head>
+<body class="skin-simplememory no-navbar mathjax2">
+    <a name="top"></a>
+    <div id="top_nav" class="navbar forpc navbar-custom">
+        <nav id="nav_main" class="navbar-main">
+            <ul id="nav_left" class="navbar-list navbar-left">
+                <li class="navbar-branding">
+                    <a href="https://www.cnblogs.com/" title="开发者的网上家园" role="banner">
+                        <img src="//assets.cnblogs.com/logo.svg" alt="博客园Logo" />
+                    </a>
+                </li>
+                <li><a href="https://cnblogs.vip/">会员</a></li>
+                <li><a href="https://cnblogs.vip/store">周边</a></li>
+                <li>
+                    <a href="https://news.cnblogs.com/" onclick="countClicks('nav', 'skin-navbar-news')">新闻</a>
+                </li>
+                <li>
+                    <a href="https://q.cnblogs.com/" onclick="countClicks('nav', 'skin-navbar-q')">博问</a>
+                </li>
+                    <li>
+                        <a href="https://www.cnblogs.com/cmt/p/18172236" target="_blank">融资</a>
+                    </li>
+                <li><a href="https://market.cnblogs.com" target="_blank">云市场</a></li>
+            </ul>
+            <ul id="nav_right" class="navbar-list navbar-right">
+                <li>
+                    <form id="zzk_search" class="navbar-search dropdown" action="https://zzk.cnblogs.com/s" method="get" role="search">
+                        <input name="w" id="zzk_search_input" placeholder="代码改变世界" type="search" tabindex="3" autocomplete="off" />
+                        <button id="zzk_search_button" onclick="window.navbarSearchManager.triggerActiveOption()">
+                            <img id="search_icon" class="focus-hidden" src="//assets.cnblogs.com/icons/search.svg" alt="搜索" />
+                            <img class="hidden focus-visible" src="//assets.cnblogs.com/icons/enter.svg" alt="搜索" />
+                        </button>
+                        <ul id="navbar_search_options" class="dropdown-menu quick-search-menu">
+                            <li tabindex="0" class="active" onclick="zzkSearch(event, document.getElementById('zzk_search_input').value)">
+                                <div class="keyword-wrapper">
+                                    <img src="//assets.cnblogs.com/icons/search.svg" alt="搜索" />
+                                    <div class="keyword"></div>
+                                </div>
+                                <span class="search-area">所有博客</span>
+                            </li>
+                                    <li tabindex="1" onclick="zzkBlogSearch(event, 'sheng-jie', document.getElementById('zzk_search_input').value)">
+                                        <div class="keyword-wrapper">
+                                            <img src="//assets.cnblogs.com/icons/search.svg" alt="搜索" />
+                                            <div class="keyword"></div>
+                                        </div>
+                                        <span class="search-area">当前博客</span>
+                                    </li>
+                        </ul>
+                    </form>
+                </li>
+                <li id="navbar_login_status" class="navbar-list">
+                    <a class="navbar-user-info navbar-blog" href="https://i.cnblogs.com/EditPosts.aspx?opt=1" alt="写随笔" title="写随笔">
+                        <img id="new_post_icon" class="navbar-icon" src="//assets.cnblogs.com/icons/newpost.svg" alt="写随笔" />
+                    </a>
+                    <a id="navblog-myblog-icon" class="navbar-user-info navbar-blog" href="https://passport.cnblogs.com/GetBlogApplyStatus.aspx" alt="我的博客" title="我的博客">
+                        <img id="myblog_icon" class="navbar-icon" src="//assets.cnblogs.com/icons/myblog.svg" alt="我的博客" />
+                    </a>
+                    <a class="navbar-user-info navbar-message navbar-icon-wrapper" href="https://msg.cnblogs.com/" alt="短消息" title="短消息">
+                        <img id="msg_icon" class="navbar-icon" src="//assets.cnblogs.com/icons/message.svg" alt="短消息" />
+                        <span id="msg_count" style="display: none"></span>
+                    </a>
+                    <a id="navbar_lite_mode_indicator" data-current-page="blog" style="display: none" href="javascript:void(0)" alt="简洁模式" title="简洁模式启用，您在访问他人博客时会使用简洁款皮肤展示">
+                        <img class="navbar-icon" src="//assets.cnblogs.com/icons/lite-mode-on.svg" alt="简洁模式" />
+                    </a>
+                    <div id="user_info" class="navbar-user-info dropdown">
+                        <a class="dropdown-button" href="https://home.cnblogs.com/">
+                            <img id="user_icon" class="navbar-avatar" src="//assets.cnblogs.com/icons/avatar-default.svg" alt="用户头像" />
+                        </a>
+                        <div class="dropdown-menu">
+                            <a id="navblog-myblog-text" href="https://passport.cnblogs.com/GetBlogApplyStatus.aspx">我的博客</a>
+                            <a href="https://home.cnblogs.com/">我的园子</a>
+                            <a href="https://account.cnblogs.com/settings/account">账号设置</a>
+                            <a href="javascript:void(0)" id="navbar_lite_mode_toggle" title="简洁模式会使用简洁款皮肤显示所有博客">
+    简洁模式 <img id="navbar_lite_mode_on" src="/images/lite-mode-check.svg" class="hide" /><span id="navbar_lite_mode_spinner" class="hide">...</span>
+</a>
+                            <a href="javascript:void(0)" onclick="account.logout();">退出登录</a>
+                        </div>
+                    </div>
+                    <a class="navbar-anonymous" href="https://account.cnblogs.com/signup">注册</a>
+                    <a class="navbar-anonymous" href="javascript:void(0);" onclick="account.login()">登录</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    <div id="page_begin_html">
+        <a href="https://github.com/sheng-jie"  target="_blank" class="github-corner" aria-label="View source on GitHub"><svg width="100" height="100" viewBox="0 0 250 250" style="fill:#FD6C6C; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?b0ea31a9aa64a27f329823a0796c132e";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+<style>
+#home{
+width:85%
+}
+#back-top {
+     position: fixed;
+     bottom: 10px;
+     right: 5px;
+     z-index: 99;
+}
+#back-top span {
+     width: 50px;
+     height: 64px;
+     display: block;
+     background:url(http://images.cnblogs.com/cnblogs_com/seanshao/855033/o_rocket.png) no-repeat center center;
+}
+#back-top a{outline:none}
+</style>
+    </div>
+
+    <!--done-->
+<div id="home">
+<div id="header">
+	<div id="blogTitle">
+        <a id="lnkBlogLogo" href="https://www.cnblogs.com/sheng-jie/"><img id="blogLogo" src="/skins/custom/images/logo.gif" alt="返回主页" /></a>		
+		
+<!--done-->
+<h1><a id="Header1_HeaderTitle" class="headermaintitle HeaderMainTitle" href="https://www.cnblogs.com/sheng-jie">『___知多少』</a>
+</h1>
+<h2>一名寻求机会努力破局的架构师</h2>
+
+
+
+
+		
+	</div><!--end: blogTitle 博客的标题和副标题 -->
+	<div id="navigator">
+		
+<ul id="navList">
+<li><a id="blog_nav_sitehome" class="menu" href="https://www.cnblogs.com/">
+博客园</a>
+</li>
+<li>
+<a id="blog_nav_myhome" class="menu" href="https://www.cnblogs.com/sheng-jie/">
+首页</a>
+</li>
+<li>
+
+<a id="blog_nav_newpost" class="menu" href="https://i.cnblogs.com/EditPosts.aspx?opt=1">
+新随笔</a>
+</li>
+<li>
+<a id="blog_nav_contact" class="menu" href="https://msg.cnblogs.com/send/%E3%80%8C%E5%9C%A3%E6%9D%B0%E3%80%8D">
+联系</a></li>
+<li>
+<a id="blog_nav_rss" class="menu" href="javascript:void(0)" data-rss="https://www.cnblogs.com/sheng-jie/rss/">
+订阅</a>
+<!--<partial name="./Shared/_XmlLink.cshtml" model="Model" /></li>--></li>
+<li>
+<a id="blog_nav_admin" class="menu" href="https://i.cnblogs.com/">
+管理</a>
+</li>
+</ul>
+
+
+		<div class="blogStats">
+			<div id="blog_stats_place_holder"><script>loadBlogStats();</script></div>
+		</div><!--end: blogStats -->
+	</div><!--end: navigator 博客导航栏 -->
+</div><!--end: header 头部 -->
+<div id="main">
+	<div id="mainContent">
+	<div class="forFlow">
+		<div id="post_detail">
+    <!--done-->
+    <div id="topics">
+        <div class="post">
+            <h1 class = "postTitle">
+                <a id="cb_post_title_url" class="postTitle2 vertical-middle" href="https://www.cnblogs.com/sheng-jie/p/17100467.html" title="发布于 2023-02-08 09:07">
+    <span role="heading" aria-level="2">分布式事务 | 使用DTM 的Saga 模式</span>
+    
+
+</a>
+
+            </h1>
+            <div class="clear"></div>
+            <div class="postBody">
+                    <div id="cnblogs_post_description" style="display: none">
+        
+        DTM 首创的子事务屏障技术，使得开发者基于DTM 提供的SDK能够轻松开发出更可靠的分布式应用，彻底将开发人员从网络异常的处理中解放出来，再也不用担心空补偿、防悬挂、幂等等分布式问题。如果要进行分布式事务框架的选型，DTM 将是不二之选。
+    </div>
+<div id="cnblogs_post_body" class="blogpost-body cnblogs-markdown">
+<blockquote>
+<p>分布式事务系列文章<br>
+<a href="https://www.cnblogs.com/sheng-jie/p/17100467.html" target="_blank" rel="noopener">分布式事务 | 使用DTM 的Saga 模式</a><br>
+<a href="https://www.cnblogs.com/sheng-jie/p/17074266.html" target="_blank" rel="noopener">分布式事务 | 使用 dotnetcore/CAP 的本地消息表模式</a><br>
+<a href="https://www.cnblogs.com/sheng-jie/p/17019926.html" target="_blank" rel="noopener">分布式事务 | 基于MassTransit的StateMachine实现Saga编排式分布式事务</a><br>
+<a href="https://www.cnblogs.com/sheng-jie/p/16975156.html" target="_blank" rel="noopener">分布式事务 | 基于MassTransit Courier实现Saga 编排式分布式事务</a></p>
+</blockquote>
+<h1 id="dtm-简介">DTM 简介</h1>
+<p>前面章节提及的<code>MassTransit</code>、<code>dotnetcore/CAP</code>都提供了分布式事务的处理能力，但也仅局限于Saga和本地消息表模式的实现。那有没有一个独立的分布式事务解决方案，涵盖多种分布式事务处理模式，如<code>Saga</code>、<code>TCC</code>、<code>XA</code>模式等。有，目前业界主要有两种开源方案，其一是阿里开源的<code>Seata</code>，另一个就是<code>DTM</code>。其中<code>Seata</code>仅支持Java、Go和Python语言，因此不在.NET 的选择范围。<code>DTM</code>则通过提供简单易用的HTTP和gRPC接口，屏蔽了语言的无关性，因此支持任何开发语言接入，目前提供了Go、Python、NodeJs、Ruby、Java和C#等语言的SDK。<br>
+DTM，全称Distributed Transaction Manager，是一个分布式事务管理器，解决跨数据库、跨服务、跨语言更新数据的一致性问题。它提供了Saga、TCC、 XA和二阶段消息模式以满足不同应用场景的需求，同时其首创的<strong>子事务屏障</strong>技术可以有效解决幂等、悬挂和空补偿等异常问题。</p>
+<h1 id="dtm-事务处理过程及架构">DTM 事务处理过程及架构</h1>
+<p>那DTM是如何处理分布式事务的呢？以一个经典的跨行转账业务为例来看下事务处理过程。对于跨行转账业务而言，很显然是跨库跨服务的应用场景，不能简单通过本地事务解决，可以使用Saga模式，以下是基于DTM提供的Saga事务模式成功转账的的时序图：</p>
+<p><img src="https://img2023.cnblogs.com/blog/577140/202302/577140-20230208090615349-874642450.png" alt="" loading="lazy"></p>
+<p>从以上时序图可以看出，DTM整个全局事务分为如下几步：</p>
+<ol>
+<li>用户定义好全局事务所有的事务分支（全局事务的组成部分称为事务分支），然后提交给DTM，DTM持久化全局事务信息后，立即返回</li>
+<li>DTM取出第一个事务分支，这里是TransOut，调用该服务并成功返回</li>
+<li>DTM取出第二个事务分支，这里是TransIn，调用该服务并成功返回</li>
+<li>DTM已完成所有的事务分支，将全局事务的状态修改为已完成</li>
+</ol>
+<p>基于以上这个时序图的基础上，再来看下DTM的架构：</p>
+<p><img src="https://img2023.cnblogs.com/blog/577140/202302/577140-20230208090615605-1027506109.png" alt="" loading="lazy"></p>
+<p>整个DTM架构中，一共有三个角色，分别承担了不同的职责：</p>
+<ul>
+<li>RM-资源管理器：RM是一个应用服务，通常连接到独立的数据库，负责处理全局事务中的本地事务，执行相关数据的修改、提交、回滚、补偿等操作。例如在前面的这个Saga事务时序图中，步骤2、3中被调用的TransIn和TransOut方法所在的服务都是RM。</li>
+<li>AP-应用程序：AP是一个应用服务，负责全局事务的编排，他会注册全局事务，注册子事务，调用RM接口。例如在前面的这个SAGA事务中，发起步骤1的是AP，它编排了一个包含TransOut、TransIn的全局事务，然后提交给TM</li>
+<li>TM-事务管理器：TM就是DTM服务，负责全局事务的管理，作为一个独立的服务而存在。每个全局事务都注册到TM，每个事务分支也注册到TM。TM会协调所有的RM来执行不同的事务分支，并根据执行结果决定是否提交或回滚事务。例如在前面的Saga事务时序图中，TM在步骤2、3中调用了各个RM，在步骤4中，完成这个全局事务。</li>
+</ul>
+<p>总体而言，AP-应用程序充当全局事务编排器的角色通过DTM提供的开箱即用的SDK进行全局事务和子事务的注册。TM-事务管理器接收到注册的全局事务和子事务后，负责调用RM-资源管理器来执行对应的事务分支，TM-事务管理器根据事务分支的执行结果决定是否提及或回滚事务。</p>
+<h1 id="快速上手">快速上手</h1>
+<p>百闻不如一见，接下来就来实际上手体验下如何基于DTM来实际应用Saga进行分布式跨行转账事务的处理。</p>
+<h2 id="创建示例项目">创建示例项目</h2>
+<p>接下来就来创建一个示例项目：</p>
+<ol>
+<li>使用<code>dotnet new webapi -n DtmDemo.Webapi</code>创建示例项目。</li>
+<li>添加Nuget包：<code>Dtmcli</code> 和<code>Pomelo.EntityFrameworkCore.MySql</code>。</li>
+<li>添加DTM配置项：</li>
+</ol>
+<pre><code class="language-bash">{
+  "dtm": {
+    "DtmUrl": "http://localhost:36789",
+    "DtmTimeout": 10000,
+    "BranchTimeout": 10000,
+    "DBType": "mysql",
+    "BarrierTableName": "dtm_barrier.barrier",
+  }
+}
+</code></pre>
+<ol start="4">
+<li>定义银行账户<code>BankAccount</code>实体类：</li>
+</ol>
+<pre><code class="language-csharp">namespace DtmDemo.WebApi.Models
+{
+    public class BankAccount
+    {
+        public int Id { get; set; }
+        public decimal Balance { get; set; }
+    }
+}
+</code></pre>
+<ol start="5">
+<li>定义<code>DtmDemoWebApiContext</code>数据库上下文：</li>
+</ol>
+<pre><code class="language-csharp">using Microsoft.EntityFrameworkCore;
+
+namespace DtmDemo.WebApi.Data
+{
+    public class DtmDemoWebApiContext : DbContext
+    {
+        public DtmDemoWebApiContext (DbContextOptions&lt;DtmDemoWebApiContext&gt; options)
+            : base(options)
+        {
+        }
+
+        public DbSet&lt;DtmDemo.WebApi.Models.BankAccount&gt; BankAccount { get; set; } = default!;
+    }
+}
+</code></pre>
+<ol start="6">
+<li>注册DbContext 和DTM服务：</li>
+</ol>
+<pre><code class="language-csharp">using Microsoft.EntityFrameworkCore;
+using DtmDemo.WebApi.Data;
+using Dtmcli;
+
+var builder = WebApplication.CreateBuilder(args);
+var connectionStr = builder.Configuration.GetConnectionString("DtmDemoWebApiContext");
+// 注册DbContext
+builder.Services.AddDbContext&lt;DtmDemoWebApiContext&gt;(options =&gt;
+{
+    options.UseMySql(connectionStr, ServerVersion.AutoDetect(connectionStr));
+});
+
+// 注册DTM
+builder.Services.AddDtmcli(builder.Configuration, "dtm");
+</code></pre>
+<ol start="7">
+<li>执行<code>dotnet ef migrations add 'Initial' </code> 创建迁移。</li>
+<li>为便于初始化演示数据，定义<code>BankAccountController</code>如下，其中<code>PostBankAccount</code>接口添加了<code>await _context.Database.MigrateAsync();</code>用于自动应用迁移。</li>
+</ol>
+<pre><code class="language-csharp">using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using DtmDemo.WebApi.Data;
+using DtmDemo.WebApi.Models;
+using Dtmcli;
+
+namespace DtmDemo.WebApi.Controllers
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    public class BankAccountsController : ControllerBase
+    {
+        private readonly DtmDemoWebApiContext _context;
+
+        public BankAccountsController(DtmDemoWebApiContext context)
+        {
+            _context = context;
+        }
+		[HttpGet]
+        public async Task&lt;ActionResult&lt;IEnumerable&lt;BankAccount&gt;&gt;&gt; GetBankAccount()
+        {
+            return await _context.BankAccount.ToListAsync();
+        }
+
+        [HttpPost]
+        public async Task&lt;ActionResult&lt;BankAccount&gt;&gt; PostBankAccount(BankAccount bankAccount)
+        {
+            await _context.Database.MigrateAsync();
+            _context.BankAccount.Add(bankAccount);
+            await _context.SaveChangesAsync();
+
+            return Ok(bankAccount);
+        }
+}
+</code></pre>
+<h2 id="应用saga模式">应用Saga模式</h2>
+<p>接下来定义<code>SagaDemoController</code>来使用DTM的Saga模式来模拟跨行转账分布式事务：</p>
+<pre><code class="language-csharp">using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using DtmDemo.WebApi.Data;
+using DtmDemo.WebApi.Models;
+using Dtmcli;
+using DtmCommon;
+
+namespace DtmDemo.WebApi.Controllers
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    public class SagaDemoController : ControllerBase
+    {
+        private readonly DtmDemoWebApiContext _context;
+        private readonly IConfiguration _configuration;
+        private readonly IDtmClient _dtmClient;
+        private readonly IDtmTransFactory _transFactory;
+
+        private readonly IBranchBarrierFactory _barrierFactory;
+        private readonly ILogger&lt;BankAccountsController&gt; _logger;
+
+        public SagaDemoController(DtmDemoWebApiContext context, IConfiguration configuration, IDtmClient dtmClient, IDtmTransFactory transFactory, ILogger&lt;BankAccountsController&gt; logger, IBranchBarrierFactory barrierFactory)
+        {
+            this._context = context;
+            this._configuration = configuration;
+            this._dtmClient = dtmClient;
+            this._transFactory = transFactory;
+            this._logger = logger;
+            this._barrierFactory = barrierFactory;
+        }
+}
+</code></pre>
+<p>对于跨行转账业务，使用DTM的Saga模式，首先要进行事务拆分，可以拆分为以下4个子事务，并分别实现：</p>
+<h3 id="转出子事务transferout">转出子事务（TransferOut）</h3>
+<pre><code class="language-csharp">    [HttpPost("TransferOut")]
+    public async Task&lt;IActionResult&gt; TransferOut([FromBody] TransferRequest request)
+    {
+        var msg = $"用户{request.UserId}转出{request.Amount}元";
+        _logger.LogInformation($"转出子事务-启动：{msg}");
+        // 1. 创建子事务屏障
+        var branchBarrier = _barrierFactory.CreateBranchBarrier(Request.Query);
+        try
+        {
+            using (var conn = _context.Database.GetDbConnection())
+            {
+                // 2. 在子事务屏障内执行事务操作
+                await branchBarrier.Call(conn, async (tx) =&gt;
+                {
+                    _logger.LogInformation($"转出子事务-执行：{msg}");
+                    await _context.Database.UseTransactionAsync(tx);
+                    var bankAccount = await _context.BankAccount.FindAsync(request.UserId);
+                    if (bankAccount == null || bankAccount.Balance &lt; request.Amount)
+                        throw new InvalidDataException("账户不存在或余额不足！");
+                    bankAccount.Balance -= request.Amount;
+                    await _context.SaveChangesAsync();
+                });
+            }
+        }
+        catch (InvalidDataException ex)
+        {
+            _logger.LogInformation($"转出子事务-失败：{ex.Message}");
+            // 3. 按照接口协议，返回409，以表示子事务失败
+            return new StatusCodeResult(StatusCodes.Status409Conflict);
+        }
+        _logger.LogInformation($"转出子事务-成功：{msg}");
+        return Ok();
+    }
+</code></pre>
+<p>以上代码中有几点需要额外注意：</p>
+<ol>
+<li>使用Saga模式，必须开启子事务屏障：<code>_barrierFactory.CreateBranchBarrier(Request.Query)</code>，其中<code>Request.Query</code>中的参数由DTM 生成，类似：<code>?branch_id=01&amp;gid=XTzKHgxemLyL8EXtMTLvzK&amp;op=action&amp;trans_type=saga</code>，主要包含四个参数：
+<ol>
+<li>gid：全局事务Id</li>
+<li>trans_type：事务类型，是saga、msg、xa或者是tcc。</li>
+<li>branch_id：子事务的Id</li>
+<li>op：当前操作，对于Saga事务模式，要么为action（正向操作），要么为compensate（补偿操作）。</li>
+</ol>
+</li>
+<li>必须在子事务屏障内执行事务操作：<code>branchBarrier.Call(conn, async (tx) =&gt;{}</code></li>
+<li>对于Saga正向操作而言，业务上的失败与异常是需要做严格区分的，例如前面的余额不足，是业务上的失败，必须回滚。而对于网络抖动等其他外界原因导致的事务失败，属于业务异常，则需要重试。<strong>因此若因业务失败（这里是账户不存在或余额不足）而导致子事务失败，则必须通过抛异常的方式并返回</strong><code>**409**</code><strong>状态码以告知DTM 子事务失败。</strong></li>
+<li>以上通过抛出异常的方式中断子事务执行并在外围捕获特定异常返回<code>409</code>状态码。在外围捕获异常时切忌放大异常捕获，比如直接<code>catch(Exception)</code>，如此会捕获由于网络等其他原因导致的异常，而导致DTM 不再自动处理该异常，比如业务异常时的自动重试。</li>
+</ol>
+<h3 id="转出补偿子事务transferout_compensate">转出补偿子事务（TransferOut_Compensate）</h3>
+<p>转出补偿，就是回滚转出操作，进行账户余额归还，实现如下：</p>
+<pre><code class="language-csharp">    [HttpPost("TransferOut_Compensate")]
+    public async Task&lt;IActionResult&gt; TransferOut_Compensate([FromBody] TransferRequest request)
+    {
+        var msg = $"用户{request.UserId}回滚转出{request.Amount}元";
+        _logger.LogInformation($"转出补偿子事务-启动：{msg}");
+        // 1. 创建子事务屏障
+        var branchBarrier = _barrierFactory.CreateBranchBarrier(Request.Query);
+        using (var conn = _context.Database.GetDbConnection())
+        {
+            // 在子事务屏障内执行事务操作
+            await branchBarrier.Call(conn, async (tx) =&gt;
+            {
+                _logger.LogInformation($"转出补偿子事务-执行：{msg}");
+                await _context.Database.UseTransactionAsync(tx);
+                var bankAccount = await _context.BankAccount.FindAsync(request.UserId);
+                if (bankAccount == null)
+                    return; //对于补偿操作，可直接返回，中断后续操作
+                bankAccount.Balance += request.Amount;
+                await _context.SaveChangesAsync();
+            });
+        }
+        _logger.LogInformation($"转出补偿子事务-成功！");
+        // 2. 因补偿操作必须成功，所以必须返回200。
+        return Ok();
+    }
+</code></pre>
+<p><strong>由于DTM设计为总是执行补偿，也就是说即使正向操作子事务失败时，DTM 仍旧会执行补偿逻辑。但子事务屏障会在执行时判断正向操作的执行状态，当子事务失败时，并不会执行补偿逻辑。</strong><br>
+<strong>另外DTM的补偿操作，是要求最终成功的，只要还没成功，就会不断进行重试，直到成功</strong>。<strong>因此在补偿子事务中，即使补偿子事务中出现业务失败时，也必须返回</strong><code>**200**</code><strong>。</strong>因此当出现<code>bankAccount==null</code>时可以直接 return。</p>
+<h3 id="转入子事务transferin">转入子事务（TransferIn）</h3>
+<p>转入子事务和转出子事务的实现基本类似，都是开启子事务屏障后，在<code>branchBarrier.Call(conn, async tx =&gt; {}</code>中实现事务逻辑，并通过抛异常的方式并最终返回<code>409</code>状态码来显式告知DTM 子事务执行失败。</p>
+<pre><code class="language-csharp">    [HttpPost("TransferIn")]
+    public async Task&lt;IActionResult&gt; TransferIn([FromBody] TransferRequest request)
+    {
+        var msg = $"用户{request.UserId}转入{request.Amount}元";
+        _logger.LogInformation($"转入子事务-启动：{msg}");
+        var branchBarrier = _barrierFactory.CreateBranchBarrier(Request.Query);
+        try
+        {
+            using (var conn = _context.Database.GetDbConnection())
+            {
+                await branchBarrier.Call(conn, async (tx) =&gt;
+                {
+                    _logger.LogInformation($"转入子事务-执行：{msg}");
+                    await _context.Database.UseTransactionAsync(tx);
+                    var bankAccount = await _context.BankAccount.FindAsync(request.UserId);
+                    if (bankAccount == null)
+                        throw new InvalidDataException("账户不存在！");
+                    bankAccount.Balance += request.Amount;
+                    await _context.SaveChangesAsync();
+                });
+            }
+        }
+        catch (InvalidDataException ex)
+        {
+            _logger.LogInformation($"转入子事务-失败：{ex.Message}");
+            return new StatusCodeResult(StatusCodes.Status409Conflict);
+        }
+        _logger.LogInformation($"转入子事务-成功：{msg}");
+        return Ok();
+    }
+</code></pre>
+<h3 id="转入补偿子事务transferin_compensate">转入补偿子事务（TransferIn_Compensate）</h3>
+<p>转入补偿子事务和转出补偿子事务的实现也基本类似，都是开启子事务屏障后，在<code>branchBarrier.Call(conn, async tx =&gt; {}</code>中实现事务逻辑，并最终返回<code>200</code>状态码来告知DTM 补偿子事务执行成功。</p>
+<pre><code class="language-csharp">    [HttpPost("TransferIn_Compensate")]
+    public async Task&lt;IActionResult&gt; TransferIn_Compensate([FromBody] TransferRequest request)
+    {
+        var msg = "用户{request.UserId}回滚转入{request.Amount}元";
+        _logger.LogInformation($"转入补偿子事务-启动：{msg}");
+        var branchBarrier = _barrierFactory.CreateBranchBarrier(Request.Query);
+        using (var conn = _context.Database.GetDbConnection())
+        {
+            await branchBarrier.Call(conn, async (tx) =&gt;
+            {
+                _logger.LogInformation($"转入补偿子事务-执行：{msg}");
+                await _context.Database.UseTransactionAsync(tx);
+                var bankAccount = await _context.BankAccount.FindAsync(request.UserId);
+                if (bankAccount == null) return;
+                bankAccount.Balance -= request.Amount;
+                await _context.SaveChangesAsync();
+            });
+        }
+        _logger.LogInformation($"转入补偿子事务-成功！");
+        return Ok();
+    }
+</code></pre>
+<h3 id="编排saga事务">编排Saga事务</h3>
+<p>拆分完子事务，最后就可以进行Saga事务编排了，其代码如下所示：</p>
+<pre><code class="language-csharp">    [HttpPost("Transfer")]
+    public async Task&lt;IActionResult&gt; Transfer(int fromUserId, int toUserId, decimal amount,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            _logger.LogInformation($"转账事务-启动：用户{fromUserId}转账{amount}元到用户{toUserId}");
+            //1. 生成全局事务ID
+            var gid = await _dtmClient.GenGid(cancellationToken);
+            var bizUrl = _configuration.GetValue&lt;string&gt;("TransferBaseURL");
+            //2. 创建Saga
+            var saga = _transFactory.NewSaga(gid);
+            //3. 添加子事务
+        	saga.Add(bizUrl + "/TransferOut", bizUrl + "/TransferOut_Compensate",
+                    new TransferRequest(fromUserId, amount))
+                .Add(bizUrl + "/TransferIn", bizUrl + "/TransferIn_Compensate",
+                    new TransferRequest(toUserId, amount))
+                .EnableWaitResult(); // 4. 按需启用是否等待事务执行结果
+
+            //5. 提交Saga事务
+            await saga.Submit(cancellationToken);
+        }
+        catch (DtmException ex) // 6. 如果开启了`EnableWaitResult()`，则可通过捕获异常的方式，捕获事务失败的结果。
+        {
+            _logger.LogError($"转账事务-失败：用户{fromUserId}转账{amount}元到用户{toUserId}失败！");
+            return new BadRequestObjectResult($"转账失败:{ex.Message}");
+        }
+
+        _logger.LogError($"转账事务-完成：用户{fromUserId}转账{amount}元到用户{toUserId}成功！");
+        return Ok($"转账事务-完成：用户{fromUserId}转账{amount}元到用户{toUserId}成功！");
+    }
+</code></pre>
+<p>主要步骤如下：</p>
+<ol>
+<li>生成全局事务Id：<code>var gid =await _dtmClient.GenGid(cancellationToken);</code></li>
+<li>创建Saga全局事务：<code>_transFactory.NewSaga(gid);</code></li>
+<li>添加子事务：<code>saga.Add(string action, string compensate, object postData);</code>包含正向和反向子事务。</li>
+<li>如果依赖事务执行结果，可通过<code>EnableWaitResult()</code>开启事务结果等待。</li>
+<li>提交Saga全局事务：<code>saga.Submit(cancellationToken);</code></li>
+<li>若开启了事务结果等待，可以通过<code>try...catch..</code>来捕获<code>DtmExcepiton</code>异常来获取事务执行异常信息。</li>
+</ol>
+<h2 id="运行项目">运行项目</h2>
+<p>既然DTM作为一个独立的服务存在，其负责通过<code>HTTP</code>或<code>gRPC</code>协议发起子事务的调用，因此首先需要启动一个DTM实例，又由于本项目依赖MySQL，因此我们采用Docker Compose的方式来启动项目。在Visual Studio中通过<code>右键项目-&gt;Add-&gt;Docker Support-&gt;Linux</code> 即可添加<code>Dockerfile</code>如下所示：</p>
+<pre><code class="language-csharp">FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS base
+WORKDIR /app
+EXPOSE 80
+EXPOSE 443
+
+FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
+WORKDIR /src
+COPY ["DtmDemo.WebApi/DtmDemo.WebApi.csproj", "DtmDemo.WebApi/"]
+RUN dotnet restore "DtmDemo.WebApi/DtmDemo.WebApi.csproj"
+COPY . .
+WORKDIR "/src/DtmDemo.WebApi"
+RUN dotnet build "DtmDemo.WebApi.csproj" -c Release -o /app/build
+
+FROM build AS publish
+RUN dotnet publish "DtmDemo.WebApi.csproj" -c Release -o /app/publish
+
+FROM base AS final
+WORKDIR /app
+COPY --from=publish /app/publish .
+ENTRYPOINT ["dotnet", "DtmDemo.WebApi.dll"]
+</code></pre>
+<p>在Visual Studio中通过<code>右键项目-&gt;Add Container Orchestrator Support-&gt;Docker Compose</code>即可添加<code>docker-compose.yml</code>，由于整个项目依赖<code>mysql</code>和<code>DTM</code>，修改<code>docker-compose.yml</code>如下所示，其中定义了三个服务：db，dtm和dtmdemo.webapi。</p>
+<pre><code class="language-yaml">version: '3.4'
+services:
+  db:
+    image: 'mysql:5.7'
+    container_name: dtm-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456 # 指定MySQL初始密码
+    volumes:
+      - ./docker/mysql/scripts:/docker-entrypoint-initdb.d  # 挂载用于初始化数据库的脚本
+    ports:
+      - '3306:3306'
+  dtm:
+    depends_on: ["db"]
+    image: 'yedf/dtm:latest'
+    container_name: dtm-svc
+    environment:
+      IS_DOCKER: '1'
+      STORE_DRIVER: mysql  # 指定使用MySQL持久化DTM事务数据
+      STORE_HOST: db   # 指定MySQL服务名，这里是db
+      STORE_USER: root
+      STORE_PASSWORD: '123456'
+      STORE_PORT: 3306
+      STORE_DB: "dtm" # 指定DTM 数据库名
+    ports:
+      - '36789:36789' # DTM HTTP 端口
+      - '36790:36790' # DTM gRPC 端口
+  dtmdemo.webapi:
+    depends_on: ["dtm", "db"]
+    image: ${DOCKER_REGISTRY-}dtmdemowebapi
+    environment:
+      ASPNETCORE_ENVIRONMENT: docker # 设定启动环境为docker
+    container_name: dtm-webapi-demo
+    build:
+      context: .
+      dockerfile: DtmDemo.WebApi/Dockerfile
+    ports:
+      - '31293:80'   # 映射Demo:80端口到本地31293端口
+      - '31294:443'	 # 映射Demo:443端口到本地31294端口
+
+</code></pre>
+<p>其中<code>dtmdemo.webapi</code>服务通过<code>ASPNETCORE_ENVIRONMENT: docker </code>指定启动环境为<code>docker</code>，因此需要在项目下添加<code>appsettings.docker.json</code>以配置应用参数：</p>
+<pre><code class="language-yaml">{
+  "ConnectionStrings": {
+    "DtmDemoWebApiContext": "Server=db;port=3306;database=dtm_barrier;user id=root;password=123456;AllowLoadLocalInfile=true"
+  },
+  "TransferBaseURL": "http://dtmdemo.webapi/api/SagaDemo",
+  "dtm": {
+    "DtmUrl": "http://dtm:36789",
+    "DtmTimeout": 10000,
+    "BranchTimeout": 10000,
+    "DBType": "mysql",
+    "BarrierTableName": "dtm_barrier.barrier"
+  }
+}
+
+</code></pre>
+<p>另外<code>db</code>服务中通过<code>volumes: ["./docker/mysql/scripts:/docker-entrypoint-initdb.d"]</code>来挂载初始化脚本，以创建DTM依赖的MySQL 存储数据库<code>dtm</code>和示例项目使用子事务屏障需要的<code>barrier</code>数据表。脚本如下：</p>
+<pre><code class="language-sql">CREATE DATABASE IF NOT EXISTS dtm
+/*!40100 DEFAULT CHARACTER SET utf8mb4 */
+;
+drop table IF EXISTS dtm.trans_global;
+CREATE TABLE if not EXISTS dtm.trans_global (
+  `id` bigint(22) NOT NULL AUTO_INCREMENT,
+  `gid` varchar(128) NOT NULL COMMENT 'global transaction id',
+  `trans_type` varchar(45) not null COMMENT 'transaction type: saga | xa | tcc | msg',
+  `status` varchar(12) NOT NULL COMMENT 'tranaction status: prepared | submitted | aborting | finished | rollbacked',
+  `query_prepared` varchar(1024) NOT NULL COMMENT 'url to check for msg|workflow',
+  `protocol` varchar(45) not null comment 'protocol: http | grpc | json-rpc',
+  `create_time` datetime DEFAULT NULL,
+  `update_time` datetime DEFAULT NULL,
+  `finish_time` datetime DEFAULT NULL,
+  `rollback_time` datetime DEFAULT NULL,
+  `options` varchar(1024) DEFAULT 'options for transaction like: TimeoutToFail, RequestTimeout',
+  `custom_data` varchar(1024) DEFAULT '' COMMENT 'custom data for transaction',
+  `next_cron_interval` int(11) default null comment 'next cron interval. for use of cron job',
+  `next_cron_time` datetime default null comment 'next time to process this trans. for use of cron job',
+  `owner` varchar(128) not null default '' comment 'who is locking this trans',
+  `ext_data` TEXT comment 'result for this trans. currently used in workflow pattern',
+  `result` varchar(1024) DEFAULT '' COMMENT 'rollback reason for transaction',
+  `rollback_reason` varchar(1024) DEFAULT '' COMMENT 'rollback reason for transaction',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `gid` (`gid`),
+  key `owner`(`owner`),
+  key `status_next_cron_time` (`status`, `next_cron_time`) comment 'cron job will use this index to query trans'
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
+drop table IF EXISTS dtm.trans_branch_op;
+CREATE TABLE IF NOT EXISTS dtm.trans_branch_op (
+  `id` bigint(22) NOT NULL AUTO_INCREMENT,
+  `gid` varchar(128) NOT NULL COMMENT 'global transaction id',
+  `url` varchar(1024) NOT NULL COMMENT 'the url of this op',
+  `data` TEXT COMMENT 'request body, depreceated',
+  `bin_data` BLOB COMMENT 'request body',
+  `branch_id` VARCHAR(128) NOT NULL COMMENT 'transaction branch ID',
+  `op` varchar(45) NOT NULL COMMENT 'transaction operation type like: action | compensate | try | confirm | cancel',
+  `status` varchar(45) NOT NULL COMMENT 'transaction op status: prepared | succeed | failed',
+  `finish_time` datetime DEFAULT NULL,
+  `rollback_time` datetime DEFAULT NULL,
+  `create_time` datetime DEFAULT NULL,
+  `update_time` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `gid_uniq` (`gid`, `branch_id`, `op`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
+drop table IF EXISTS dtm.kv;
+CREATE TABLE IF NOT EXISTS dtm.kv (
+  `id` bigint(22) NOT NULL AUTO_INCREMENT,
+  `cat` varchar(45) NOT NULL COMMENT 'the category of this data',
+  `k` varchar(128) NOT NULL,
+  `v` TEXT,
+  `version` bigint(22) default 1 COMMENT 'version of the value',
+  create_time datetime default NULL,
+  update_time datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE key `uniq_k`(`cat`, `k`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
+
+</code></pre>
+<pre><code class="language-sql">create database if not exists dtm_barrier
+/*!40100 DEFAULT CHARACTER SET utf8mb4 */
+;
+drop table if exists dtm_barrier.barrier;
+create table if not exists dtm_barrier.barrier(
+  id bigint(22) PRIMARY KEY AUTO_INCREMENT,
+  trans_type varchar(45) default '',
+  gid varchar(128) default '',
+  branch_id varchar(128) default '',
+  op varchar(45) default '',
+  barrier_id varchar(45) default '',
+  reason varchar(45) default '' comment 'the branch type who insert this record',
+  create_time datetime DEFAULT now(),
+  update_time datetime DEFAULT now(),
+  key(create_time),
+  key(update_time),
+  UNIQUE key(gid, branch_id, op, barrier_id)
+);
+</code></pre>
+<p>准备完毕，即可通过点击Visual Studio工具栏的<code>Docker Compose</code>的启动按钮，启动后可以在<code>Containers</code>窗口看到启动了<code>dtm-mysql</code>、<code>dtm-svc</code>和<code>dtm-webapi-demo</code>三个容器，并在浏览器中打开了 <a href="http://localhost:31293/swagger/index.html" target="_blank" rel="noopener">http://localhost:31293/swagger/index.html</a> Swagger 网页。该种方式启动项目是支持断点调试项目，如下图所示：</p>
+<p><img src="https://img2023.cnblogs.com/blog/577140/202302/577140-20230208090615930-1075982461.png" alt="" loading="lazy"></p>
+<p>通过<code>BankAccouts</code>控制器的<code>POST</code>接口，初始化用户1和用户2各100元。再通过<code>SagaDemo</code>控制器的<code>/api/Transfer</code>接口，进行Saga事务测试。</p>
+<ol>
+<li>用户1转账10元到用户2</li>
+</ol>
+<p>由于用户1和用户2已存在，且用户1余额足够， 因此该笔转账合法因此会成功，其执行路径为：转出（成功）-&gt;转入（成功）-&gt; 事务完成，执行日志如下图所示：</p>
+<p><img src="https://img2023.cnblogs.com/blog/577140/202302/577140-20230208090615483-2075534255.png" alt="" loading="lazy"></p>
+<ol start="2">
+<li>用户3转账10元到用户1</li>
+</ol>
+<p>由于用户3不存在，因此执行路径为：转出（失败）-&gt;转出补偿（成功）-&gt;事务完成。从下图的执行日志可以看出，转出子事务失败，还是会调用对应的转出补偿操作，但子事务屏障会过进行过滤，因此实际上并不会执行真正的转出补偿逻辑，其中红线框住的部分就是证明。</p>
+<p><img src="https://img2023.cnblogs.com/blog/577140/202302/577140-20230208090615654-493801167.png" alt="" loading="lazy"></p>
+<ol start="3">
+<li>用户1转账10元到用户3</li>
+</ol>
+<p>由于用户3不存在，因此执行路径为：转出（成功）-&gt;转入（失败）-&gt;转入补偿（成功）-&gt;转出补偿（成功）-&gt;事务完成。从下图的执行日志可以看出，转入子事务失败，还是会调用对应的转入补偿操作，但子事务屏障会过进行过滤，因此实际上并不会执行真正的转入补偿逻辑，其中红线框住的部分就是证明。</p>
+<p><img src="https://img2023.cnblogs.com/blog/577140/202302/577140-20230208090615566-2102947752.png" alt="" loading="lazy"></p>
+<h1 id="子事务屏障">子事务屏障</h1>
+<p>在以上的示例中，重复提及子事务屏障，那子事务屏障具体是什么，这里有必要重点说明下。以上面用户1转账10元到用户3为例，整个事务流转过程中，即转出（成功）-&gt;转入（失败）-&gt;转入补偿（成功）-&gt;转出补偿（成功）-&gt;事务完成。<br>
+在提交事务之后，首先是全局事务的落库，主要由DTM 服务负责，主要包括两张表：<code>trans_global</code>和<code>trans_branch_op</code>，DTM 依此进行子事务分支的协调。其中<code>trans_global</code>会插入一条全局事务记录，用于记录全局事务的状态信息，如下图1所示。<code>trans_branch_op</code>表为<code>trans_global</code>的子表，记录四条子事务分支数据，如下图2所示：</p>
+<p><img src="https://img2023.cnblogs.com/blog/577140/202302/577140-20230208090615572-1686755485.png" alt="" loading="lazy"></p>
+<p><img src="https://img2023.cnblogs.com/blog/577140/202302/577140-20230208090615508-569004398.png" alt="" loading="lazy"></p>
+<p>具体的服务再接收到来自Dtm的子事务分支调用时，每次都会往子事务屏障表<code>barrier</code>中插入一条数据，如下图所示。业务服务就是依赖此表来完成子事务的控制。</p>
+<p><img src="https://img2023.cnblogs.com/blog/577140/202302/577140-20230208090615335-1482846572.png" alt="" loading="lazy"></p>
+<p>而子事务屏障的核心就是子事务屏障表唯一键的设计，以<code>gid</code>、<code>branch_id</code>、<code>op</code>和<code>barrier_id</code>为唯一索引，利用唯一索引，“以改代查”来避免竞态条件。在跨行转账的<code>Saga</code>示例中，子事务分支的执行步骤如下所示：</p>
+<ol>
+<li>开启本地事务</li>
+<li>对于当前操作op（action|compensate），使用<code>inster ignore into barrier(trans_type, gid, branch_id, op, barrier_id, reason)</code>向子事务屏障表插入一条数据，有几种情况：
+<ol>
+<li>插入成功且影响条数大于0，则继续向下执行。</li>
+<li>插入成功但影响条数等于0，说明触发唯一键约束，此时会进行空补偿、悬挂和重复请求判断，若是则直接返回，跳过后续子事务分支逻辑的执行。</li>
+</ol>
+</li>
+<li>第2步插入成功，则可以继续执行子事务分支逻辑，执行业务数据表操作，结果分两种请求
+<ol>
+<li>子事务成功，子事务屏障表操作和业务数据表操作由于共享同一个本地事务，提交本地事务，因此可实现强一致性，当前子事务分支完成。</li>
+<li>子事务失败，回滚本地事务</li>
+</ol>
+</li>
+</ol>
+<p>每个子事务分支通过以上步骤，即可实现下图的效果：</p>
+<p><img src="https://img2023.cnblogs.com/blog/577140/202302/577140-20230208090615309-315814684.png" alt="" loading="lazy"></p>
+<h1 id="小结">小结</h1>
+<p>本文主要介绍了DTM的Saga模式的应用，基于DTM 首创的子事务屏障技术，使得开发者基于DTM 提供的SDK能够轻松开发出更可靠的分布式应用，彻底将开发人员从网络异常的处理中解放出来，再也不用担心空补偿、防悬挂、幂等等分布式问题。如果要进行分布式事务框架的选型，DTM 将是不二之选。</p>
+<iframe src="//player.bilibili.com/player.html?aid=950101825&amp;bvid=BV1ts4y1j7kq&amp;cid=1027118197&amp;page=1" scrolling="no" border="0" frameborder="no" framespacing="0" width="800px" height="400px" allowfullscreen="true"> </iframe>
+</div>
+<div id="MySignature" role="contentinfo">
+    <div style="display: block; border: 2px solid #6ecaa8; padding: 10px; background: aliceblue">  
+<a href="https://docs.microsoft.com/zh-cn/dotnet/core/?WT.mc_id=DT-MVP-5003052">推荐链接：你必须知道的.NET Core开发指南</a> 
+<br>
+<a href="https://docs.microsoft.com/zh-cn/dotnet/machine-learning?WT.mc_id=DT-MVP-5003052">推荐链接：你必须知道的ML.NET开发指南</a> 
+<br>
+<a href="https://docs.microsoft.com/zh-cn/office/?WT.mc_id=M365-MVP-5003052">推荐链接：你必须知道的Office开发指南</a> 
+<br>
+<a href="https://docs.microsoft.com/zh-cn/windows/iot-core/getstarted?WT.mc_id=IoT-MVP-5003052">推荐链接：你必须知道的IOT开发指南</a> 
+<br>
+<a href="https://docs.microsoft.com/zh-cn/learn/paths/azure-fundamentals/?WT.mc_id=DT-MVP-5003052">推荐链接：你必须知道的Azure基础知识</a> 
+<br>
+
+<a href="https://docs.microsoft.com/zh-cn/learn/paths/create-use-analytics-reports-power-bi/?WT.mc_id=DT-MVP-5003052">推荐链接：你必须知道的PowerBI基础知识</a> 
+<br>
+</div>
+
+<img src="https://files.cnblogs.com/files/sheng-jie/scan-follow.bmp">
+<blockquote>
+<b>
+关注我的公众号『微服务知多少』，我们微信不见不散。
+<br>
+阅罢此文，如果您觉得本文不错并有所收获，请【打赏】或【推荐】，也可【评论】留下您的问题或建议与我交流。
+
+你的支持是我不断创作和分享的不竭动力！</b>
+</blockquote>
+
+<div style="display: block; border: 2px solid #6ecaa8; padding: 10px; background: aliceblue" id="AllanboltSignature">    
+        <div>作者：<a href="http://www.jianshu.com/u/39ec0e6b1844" target="_blank">『圣杰』</a></div>
+        <div>出处：<a href="http://www.cnblogs.com/sheng-jie/" target="_blank">http://www.cnblogs.com/sheng-jie/</a></div>
+        <div>本文版权归作者和博客园共有，欢迎转载，但未经作者同意必须保留此段声明，且在文章页面明显位置给出原文链接，否则保留追究法律责任的权利。</div>  
+</div>
+</div>
+<div class="clear"></div>
+<div id="blog_post_info_block" role="contentinfo">
+    <div id="blog_post_info"></div>
+    <div class="clear"></div>
+    <div id="post_next_prev"></div>
+</div>
+            </div>
+            <div class="postDesc">posted @ 
+<span id="post-date" data-last-update-days="452.83196098250346" data-date-created="BlogServer.Application.Dto.BlogPost.BlogPostDto" data-date-updated="2023-02-26 14:43">2023-02-08 09:07</span>&nbsp;
+<a href="https://www.cnblogs.com/sheng-jie">「圣杰」</a>&nbsp;
+阅读(<span id="post_view_count">3624</span>)&nbsp;
+评论(<span id="post_comment_count">6</span>)&nbsp;
+<a href="https://i.cnblogs.com/EditPosts.aspx?postid=17100467" rel="nofollow">编辑</a>&nbsp;
+<a href="javascript:void(0)" onclick="AddToWz(17100467);return false;">收藏</a>&nbsp;
+<a href="javascript:void(0)" onclick="reportManager.report({ currentUserId: '', targetType: 'blogPost', targetId: '17100467', targetLink: 'https://www.cnblogs.com/sheng-jie/p/17100467.html', title: '分布式事务 | 使用DTM 的Saga 模式' })">举报</a>
+</div>
+        </div>
+	    
+	    
+    </div><!--end: topics 文章、评论容器-->
+</div>
+<script>
+    var cb_entryId = 17100467, cb_entryCreatedDate = '2023-02-08 09:07', cb_postType = 1, cb_postTitle = '分布式事务 | 使用DTM 的Saga 模式';
+    var allowComments = true, cb_blogId = 326932, cb_blogApp = 'sheng-jie', cb_blogUserGuid = '56782349-8e3d-e311-8d02-90b11c0b17d6';
+    mermaidRender.render()
+    markdown_highlight()
+    zoomManager.apply("#cnblogs_post_body img:not(.code_img_closed):not(.code_img_opened)");    
+</script>
+<a id="!comments"></a>
+<div id="blog-comments-placeholder"></div>
+<div id="comment_form" class="commentform">
+    <a name="commentform"></a>
+    <div id="divCommentShow"></div>
+    <div id="comment_nav">
+            <a class="comment-nav-left forpc" href="https://cnblogs.vip/" target="_blank">会员力量，点亮园子希望</a>
+        <div class="comment-nav-right">
+            <span id="span_refresh_tips"></span><a href="#" onclick="return RefreshPage();">刷新页面</a><a href="#top">返回顶部</a>
+        </div>
+    </div>
+    <div id="comment_form_container"></div>
+    <div class="ad_text_commentbox" id="ad_text_under_commentbox"></div>
+        <div id="cnblogs_ch"></div>
+    <div id="opt_under_post"></div>
+        <div id="cnblogs_c1" class="under-post-card">
+            <a href="https://www.finclip.com?channel=cnblog2024" rel="nofollow" target="_blank" onclick="countCreativeClicks('C1-凡泰极客')">
+                <img src="https://img2024.cnblogs.com/blog/35695/202405/35695-20240517155930267-114888508.jpg" onload="countCreativeImpressions('C1-凡泰极客')" alt="" />
+                <span id="c1_impression" style="display:none"></span>
+            </a>
+        </div>
+    <div id="under_post_card1"></div>
+    <div id="under_post_card2"></div>
+    <div id="HistoryToday" class="under-post-card"></div>
+    <script type="text/javascript">
+        var commentManager = new blogCommentManager();
+        commentManager.renderComments(0);
+        fixPostBody();
+        window.footnoteTipManager.generateFootnoteTips();
+
+            window.tocManager.displayDisableTocTips = false;
+            window.tocManager.generateToc();
+            
+                setTimeout(function() { countViews(cb_blogId, cb_entryId); }, 50);
+            
+            deliverT2();
+            deliverC1C2();
+            loadNewsAndKb();
+            
+                LoadPostCategoriesTags(cb_blogId, cb_entryId);
+            
+            LoadPostInfoBlock(cb_blogId, cb_entryId, cb_blogApp, cb_blogUserGuid);
+            GetPrevNextPost(cb_entryId, cb_blogId, cb_entryCreatedDate, cb_postType);
+            loadOptUnderPost();
+            GetHistoryToday(cb_blogId, cb_blogApp, cb_entryCreatedDate);
+                </script>
+</div>
+
+	</div><!--end: forFlow -->
+	</div><!--end: mainContent 主体内容容器-->
+	<div id="sideBar">
+		<div id="sideBarMain">
+			<div id="sidebar_news" class="newsItem">
+    <h3 class="catListTitle">公告</h3>
+<div id="blog-news">    
+    <div id="sidebar_news_content">
+    </div>
+</div>
+<script>loadBlogNews();</script>
+
+ 
+</div>
+<div id="sidebar_c3"></div>
+			<div id="blog-calendar" style="display:none"></div><script>loadBlogDefaultCalendar();</script>			
+			<div id="leftcontentcontainer">
+				<div id="blog-sidecolumn"></div>
+                    <script>loadBlogSideColumn();</script>
+			</div>			
+		</div><!--end: sideBarMain -->
+	</div><!--end: sideBar 侧边栏容器 -->
+	<div class="clear"></div>
+	</div><!--end: main -->
+	<div class="clear"></div>
+	<div id="footer">
+		<!--done-->
+Copyright &copy; 2024 「圣杰」
+<br /><span id="poweredby">Powered by .NET 8.0 on Kubernetes</span>
+
+
+
+	</div><!--end: footer -->
+</div><!--end: home 自定义的最大容器 -->
+
+
+
+    <div id="page_end_html">
+        <script src="https://cdn.bootcss.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+<link href="https://files.cnblogs.com/files/sheng-jie/auto.catalogs.css" rel="stylesheet">
+<script type="text/javascript" src="https://files.cnblogs.com/files/sheng-jie/auto.catalogs.js"></script>
+<script>
+//Setting ico for cnblogs
+var linkObject = document.createElement('link');
+linkObject.rel = "shortcut icon";
+linkObject.href = "https://files.cnblogs.com/files/sheng-jie/brand.ico";
+document.getElementsByTagName("head")[0].appendChild(linkObject);
+
+window.tctipConfig = {
+        imagePrefix: "https://files.cnblogs.com/files/kdy11/",
+        cssPrefix:     "https://files.cnblogs.com/files/kdy11",
+        buttonImageId:  4,
+        buttonTip:  "dashang",
+        list:{
+            alipay: {qrimg: "https://files.cnblogs.com/files/sheng-jie/zfb.bmp"},
+            weixin:{qrimg: "https://files.cnblogs.com/files/sheng-jie/wechat.bmp"},
+        }
+};
+</script>
+    </div>
+
+    <input type="hidden" id="antiforgery_token" value="CfDJ8ONv0caE5GtEh3YJ5j088klFuKidc0iNO5QvO-QuK1Q9eqKZPgCmL0k1S7QRfDb-NKmuvsbiMxnicE_CG2RT4DHajKV_VP8VBIEAICXdgWWKYAnUiPwzO9y2gPsIyiECRpccJzVlS3YeDJHaGDDDvPs" />
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-M95P3TTWJZ"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-M95P3TTWJZ');
+</script>
+<script defer src="https://hm.baidu.com/hm.js?866c9be12d4a814454792b1fd0fed295"></script>
+</body>
+</html>

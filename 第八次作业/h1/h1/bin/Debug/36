@@ -1,0 +1,436 @@
+﻿<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="referrer" content="origin-when-cross-origin" />
+    <meta name="description" content="我叫GDB，是一个调试器，程序员通过我可以调试他们编写的软件，分析其中的bug。 作为一个调试器，调试分析是我的看家本领，像是给目标进程设置断点，或者让它单步执行，又或是查看进程中的变量、内存数据、CPU的寄存等等操作，我都手到擒来。 你只要输入对应的命令，我就能帮助你调试你的程序。 我之所以有这些" />
+    <meta property="og:description" content="我叫GDB，是一个调试器，程序员通过我可以调试他们编写的软件，分析其中的bug。 作为一个调试器，调试分析是我的看家本领，像是给目标进程设置断点，或者让它单步执行，又或是查看进程中的变量、内存数据、CPU的寄存等等操作，我都手到擒来。 你只要输入对应的命令，我就能帮助你调试你的程序。 我之所以有这些" />
+    <meta http-equiv="Cache-Control" content="no-transform" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>【趣话计算机底层技术】调试器是个大骗子！ - 轩辕之风 - 博客园</title>
+    <link rel="canonical" href="https://www.cnblogs.com/xuanyuan/p/17373994.html" />
+    <link rel="shortcut icon" id="favicon" href="//assets.cnblogs.com/favicon.svg?v=2" type="image/svg+xml" />
+    
+    <link rel="stylesheet" href="/css/blog-common.min.css?v=JnYHs5HAUCOVmwbxBNuH-ED7ggVDfqtff-pdhyndpr8" />
+    
+
+    <link id="MainCss" rel="stylesheet" href="/skins/codinglife/bundle-codinglife.min.css?v=BpDsZaqt3Vo17LmofajxibGWthTFRyeegD3DeE1U2E0" />
+        <link id="highlighter-theme-cnblogs" type="text/css" rel="stylesheet" href="/css/hljs/cnblogs.css?v=5J1NDtbnnIr2Rc2SdhEMlMxD4l9Eydj88B31E7_NhS4" />
+    <link type="text/css" rel="stylesheet" href="https://www.cnblogs.com/xuanyuan/custom.css?v=1x/hOAF2DBc3F9SC1kmM7U6j8oc=" />
+    
+    <link id="mobile-style" media="only screen and (max-width: 767px)" type="text/css" rel="stylesheet" href="/skins/codinglife/bundle-codinglife-mobile.min.css?v=nKYRRiCAgdHHKoqtFkqXweTDit8MaL8XLJDkQUS4rf4" />
+    
+    <link type="application/rss+xml" rel="alternate" href="https://www.cnblogs.com/xuanyuan/rss" />
+    <link type="application/rsd+xml" rel="EditURI" href="https://www.cnblogs.com/xuanyuan/rsd.xml" />
+    <link type="application/wlwmanifest+xml" rel="wlwmanifest" href="https://www.cnblogs.com/xuanyuan/wlwmanifest.xml" />
+    <script>
+        var currentBlogId = 193695;
+        var currentBlogApp = 'xuanyuan';
+        var isLogined = false;
+        var isBlogOwner = false;
+        var skinName = 'CodingLife';
+        var visitorUserId = '';
+        var hasCustomScript = true;
+        window.cb_enable_mathjax = false;
+        window.mathEngine = 0;
+        window.codeHighlightEngine = 1;
+        window.enableCodeLineNumber = false;
+        window.codeHighlightTheme = 'cnblogs';
+        window.darkModeCodeHighlightTheme = 'vs2015';
+        window.isDarkCodeHighlightTheme = false;
+        window.isDarkModeCodeHighlightThemeDark = true;
+        window.isDisableCodeHighlighter = false;
+        window.enableCodeThemeTypeFollowSystem = false;
+        window.enableMacStyleCodeBlock = false;
+    </script>
+        <script>
+            window.currentPostId = 17373994;
+            window.currentPostDateAdded = '2023-05-05 14:12';
+        </script>
+    <script src="https://assets.cnblogs.com/scripts/jquery-3.3.1.min.js"></script>
+    <script src="https://cdn-www.cnblogs.com/js/blog-common.min.js?v=e7iDdKE0ie8Fi0lKgiYt7eXqsQNrVeJmcEHX6zqQWKc"></script>
+        <script>updateCustomBlogReferrer();</script>
+    
+</head>
+<body class="skin-codinglife no-navbar">
+    <a name="top"></a>
+    <div id="top_nav" class="navbar forpc navbar-custom">
+        <nav id="nav_main" class="navbar-main">
+            <ul id="nav_left" class="navbar-list navbar-left">
+                <li class="navbar-branding">
+                    <a href="https://www.cnblogs.com/" title="开发者的网上家园" role="banner">
+                        <img src="//assets.cnblogs.com/logo.svg" alt="博客园Logo" />
+                    </a>
+                </li>
+                <li><a href="https://cnblogs.vip/">会员</a></li>
+                <li><a href="https://cnblogs.vip/store">周边</a></li>
+                <li>
+                    <a href="https://news.cnblogs.com/" onclick="countClicks('nav', 'skin-navbar-news')">新闻</a>
+                </li>
+                <li>
+                    <a href="https://q.cnblogs.com/" onclick="countClicks('nav', 'skin-navbar-q')">博问</a>
+                </li>
+                    <li>
+                        <a href="https://www.cnblogs.com/cmt/p/18172236" target="_blank">融资</a>
+                    </li>
+                <li><a href="https://market.cnblogs.com" target="_blank">云市场</a></li>
+            </ul>
+            <ul id="nav_right" class="navbar-list navbar-right">
+                <li>
+                    <form id="zzk_search" class="navbar-search dropdown" action="https://zzk.cnblogs.com/s" method="get" role="search">
+                        <input name="w" id="zzk_search_input" placeholder="代码改变世界" type="search" tabindex="3" autocomplete="off" />
+                        <button id="zzk_search_button" onclick="window.navbarSearchManager.triggerActiveOption()">
+                            <img id="search_icon" class="focus-hidden" src="//assets.cnblogs.com/icons/search.svg" alt="搜索" />
+                            <img class="hidden focus-visible" src="//assets.cnblogs.com/icons/enter.svg" alt="搜索" />
+                        </button>
+                        <ul id="navbar_search_options" class="dropdown-menu quick-search-menu">
+                            <li tabindex="0" class="active" onclick="zzkSearch(event, document.getElementById('zzk_search_input').value)">
+                                <div class="keyword-wrapper">
+                                    <img src="//assets.cnblogs.com/icons/search.svg" alt="搜索" />
+                                    <div class="keyword"></div>
+                                </div>
+                                <span class="search-area">所有博客</span>
+                            </li>
+                                    <li tabindex="1" onclick="zzkBlogSearch(event, 'xuanyuan', document.getElementById('zzk_search_input').value)">
+                                        <div class="keyword-wrapper">
+                                            <img src="//assets.cnblogs.com/icons/search.svg" alt="搜索" />
+                                            <div class="keyword"></div>
+                                        </div>
+                                        <span class="search-area">当前博客</span>
+                                    </li>
+                        </ul>
+                    </form>
+                </li>
+                <li id="navbar_login_status" class="navbar-list">
+                    <a class="navbar-user-info navbar-blog" href="https://i.cnblogs.com/EditPosts.aspx?opt=1" alt="写随笔" title="写随笔">
+                        <img id="new_post_icon" class="navbar-icon" src="//assets.cnblogs.com/icons/newpost.svg" alt="写随笔" />
+                    </a>
+                    <a id="navblog-myblog-icon" class="navbar-user-info navbar-blog" href="https://passport.cnblogs.com/GetBlogApplyStatus.aspx" alt="我的博客" title="我的博客">
+                        <img id="myblog_icon" class="navbar-icon" src="//assets.cnblogs.com/icons/myblog.svg" alt="我的博客" />
+                    </a>
+                    <a class="navbar-user-info navbar-message navbar-icon-wrapper" href="https://msg.cnblogs.com/" alt="短消息" title="短消息">
+                        <img id="msg_icon" class="navbar-icon" src="//assets.cnblogs.com/icons/message.svg" alt="短消息" />
+                        <span id="msg_count" style="display: none"></span>
+                    </a>
+                    <a id="navbar_lite_mode_indicator" data-current-page="blog" style="display: none" href="javascript:void(0)" alt="简洁模式" title="简洁模式启用，您在访问他人博客时会使用简洁款皮肤展示">
+                        <img class="navbar-icon" src="//assets.cnblogs.com/icons/lite-mode-on.svg" alt="简洁模式" />
+                    </a>
+                    <div id="user_info" class="navbar-user-info dropdown">
+                        <a class="dropdown-button" href="https://home.cnblogs.com/">
+                            <img id="user_icon" class="navbar-avatar" src="//assets.cnblogs.com/icons/avatar-default.svg" alt="用户头像" />
+                        </a>
+                        <div class="dropdown-menu">
+                            <a id="navblog-myblog-text" href="https://passport.cnblogs.com/GetBlogApplyStatus.aspx">我的博客</a>
+                            <a href="https://home.cnblogs.com/">我的园子</a>
+                            <a href="https://account.cnblogs.com/settings/account">账号设置</a>
+                            <a href="javascript:void(0)" id="navbar_lite_mode_toggle" title="简洁模式会使用简洁款皮肤显示所有博客">
+    简洁模式 <img id="navbar_lite_mode_on" src="/images/lite-mode-check.svg" class="hide" /><span id="navbar_lite_mode_spinner" class="hide">...</span>
+</a>
+                            <a href="javascript:void(0)" onclick="account.logout();">退出登录</a>
+                        </div>
+                    </div>
+                    <a class="navbar-anonymous" href="https://account.cnblogs.com/signup">注册</a>
+                    <a class="navbar-anonymous" href="javascript:void(0);" onclick="account.login()">登录</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    <div id="page_begin_html">
+        <script src="https://blog-static.cnblogs.com/files/mmzs/cursor-effects.js" defer defer></script>
+<script>
+
+window.onresize = modifyUI;
+function modifyUI(){
+	//document.getElementById("home").style.width = "60%";
+	
+	//$("#home").css("width") = "60%";
+	//$("#home #main #mainContent").css("width") = $("#home").css("width")
+}
+
+var a_idx = 0;
+jQuery(document).ready(function($) {
+    $("body").click(function(e) {
+        var a = new Array("----❤微信搜索❤----","----❤编程技术宇宙❤----","----❤有惊喜哦~❤----","----❤关注我❤----","----❤微信公众号❤----","----❤编程技术宇宙❤----");
+        var $i = $("<span></span>").text(a[a_idx]);
+        a_idx = (a_idx + 1) % a.length;
+        var x = e.pageX,
+        y = e.pageY;
+        $i.css({
+            "z-index": 999999999999999999999999999999999999999999999999999999999999999999999,
+            "top": y - 20,
+            "left": x,
+            "position": "absolute",
+            "font-weight": "bold",
+            "font-size": "16px",
+            "color": "rgb("+~~(255*Math.random())+","+~~(255*Math.random())+","+~~(255*Math.random())+")"
+        });
+        $("body").append($i);
+        $i.animate({
+            "top": y - 180,
+            "opacity": 0
+        },
+        1500,
+        function() {
+            $i.remove();
+        });
+    });
+});
+
+</script>
+    </div>
+
+    <!--done-->
+<div id="home">
+<div id="header">
+	<div id="blogTitle">
+        <a id="lnkBlogLogo" href="https://www.cnblogs.com/xuanyuan/"><img id="blogLogo" src="/skins/custom/images/logo.gif" alt="返回主页" /></a>		
+		
+<!--done-->
+<h1><a id="Header1_HeaderTitle" class="headermaintitle HeaderMainTitle" href="https://www.cnblogs.com/xuanyuan">轩辕之风</a>
+</h1>
+<h2></h2>
+
+
+
+
+		
+	</div><!--end: blogTitle 博客的标题和副标题 -->
+	<div id="navigator">
+		
+<ul id="navList">
+<li><a id="blog_nav_sitehome" class="menu" href="https://www.cnblogs.com/">
+博客园</a>
+</li>
+<li>
+<a id="blog_nav_myhome" class="menu" href="https://www.cnblogs.com/xuanyuan/">
+首页</a>
+</li>
+<li>
+
+<a id="blog_nav_newpost" class="menu" href="https://i.cnblogs.com/EditPosts.aspx?opt=1">
+新随笔</a>
+</li>
+<li>
+<a id="blog_nav_contact" class="menu" href="https://msg.cnblogs.com/send/%E8%BD%A9%E8%BE%95%E4%B9%8B%E9%A3%8E">
+联系</a></li>
+<li>
+<a id="blog_nav_rss" class="menu" href="javascript:void(0)" data-rss="https://www.cnblogs.com/xuanyuan/rss/">
+订阅</a>
+<!--<partial name="./Shared/_XmlLink.cshtml" model="Model" /></li>--></li>
+<li>
+<a id="blog_nav_admin" class="menu" href="https://i.cnblogs.com/">
+管理</a>
+</li>
+</ul>
+
+
+		<div class="blogStats">
+			<div id="blog_stats_place_holder"><script>loadBlogStats();</script></div>
+		</div><!--end: blogStats -->
+	</div><!--end: navigator 博客导航栏 -->
+</div><!--end: header 头部 -->
+<div id="main">
+	<div id="mainContent">
+	<div class="forFlow">
+		<div id="post_detail">
+    <!--done-->
+    <div id="topics">
+        <div class="post">
+            <h1 class = "postTitle">
+                <a id="cb_post_title_url" class="postTitle2 vertical-middle" href="https://www.cnblogs.com/xuanyuan/p/17373994.html" title="发布于 2023-05-05 14:12">
+    <span role="heading" aria-level="2">【趣话计算机底层技术】调试器是个大骗子！</span>
+    
+
+</a>
+
+            </h1>
+            <div class="clear"></div>
+            <div class="postBody">
+                <div id="cnblogs_post_body" class="blogpost-body cnblogs-markdown">
+<p>我叫GDB，是一个调试器，程序员通过我可以调试他们编写的软件，分析其中的bug。</p>
+<p>作为一个调试器，调试分析是我的看家本领，像是给目标进程设置断点，或者让它单步执行，又或是查看进程中的变量、内存数据、CPU的寄存等等操作，我都手到擒来。</p>
+<p>你只要输入对应的命令，我就能帮助你调试你的程序。</p>
+<p>我之所以有这些本事，都得归功于一个强大的系统函数，它的名字叫ptrace。<br>
+<img src="https://img2023.cnblogs.com/blog/659280/202305/659280-20230505094305067-2014586389.png" alt="" loading="lazy"></p>
+<p>不管是开始调试进程，还是下断点、读写进程数据、读写寄存器，我都是通过这个函数来进行，要是没了它，我可就废了。</p>
+<p>它的第一个参数是一个枚举型的变量，表示要执行的操作，我支持的调试命令很多都是靠它来实现的：</p>
+<p><img src="https://img2023.cnblogs.com/blog/659280/202305/659280-20230505094316181-627363108.png" alt="" loading="lazy"></p>
+<p>你可以通过我来启动一个新的进程调试，我会使用fork创建出一个新的子进程，然后在子进程中通过execv来执行你指定的程序。</p>
+<p>不过在执行你的程序之前，我会在子进程中调用ptrace函数，然后指定第一个参数为PTRACE_TRACEME，这样一来，我就能监控子进程中发生的事情了，也才能对你指定的程序进行调试。</p>
+<p>你也可以让我attach到一个已经运行的进程分析，这样的话，我直接调用ptrace函数，并且指定第一个参数为PTRACE_ATTACH就可以了，然后我就会变成那个进程的父进程。</p>
+<p><img src="https://img2023.cnblogs.com/blog/659280/202305/659280-20230505094329461-304876137.png" alt="" loading="lazy"></p>
+<p>具体要选择哪种方式来调试，这就看你的需要了。不过不管哪种方式，最终我都会“接管”被调试的进程，它里面发生的各种信号事件我都能得到通知，方便我对它进行调试操作。</p>
+<p>软件断点<br>
+作为一个调试器，最常用的功能就是给程序下断点了。</p>
+<p>你可以通过break命令告诉我，你要在程序的哪个位置添加断点。</p>
+<p>当我收到你的命令之后，我会偷偷把被调试进程中那个位置的指令修改为一个0xCC，这是一条特殊指令的CPU机器码——int 3，是x86架构CPU专门用来支持调试的指令。</p>
+<p>我的这个修改是偷偷进行的，你如果通过我来查看被调试进程的内存数据，或者在反汇编窗口查看那里的指令，会发现跟之前一样，这其实是我使的障眼法，让你看起来还是原来的数据，实际上已经被我修改过了，你要是不信，你可以另外写个程序来查看那里的数据内容，看看我说的是不是真的。</p>
+<p>一旦被调试的进程运行到那个位置，CPU执行这条特殊的指令时，会陷入内核态，然后取出中断描述符表IDT中的3号表项中的处理函数来执行。</p>
+<p>IDT中的内容，操作系统一启动早就安排好了，所以系统内核会拿到CPU的执行权，随后内核会发送一个SIGTRAP信号给到被调试的进程。</p>
+<p><img src="https://img2023.cnblogs.com/blog/659280/202305/659280-20230505094344006-1803051478.png" alt="" loading="lazy"></p>
+<p>而因为我的存在，这个信号会被我截获，我收到以后会检查一下是不是程序员之前下的断点，如果是的话，就会显示断点触发了，然后等待程序员的下一步指示。</p>
+<p>在没有下一步指示之前，被调试的进程都不会进入就绪队列被调度执行。</p>
+<p>直到你使用continue命令告诉我继续，我再偷偷把替换成int 3的指令恢复，然后我再次调用ptrace函数告诉操作系统让它继续运行。</p>
+<p>这就是我给程序下断点的秘密。</p>
+<p>不知道你有没有发现一个问题，当我把替换的指令恢复后让它继续运行，以后就再也不会中断在这里了，可程序员并没有撤销这个断点，而是希望每次执行到这里都能中断，这可怎么办呢？</p>
+<p>我有一个非常巧妙的办法，就是让它单步执行，只执行一条指令，然后又会中断到我这里，但这时候我并不会通知程序员，而仅仅是把刚才恢复的断点又给打上（替换指令），然后就继续运行。这一切都发生的神不知鬼不觉，程序员根本察觉不到。</p>
+<p>单步调试<br>
+说到单步执行，应该算是程序员调试程序的时候除了下断点之外最常见的操作了，每一次只让被调试的进程运行一条指令，这样方便跟踪排查问题。</p>
+<p>你可能很好奇我是如何让它单步执行的呢？</p>
+<p>单步执行的实现可比下断点简单多了，我不用去修改被调试进程内存中的指令，只需要调用ptrace函数，传递一个PTRACE_SINGLESTEP参数就行了，操作系统会自动把它设置为单步执行的模式。</p>
+<p>我也很好奇操作系统是怎么办到的，就去打听了一下。</p>
+<p>原来x86架构CPU有一个标志寄存器，名叫eflags，它里面不止包含了程序运行的一些状态，还有一些工作模式的设定。</p>
+<p><img src="https://img2023.cnblogs.com/blog/659280/202305/659280-20230505094356747-984474305.png" alt="" loading="lazy"></p>
+<p>其中就有一个TF标记，用来告诉CPU进入单步执行模式，只要把这个标记为设置为1，CPU每执行一条指令，就会触发一次调试异常，调试异常的向量号是1，所以触发的时候，都会取出IDT中的1号表项中的处理函数来执行。</p>
+<p>接下来的事情就跟命中断点差不多了，我会截获到内核发给被调试进程的SIGTRAP信号，然后等待程序员的下一步指令。</p>
+<p>如果你继续进行单步调试，那我便继续重复这个过程。</p>
+<p>如果你有程序的源代码，你还可以进行源码级别的单步调试，不过这里的单步就指的是源代码中的一行了。</p>
+<p>这种情况下要稍微麻烦一点，我还要分析出每一行代码对应的指令有哪些，然后用上面说的单步执行指令的方法，一条条指令快速掠过，直到这一行代码对应的指令都执行完成。</p>
+<p>内存断点<br>
+有的时候，直接给程序中代码的位置下断点并不能包治百病。比如程序员发现某个内存地址的内容老是莫名其妙被修改，想知道到底是哪个函数干的，这时候连地址都没有，根本没法下断点。</p>
+<p>单步执行也不行，那么多条指令，得执行到猴年马月去才能找到？</p>
+<p>不用担心，我可以帮你解决这个烦恼。</p>
+<p>你可以通过watch命令告诉我，让我监视被调试进程中某个内存地址的数据变化，一旦发现被修改，我都会把它给停下来报告给你。</p>
+<p>猜猜我是如何做到的呢？</p>
+<p>我可以用单步执行的方式，每执行一步，就检查一下内容有没有没修改，一旦发现就停下来通知你们程序员。</p>
+<p>不过这种方式实在是太麻烦了，会严重拖垮被调试进程的性能。</p>
+<p>好在x86架构的CPU提供了硬件断点的能力，帮我解决了大问题。</p>
+<p>在x86架构CPU的内部内置了一组调试寄存器，从DR0到DR7，总共8个。通过在DR0-DR3中设置要监控的内存地址，然后在DR7中设置要监控的模式，是读还是写，剩下的交给CPU就好了。<br>
+<img src="https://img2023.cnblogs.com/blog/659280/202305/659280-20230505094408049-1655248148.png" alt="" loading="lazy"></p>
+<p>CPU执行的时候，一旦发现有符合调试寄存器中设置的情况发生时，就会产生调试异常，然后取出IDT中的1号表项中的处理函数来执行，接下来的事情就跟单步调试产生的异常差不多了。</p>
+<p>CPU内部依靠硬件电路来完成监控，可比我们软件一条一条的检查快多了！</p>
+<p>现在，你不止可以使用watch命令来监控内存被修改，还可以使用rwatch、awatch命令来告诉我去监控内存被读或者被写。</p>
+<p>我叫GDB，是你调试程序的好伙伴，现在你该知道我是如何工作的了吧！</p>
+<p>好了，这一期的故事就讲到这里了，如果你想查看更多未发布过的新鲜又有趣的技术小故事，可以扫描下方二维码购买我最新出版的《趣话计算机底层技术》图书。书中用一个个的小故事系统性的讲解了计算机底层技术的基本原理，以及如何运用他们解决日常工作中的各种实际问题。<br>
+<img src="https://img2023.cnblogs.com/blog/659280/202306/659280-20230610183139057-562409798.png" alt="" loading="lazy"></p>
+
+</div>
+<div class="clear"></div>
+<div id="blog_post_info_block" role="contentinfo">
+    <div id="blog_post_info"></div>
+    <div class="clear"></div>
+    <div id="post_next_prev"></div>
+</div>
+            </div>
+            <div class="postDesc">posted @ 
+<span id="post-date" data-last-update-days="348.67153582019677" data-date-created="BlogServer.Application.Dto.BlogPost.BlogPostDto" data-date-updated="2023-06-10 18:34">2023-05-05 14:12</span>&nbsp;
+<a href="https://www.cnblogs.com/xuanyuan">轩辕之风</a>&nbsp;
+阅读(<span id="post_view_count">9053</span>)&nbsp;
+评论(<span id="post_comment_count">6</span>)&nbsp;
+<a href="https://i.cnblogs.com/EditPosts.aspx?postid=17373994" rel="nofollow">编辑</a>&nbsp;
+<a href="javascript:void(0)" onclick="AddToWz(17373994);return false;">收藏</a>&nbsp;
+<a href="javascript:void(0)" onclick="reportManager.report({ currentUserId: '', targetType: 'blogPost', targetId: '17373994', targetLink: 'https://www.cnblogs.com/xuanyuan/p/17373994.html', title: '【趣话计算机底层技术】调试器是个大骗子！' })">举报</a>
+</div>
+        </div>
+	    
+	    
+    </div><!--end: topics 文章、评论容器-->
+</div>
+<script>
+    var cb_entryId = 17373994, cb_entryCreatedDate = '2023-05-05 14:12', cb_postType = 1, cb_postTitle = '【趣话计算机底层技术】调试器是个大骗子！';
+    var allowComments = true, cb_blogId = 193695, cb_blogApp = 'xuanyuan', cb_blogUserGuid = '8508cac9-f21a-e411-8d02-90b11c0b17d6';
+    mermaidRender.render()
+    markdown_highlight()
+    zoomManager.apply("#cnblogs_post_body img:not(.code_img_closed):not(.code_img_opened)");    
+</script>
+<a id="!comments"></a>
+<div id="blog-comments-placeholder"></div>
+<div id="comment_form" class="commentform">
+    <a name="commentform"></a>
+    <div id="divCommentShow"></div>
+    <div id="comment_nav">
+            <a class="comment-nav-left forpc" href="https://cnblogs.vip/" target="_blank">会员力量，点亮园子希望</a>
+        <div class="comment-nav-right">
+            <span id="span_refresh_tips"></span><a href="#" onclick="return RefreshPage();">刷新页面</a><a href="#top">返回顶部</a>
+        </div>
+    </div>
+    <div id="comment_form_container"></div>
+    <div class="ad_text_commentbox" id="ad_text_under_commentbox"></div>
+        <div id="cnblogs_ch"></div>
+    <div id="opt_under_post"></div>
+        <div id="cnblogs_c1" class="under-post-card">
+            <a href="https://www.finclip.com?channel=cnblog2024" rel="nofollow" target="_blank" onclick="countCreativeClicks('C1-凡泰极客')">
+                <img src="https://img2024.cnblogs.com/blog/35695/202405/35695-20240517155930267-114888508.jpg" onload="countCreativeImpressions('C1-凡泰极客')" alt="" />
+                <span id="c1_impression" style="display:none"></span>
+            </a>
+        </div>
+    <div id="under_post_card1"></div>
+    <div id="under_post_card2"></div>
+    <div id="HistoryToday" class="under-post-card"></div>
+    <script type="text/javascript">
+        var commentManager = new blogCommentManager();
+        commentManager.renderComments(0);
+        fixPostBody();
+        window.footnoteTipManager.generateFootnoteTips();
+
+            window.tocManager.displayDisableTocTips = false;
+            window.tocManager.generateToc();
+            
+                setTimeout(function() { countViews(cb_blogId, cb_entryId); }, 50);
+            
+            deliverT2();
+            deliverC1C2();
+            loadNewsAndKb();
+            
+                LoadPostCategoriesTags(cb_blogId, cb_entryId);
+            
+            LoadPostInfoBlock(cb_blogId, cb_entryId, cb_blogApp, cb_blogUserGuid);
+            GetPrevNextPost(cb_entryId, cb_blogId, cb_entryCreatedDate, cb_postType);
+            loadOptUnderPost();
+            GetHistoryToday(cb_blogId, cb_blogApp, cb_entryCreatedDate);
+                </script>
+</div>
+
+	</div><!--end: forFlow -->
+	</div><!--end: mainContent 主体内容容器-->
+	<div id="sideBar">
+		<div id="sideBarMain">
+			<div id="sidebar_news" class="newsItem">
+    <h3 class="catListTitle">公告</h3>
+<div id="blog-news">    
+    <div id="sidebar_news_content">
+    </div>
+</div>
+<script>loadBlogNews();</script>
+
+ 
+</div>
+<div id="sidebar_c3"></div>
+			<div id="blog-calendar" style="display:none"></div><script>loadBlogDefaultCalendar();</script>			
+			<div id="leftcontentcontainer">
+				<div id="blog-sidecolumn"></div>
+                    <script>loadBlogSideColumn();</script>
+			</div>			
+		</div><!--end: sideBarMain -->
+	</div><!--end: sideBar 侧边栏容器 -->
+	<div class="clear"></div>
+	</div><!--end: main -->
+	<div class="clear"></div>
+	<div id="footer">
+		<!--done-->
+Copyright &copy; 2024 轩辕之风
+<br /><span id="poweredby">Powered by .NET 8.0 on Kubernetes</span>
+
+
+
+	</div><!--end: footer -->
+</div><!--end: home 自定义的最大容器 -->
+
+
+
+    
+
+    <input type="hidden" id="antiforgery_token" value="CfDJ8ONv0caE5GtEh3YJ5j088klkCr3mrNuqnPIRUny7ElWOi9Q-cg3Wf1RYZDQqjHB03bS1GuMDVAWVQMsts-kEuqOpjp3rY-tslGxGNBZAISwFk0TRo2tXc8rOUcPSIN_O0HOQJge2X-5joiM91SzQUVw" />
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-M95P3TTWJZ"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-M95P3TTWJZ');
+</script>
+<script defer src="https://hm.baidu.com/hm.js?866c9be12d4a814454792b1fd0fed295"></script>
+</body>
+</html>

@@ -1,0 +1,469 @@
+﻿<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="referrer" content="origin-when-cross-origin" />
+    <meta name="description" content="本篇文章会从系统架构设计的角度，分享在对业务安全风控相关基础安全产品进行系统设计时遇到的问题难点及其解决方案。&#xA;&#xA;内容包括三部分：（1）风控业务架构；（2）基础安全产品的职责；（3）基础安全产品相关系统架构的设计要点。&#xA;&#xA;文章会以总-分的形式进行阐述。懂的不多，做的太少。欢迎批评、指正。" />
+    <meta property="og:description" content="本篇文章会从系统架构设计的角度，分享在对业务安全风控相关基础安全产品进行系统设计时遇到的问题难点及其解决方案。&#xA;&#xA;内容包括三部分：（1）风控业务架构；（2）基础安全产品的职责；（3）基础安全产品相关系统架构的设计要点。&#xA;&#xA;文章会以总-分的形式进行阐述。懂的不多，做的太少。欢迎批评、指正。" />
+    <meta http-equiv="Cache-Control" content="no-transform" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>【领域专家系列】风控安全产品系统设计的一些思考 - 码头工人 - 博客园</title>
+    <link rel="canonical" href="https://www.cnblogs.com/boycelee/p/17324600.html" />
+    <link rel="shortcut icon" id="favicon" href="//assets.cnblogs.com/favicon.svg?v=2" type="image/svg+xml" />
+    
+    <link rel="stylesheet" href="/css/blog-common.min.css?v=JnYHs5HAUCOVmwbxBNuH-ED7ggVDfqtff-pdhyndpr8" />
+    
+
+    <link id="MainCss" rel="stylesheet" href="/skins/codinglife/bundle-codinglife.min.css?v=BpDsZaqt3Vo17LmofajxibGWthTFRyeegD3DeE1U2E0" />
+        <link id="highlighter-theme-cnblogs" type="text/css" rel="stylesheet" href="/css/hljs/cnblogs.css?v=5J1NDtbnnIr2Rc2SdhEMlMxD4l9Eydj88B31E7_NhS4" />
+    
+    
+    <link id="mobile-style" media="only screen and (max-width: 767px)" type="text/css" rel="stylesheet" href="/skins/codinglife/bundle-codinglife-mobile.min.css?v=nKYRRiCAgdHHKoqtFkqXweTDit8MaL8XLJDkQUS4rf4" />
+    
+    <link type="application/rss+xml" rel="alternate" href="https://www.cnblogs.com/boycelee/rss" />
+    <link type="application/rsd+xml" rel="EditURI" href="https://www.cnblogs.com/boycelee/rsd.xml" />
+    <link type="application/wlwmanifest+xml" rel="wlwmanifest" href="https://www.cnblogs.com/boycelee/wlwmanifest.xml" />
+    <script>
+        var currentBlogId = 230515;
+        var currentBlogApp = 'boycelee';
+        var isLogined = false;
+        var isBlogOwner = false;
+        var skinName = 'CodingLife';
+        var visitorUserId = '';
+        var hasCustomScript = false;
+        window.cb_enable_mathjax = false;
+        window.mathEngine = 0;
+        window.codeHighlightEngine = 1;
+        window.enableCodeLineNumber = false;
+        window.codeHighlightTheme = 'cnblogs';
+        window.darkModeCodeHighlightTheme = 'vs2015';
+        window.isDarkCodeHighlightTheme = false;
+        window.isDarkModeCodeHighlightThemeDark = true;
+        window.isDisableCodeHighlighter = false;
+        window.enableCodeThemeTypeFollowSystem = false;
+        window.enableMacStyleCodeBlock = false;
+    </script>
+        <script>
+            window.currentPostId = 17324600;
+            window.currentPostDateAdded = '2023-04-17 01:48';
+        </script>
+    <script src="https://assets.cnblogs.com/scripts/jquery-3.3.1.min.js"></script>
+    <script src="https://cdn-www.cnblogs.com/js/blog-common.min.js?v=e7iDdKE0ie8Fi0lKgiYt7eXqsQNrVeJmcEHX6zqQWKc"></script>
+    
+</head>
+<body class="skin-codinglife has-navbar">
+    <a name="top"></a>
+    <div id="top_nav" class="navbar forpc">
+        <nav id="nav_main" class="navbar-main">
+            <ul id="nav_left" class="navbar-list navbar-left">
+                <li class="navbar-branding">
+                    <a href="https://www.cnblogs.com/" title="开发者的网上家园" role="banner">
+                        <img src="//assets.cnblogs.com/logo.svg" alt="博客园Logo" />
+                    </a>
+                </li>
+                <li><a href="https://cnblogs.vip/">会员</a></li>
+                <li><a href="https://cnblogs.vip/store">周边</a></li>
+                <li>
+                    <a href="https://news.cnblogs.com/" onclick="countClicks('nav', 'skin-navbar-news')">新闻</a>
+                </li>
+                <li>
+                    <a href="https://q.cnblogs.com/" onclick="countClicks('nav', 'skin-navbar-q')">博问</a>
+                </li>
+                    <li>
+                        <a href="https://www.cnblogs.com/cmt/p/18172236" target="_blank">融资</a>
+                    </li>
+                <li><a href="https://market.cnblogs.com" target="_blank">云市场</a></li>
+            </ul>
+            <ul id="nav_right" class="navbar-list navbar-right">
+                <li>
+                    <form id="zzk_search" class="navbar-search dropdown" action="https://zzk.cnblogs.com/s" method="get" role="search">
+                        <input name="w" id="zzk_search_input" placeholder="代码改变世界" type="search" tabindex="3" autocomplete="off" />
+                        <button id="zzk_search_button" onclick="window.navbarSearchManager.triggerActiveOption()">
+                            <img id="search_icon" class="focus-hidden" src="//assets.cnblogs.com/icons/search.svg" alt="搜索" />
+                            <img class="hidden focus-visible" src="//assets.cnblogs.com/icons/enter.svg" alt="搜索" />
+                        </button>
+                        <ul id="navbar_search_options" class="dropdown-menu quick-search-menu">
+                            <li tabindex="0" class="active" onclick="zzkSearch(event, document.getElementById('zzk_search_input').value)">
+                                <div class="keyword-wrapper">
+                                    <img src="//assets.cnblogs.com/icons/search.svg" alt="搜索" />
+                                    <div class="keyword"></div>
+                                </div>
+                                <span class="search-area">所有博客</span>
+                            </li>
+                                    <li tabindex="1" onclick="zzkBlogSearch(event, 'boycelee', document.getElementById('zzk_search_input').value)">
+                                        <div class="keyword-wrapper">
+                                            <img src="//assets.cnblogs.com/icons/search.svg" alt="搜索" />
+                                            <div class="keyword"></div>
+                                        </div>
+                                        <span class="search-area">当前博客</span>
+                                    </li>
+                        </ul>
+                    </form>
+                </li>
+                <li id="navbar_login_status" class="navbar-list">
+                    <a class="navbar-user-info navbar-blog" href="https://i.cnblogs.com/EditPosts.aspx?opt=1" alt="写随笔" title="写随笔">
+                        <img id="new_post_icon" class="navbar-icon" src="//assets.cnblogs.com/icons/newpost.svg" alt="写随笔" />
+                    </a>
+                    <a id="navblog-myblog-icon" class="navbar-user-info navbar-blog" href="https://passport.cnblogs.com/GetBlogApplyStatus.aspx" alt="我的博客" title="我的博客">
+                        <img id="myblog_icon" class="navbar-icon" src="//assets.cnblogs.com/icons/myblog.svg" alt="我的博客" />
+                    </a>
+                    <a class="navbar-user-info navbar-message navbar-icon-wrapper" href="https://msg.cnblogs.com/" alt="短消息" title="短消息">
+                        <img id="msg_icon" class="navbar-icon" src="//assets.cnblogs.com/icons/message.svg" alt="短消息" />
+                        <span id="msg_count" style="display: none"></span>
+                    </a>
+                    <a id="navbar_lite_mode_indicator" data-current-page="blog" style="display: none" href="javascript:void(0)" alt="简洁模式" title="简洁模式启用，您在访问他人博客时会使用简洁款皮肤展示">
+                        <img class="navbar-icon" src="//assets.cnblogs.com/icons/lite-mode-on.svg" alt="简洁模式" />
+                    </a>
+                    <div id="user_info" class="navbar-user-info dropdown">
+                        <a class="dropdown-button" href="https://home.cnblogs.com/">
+                            <img id="user_icon" class="navbar-avatar" src="//assets.cnblogs.com/icons/avatar-default.svg" alt="用户头像" />
+                        </a>
+                        <div class="dropdown-menu">
+                            <a id="navblog-myblog-text" href="https://passport.cnblogs.com/GetBlogApplyStatus.aspx">我的博客</a>
+                            <a href="https://home.cnblogs.com/">我的园子</a>
+                            <a href="https://account.cnblogs.com/settings/account">账号设置</a>
+                            <a href="javascript:void(0)" id="navbar_lite_mode_toggle" title="简洁模式会使用简洁款皮肤显示所有博客">
+    简洁模式 <img id="navbar_lite_mode_on" src="/images/lite-mode-check.svg" class="hide" /><span id="navbar_lite_mode_spinner" class="hide">...</span>
+</a>
+                            <a href="javascript:void(0)" onclick="account.logout();">退出登录</a>
+                        </div>
+                    </div>
+                    <a class="navbar-anonymous" href="https://account.cnblogs.com/signup">注册</a>
+                    <a class="navbar-anonymous" href="javascript:void(0);" onclick="account.login()">登录</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    
+
+    <!--done-->
+<div id="home">
+<div id="header">
+	<div id="blogTitle">
+        <a id="lnkBlogLogo" href="https://www.cnblogs.com/boycelee/"><img id="blogLogo" src="/skins/custom/images/logo.gif" alt="返回主页" /></a>		
+		
+<!--done-->
+<h1><a id="Header1_HeaderTitle" class="headermaintitle HeaderMainTitle" href="https://www.cnblogs.com/boycelee">码头工人的一千零一夜</a>
+</h1>
+<h2>专注于业务安全，一直在从事爬虫与反爬虫相关工作。携程-去哪儿、京东等大厂资深开发工程师。</h2>
+
+
+
+
+		
+	</div><!--end: blogTitle 博客的标题和副标题 -->
+	<div id="navigator">
+		
+<ul id="navList">
+<li><a id="blog_nav_sitehome" class="menu" href="https://www.cnblogs.com/">
+博客园</a>
+</li>
+<li>
+<a id="blog_nav_myhome" class="menu" href="https://www.cnblogs.com/boycelee/">
+首页</a>
+</li>
+<li>
+
+<a id="blog_nav_newpost" class="menu" href="https://i.cnblogs.com/EditPosts.aspx?opt=1">
+新随笔</a>
+</li>
+<li>
+<a id="blog_nav_contact" class="menu" href="https://msg.cnblogs.com/send/%E7%A0%81%E5%A4%B4%E5%B7%A5%E4%BA%BA">
+联系</a></li>
+<li>
+<a id="blog_nav_rss" class="menu" href="javascript:void(0)" data-rss="https://www.cnblogs.com/boycelee/rss/">
+订阅</a>
+<!--<partial name="./Shared/_XmlLink.cshtml" model="Model" /></li>--></li>
+<li>
+<a id="blog_nav_admin" class="menu" href="https://i.cnblogs.com/">
+管理</a>
+</li>
+</ul>
+
+
+		<div class="blogStats">
+			<div id="blog_stats_place_holder"><script>loadBlogStats();</script></div>
+		</div><!--end: blogStats -->
+	</div><!--end: navigator 博客导航栏 -->
+</div><!--end: header 头部 -->
+<div id="main">
+	<div id="mainContent">
+	<div class="forFlow">
+		<div id="post_detail">
+    <!--done-->
+    <div id="topics">
+        <div class="post">
+            <h1 class = "postTitle">
+                <a id="cb_post_title_url" class="postTitle2 vertical-middle" href="https://www.cnblogs.com/boycelee/p/17324600.html" title="发布于 2023-04-17 01:48">
+    <span role="heading" aria-level="2">【领域专家系列】风控安全产品系统设计的一些思考</span>
+    
+
+</a>
+
+            </h1>
+            <div class="clear"></div>
+            <div class="postBody">
+                    <div id="cnblogs_post_description" style="display: none">
+        
+        本篇文章会从系统架构设计的角度，分享在对业务安全风控相关基础安全产品进行系统设计时遇到的问题难点及其解决方案。
+
+内容包括三部分：（1）风控业务架构；（2）基础安全产品的职责；（3）基础安全产品相关系统架构的设计要点。
+
+文章会以总-分的形式进行阐述。懂的不多，做的太少。欢迎批评、指正。
+    </div>
+<div id="cnblogs_post_body" class="blogpost-body cnblogs-markdown">
+<p></p><div class="toc"><div class="toc-container-header">目录</div><ul><li><a href="#背景" rel="noopener">背景</a></li><li><a href="#风控业务架构" rel="noopener">风控业务架构</a><ul><li><a href="#组件层" rel="noopener">组件层</a></li><li><a href="#业务层" rel="noopener">业务层</a></li><li><a href="#决策层" rel="noopener">决策层</a></li><li><a href="#能力层" rel="noopener">能力层</a></li><li><a href="#计算层" rel="noopener">计算层</a></li><li><a href="#可视层" rel="noopener">可视层</a></li></ul></li><li><a href="#基础安全组件" rel="noopener">基础安全组件</a><ul><li><a href="#落地难点" rel="noopener">落地难点</a><ul><li><a href="#接入场景多" rel="noopener">接入场景多</a></li><li><a href="#接入终端多" rel="noopener">接入终端多</a></li><li><a href="#接入组件多" rel="noopener">接入组件多</a></li></ul></li><li><a href="#待解决问题" rel="noopener">待解决问题</a></li><li><a href="#架构特性" rel="noopener">架构特性</a><ul><li><a href="#安全性" rel="noopener">安全性</a></li><li><a href="#稳定性" rel="noopener">稳定性</a></li><li><a href="#易用性" rel="noopener">易用性</a></li></ul></li></ul></li><li><a href="#具体案例" rel="noopener">具体案例</a><ul><li><a href="#问题分析" rel="noopener">问题分析</a><ul><li><a href="#攻击场景" rel="noopener">攻击场景</a></li><li><a href="#攻击还原" rel="noopener">攻击还原</a></li><li><a href="#攻击步骤防御可行性分析" rel="noopener">攻击步骤防御可行性分析</a></li></ul></li><li><a href="#系统设计" rel="noopener">系统设计</a><ul><li><a href="#系统架构" rel="noopener">系统架构</a><ul><li><a href="#组件层-1" rel="noopener">组件层</a></li><li><a href="#透传层" rel="noopener">透传层</a></li><li><a href="#决策层-1" rel="noopener">决策层</a></li><li><a href="#能力层-1" rel="noopener">能力层</a></li></ul></li><li><a href="#架构特性-1" rel="noopener">架构特性</a><ul><li><a href="#安全性-1" rel="noopener">安全性</a></li><li><a href="#稳定性-1" rel="noopener">稳定性</a></li><li><a href="#易用性-1" rel="noopener">易用性</a></li></ul></li></ul></li></ul></li><li><a href="#最后" rel="noopener">最后</a></li></ul></div><p></p>
+<p>原创文章，转载请标注。<a href="https://www.cnblogs.com/boycelee/p/17324600.html" target="_blank" rel="noopener">https://www.cnblogs.com/boycelee/p/17324600.html</a></p>
+<h1 id="背景">背景</h1>
+<p>本篇文章会从系统架构设计的角度，分享在对<strong>业务安全风控相关基础安全产品</strong>进行<strong>系统设计</strong>时遇到的<strong>问题难点</strong>及其<strong>解决方案</strong>。</p>
+<p>内容包括三部分：（1）风控业务架构；（2）基础安全产品的职责；（3）基础安全产品相关系统架构的设计要点。</p>
+<p>文章会以总-分的形式进行阐述。懂的不多，做的太少。欢迎批评、指正。</p>
+<h1 id="风控业务架构">风控业务架构</h1>
+<p>我把风控业务架构的分层分为<strong>6</strong>层，分别是<strong>组件层</strong>、业务层、决策层、<strong>能力层</strong>、计算层、可视层。</p>
+<p>以下<strong>基建</strong>为<strong>基础安全产品</strong>的简称。</p>
+<img src="https://img2023.cnblogs.com/blog/765838/202304/765838-20230417013420044-2102524749.png" alt="image-20230416170722704" style="zoom: 50%">
+<h2 id="组件层">组件层</h2>
+<p>组件层的职责是：<strong>数据收集与行为反制</strong>。</p>
+<p>从接口、设备、行为三个维度进行数据收集，接收决策层的指令进行行为反制。为了保证数据的收集数据的可靠性，就衍生出了壳、混淆、反调试等加固策略。</p>
+<img src="https://img2022.cnblogs.com/blog/765838/202205/765838-20220528121002004-793113845.png" alt="image-20211106214029593" style="zoom: 40%">
+<p>更详细的思考在我的《风控安全产品的探索之路》这篇文章中，感兴趣可跳转阅读，这里就不再赘述。<a href="https://www.cnblogs.com/boycelee/p/15948323.html" target="_blank" rel="noopener">https://www.cnblogs.com/boycelee/p/15948323.html</a></p>
+<h2 id="业务层">业务层</h2>
+<p>业务层的职责是：<strong>风控数据透传与风控决策结果处理</strong>。</p>
+<p>将风控所需要的数据透传至决策层，业务层获取到决策层数据后，根据决策层结果选择执行风险反制或业务逻辑。</p>
+<p>透传数据一般包括：风控数据和业务补充数据。</p>
+<h2 id="决策层">决策层</h2>
+<p>决策层的职责是：<strong>风控能力应用</strong>。</p>
+<p>决策层是整个风控业务的核心，将风控能力高效连接起来，有效、合理地应用能力层、计算层所具备的能力。<strong>这一层的难点在于工程而非安全领域</strong>，例如：如何设计调用链路（降低计算时长）、如何处理超高并发流量、如何保护下游风控内部系统等。</p>
+<p>其中包括：风控参数预处理、风控能力应用（组件/名单/模型等）、风险决策（规则引擎）、反制决策（观测/登录/验证码/行为验证/封禁）。</p>
+<h2 id="能力层">能力层</h2>
+<p>能力层的职责是：<strong>识别基础安全风险</strong>。</p>
+<p>该层包括：设备指纹、环境检测、接口防护、验证码、IP风险、手机号风险、链路风险等。</p>
+<p>能力层是风控系统的基石，它的能力决定了一个风控系统识别风险能力的下限。会从<strong>资源、接口、设备、链路、行为</strong>等维度进行系统性风险扫描。</p>
+<h2 id="计算层">计算层</h2>
+<p>能力层的职责是：<strong>补充风险识别能力</strong>。</p>
+<p>该层包括：数据引擎、规则引擎、风险名单、识别模型、风险预警。</p>
+<p>计算层是对基础安全风险识别能力的补充，它的能力决定了一个风控系统识别风险能力的上限。从频率统计、策略规则、风险名单、模型识别、风险预警等维度对能力层进行能力补充。</p>
+<h2 id="可视层">可视层</h2>
+<p>可视层的职责是：<strong>提升运维效率</strong>。</p>
+<p>该层包括：运维报表、引擎配置、流量监控、事件追踪。</p>
+<p>可视层能够在事前能够分析风险潜在风险，事中有效执行并降低配置错误概率，事后观察风控效果。满足运营策略调整与风险管理的需求。</p>
+<p><strong>因为目前主要深入了解与实践的是组件层和能力层的建设，所以文章后续会从基建（基础安全产品）的视角进行系统性总结。</strong></p>
+<h1 id="基础安全组件">基础安全组件</h1>
+<h2 id="落地难点">落地难点</h2>
+<ol>
+<li>
+<h3 id="接入场景多">接入场景多</h3>
+<p>拉新激活、账号、反爬（多业务线）、交易（多业务线）、营销（多业务线）。</p>
+</li>
+<li>
+<h3 id="接入终端多">接入终端多</h3>
+<p>ADR（多技术栈）、IOS（多技术栈）、WX（原生、非原生）、WEB、TOUCH。</p>
+</li>
+<li>
+<h3 id="接入组件多">接入组件多</h3>
+</li>
+</ol>
+<p>​		防护组件（指纹、环境检测、接口防护等）、验证码组件、登录组件等。</p>
+<h2 id="待解决问题">待解决问题</h2>
+<img src="https://img2023.cnblogs.com/blog/765838/202304/765838-20230417013609434-101612946.png" alt="image-20230417011910718" style="zoom: 50%">
+<h2 id="架构特性">架构特性</h2>
+<p>在进行架构设计时，我会重点关注架构的这三大特性，分别是：<strong>安全性、易用性、稳定性</strong>。</p>
+<img src="https://img2023.cnblogs.com/blog/765838/202304/765838-20230417013649702-1662008544.png" alt="image-20230416015431292" style="zoom: 50%">
+<h3 id="安全性">安全性</h3>
+<p>因为是安全组件，其识别能力和组件自身安全性是首先要保证的。</p>
+<h3 id="稳定性">稳定性</h3>
+<p>组件会应用在各个场景，所以要尽可能降低由安全组件造成故障的概率。</p>
+<h3 id="易用性">易用性</h3>
+<p>尽可能降低业务接入的成本。</p>
+<h1 id="具体案例">具体案例</h1>
+<p>以接口防护组件设计来举例。</p>
+<h2 id="问题分析">问题分析</h2>
+<h3 id="攻击场景">攻击场景</h3>
+<p><strong>（以ip138查询网举例，不代表本人对该网站进行过攻击）</strong></p>
+<img src="https://img2023.cnblogs.com/blog/765838/202304/765838-20230417013721731-1978029433.png" alt="image-20230417001904078" style="zoom: 47%">
+<h3 id="攻击还原">攻击还原</h3>
+<p><strong>思路描述</strong></p>
+<p>请求离开容器后，通过抓包的方式，获取并解析数据，然后进行数据篡改、伪造鉴权，最后重新构造数据并发送请求。</p>
+<img src="https://img2023.cnblogs.com/blog/765838/202304/765838-20230417013801405-1009507908.png" alt="image-20230417010727406" style="zoom: 50%">
+<p><strong>攻击步骤</strong></p>
+<p>（1）抓包；（2）解析数据；（3）数据篡改；（4）伪造鉴权；（5）构造数据；（6）发送请求。</p>
+<h3 id="攻击步骤防御可行性分析">攻击步骤防御可行性分析</h3>
+<img src="https://img2023.cnblogs.com/blog/765838/202304/765838-20230417014604626-818099042.png" alt="image-20230416205548600" style="zoom: 40%">
+<p><strong>防止抓包</strong></p>
+<p>（1）抓包在应用外进行；</p>
+<p>（2）除App，其他端防抓包基本不可防；</p>
+<p>（3）防御性价比不高。</p>
+<p><strong>防止解析</strong></p>
+<p>解决方案是加密。</p>
+<p>（1）入侵性较强、强依赖；</p>
+<p>（2）加解密服务稳定性要求高；</p>
+<p>（3）业务响应时长上升。</p>
+<h2 id="系统设计">系统设计</h2>
+<h3 id="系统架构">系统架构</h3>
+<p>描述系统分层、职责、关系以及运行规则。</p>
+<img src="https://img2023.cnblogs.com/blog/765838/202304/765838-20230417013922311-1964243289.png" alt="image-20230417002708863" style="zoom: 50%">
+<h4 id="组件层-1">组件层</h4>
+<p>提供接口防护组件、验证组码件和登录组件。</p>
+<h4 id="透传层">透传层</h4>
+<p>通过数据共享或业务系统透传方式透传风控参数。</p>
+<h4 id="决策层-1">决策层</h4>
+<p>进行入参校验、版控、能力使用以及反制决策等。</p>
+<h4 id="能力层-1">能力层</h4>
+<p>提供接口检测能力等。</p>
+<h3 id="架构特性-1">架构特性</h3>
+<h4 id="安全性-1">安全性</h4>
+<p>关于安全性另一篇文章《业务安全相关安全产品的反思》中已经详细阐述，这篇文章就不过多赘述。<a href="https://www.cnblogs.com/boycelee/p/16223114.html" target="_blank" rel="noopener">https://www.cnblogs.com/boycelee/p/16223114.html</a></p>
+<p>安全性的难点除了风险识别上的难点，还有就是面对<strong>多个终端</strong>（Android、iOS、小程序、PC、Touch），其底层逻辑完全不一样。<strong>我们如何总结出统一的设计思想（方法论）</strong>这样的类工程问题。</p>
+<p>如防容器脱离，我总结的思想就是：<strong>上层与业务逻辑建立联系，中层多个组件间建立联系，下层与操作系统（WX容器、浏览器）建立联系。</strong></p>
+<img src="https://img2023.cnblogs.com/blog/765838/202304/765838-20230417013957693-1843870375.png" alt="image-20230417000511003" style="zoom: 50%">
+<h4 id="稳定性-1">稳定性</h4>
+<img src="https://img2023.cnblogs.com/blog/765838/202304/765838-20230417014033215-68518165.png" alt="image-20230416210605354" style="zoom: 67%">
+<h4 id="易用性-1">易用性</h4>
+<p><strong>（1）组件化</strong></p>
+<p>关于前端组件的易用性，不能与业务过于耦合，需要根据业务特性进行适当地解耦。如果与业务系统过于耦合，首先是在对防护逻辑进行升级时势必会影响业务，就需要投入测试人力进行业务逻辑回归，其次是防护能力往其他场景迁移也会有代码重复冗余的问题。</p>
+<img src="https://img2023.cnblogs.com/blog/765838/202304/765838-20230417014109396-325976615.png" alt="image-20230416230517608" style="zoom: 30%">
+<p><strong>（2）易用性提升</strong></p>
+<p>如何在组件化的前提下进行易用性提升？我坚持的原则是<strong>尽量在不入侵业务的前提下，降低接入成本</strong>。</p>
+<p>我的解决方案是，结合项目前端技术栈特点进行如下选择：</p>
+<img src="https://img2023.cnblogs.com/blog/765838/202304/765838-20230417014144863-1385959984.png" alt="image-20230416210621663" style="zoom: 45%">
+<p>a）方式一：是否有统一的网络框架？</p>
+<p>​	  如使用<strong>安卓原生技术开发</strong>、<strong>苹果原生技术</strong>开发一般企业都有统一的网络框架进行网络出口管理，这时组件就可以从中找一个<strong>切面进行组件接入</strong>。</p>
+<p>b）方式二：是否有统一组件？</p>
+<p>​	  如<strong>小程序（或Android Hybird等）</strong>没有封装统一的网络库，而是页面直接使用HTTP协议发送请求，但有统一的工具库，此时可以帮业务提前做好组件引入工	  作，业务使用时	直接本地调用即可。这也可以一定程度地提升易用性。</p>
+<p>c）方式三：是否可以引入三方组件？</p>
+<p>​	  如<strong>网页端（WWW、TOUCH）</strong>提供好完整的风控.js文件，业务方使用时直接调用即可，虽然不如以上a、b两种方式更友好，但要强于代码拷贝的方案。</p>
+<img src="https://img2023.cnblogs.com/blog/765838/202304/765838-20230417014220574-825544955.png" alt="image-20230417000706468" style="zoom: 50%">
+<h1 id="最后">最后</h1>
+<p>软件工程没有银弹，逆向工程永远胜利。</p>
+<p>懂的不多，做的太少。欢迎批评、指正。</p>
+
+</div>
+<div class="clear"></div>
+<div id="blog_post_info_block" role="contentinfo">
+    <div id="blog_post_info"></div>
+    <div class="clear"></div>
+    <div id="post_next_prev"></div>
+</div>
+            </div>
+            <div class="postDesc">posted @ 
+<span id="post-date" data-last-update-days="126.97014846769098" data-date-created="BlogServer.Application.Dto.BlogPost.BlogPostDto" data-date-updated="2024-01-18 11:24">2023-04-17 01:48</span>&nbsp;
+<a href="https://www.cnblogs.com/boycelee">码头工人</a>&nbsp;
+阅读(<span id="post_view_count">2640</span>)&nbsp;
+评论(<span id="post_comment_count">3</span>)&nbsp;
+<a href="https://i.cnblogs.com/EditPosts.aspx?postid=17324600" rel="nofollow">编辑</a>&nbsp;
+<a href="javascript:void(0)" onclick="AddToWz(17324600);return false;">收藏</a>&nbsp;
+<a href="javascript:void(0)" onclick="reportManager.report({ currentUserId: '', targetType: 'blogPost', targetId: '17324600', targetLink: 'https://www.cnblogs.com/boycelee/p/17324600.html', title: '【领域专家系列】风控安全产品系统设计的一些思考' })">举报</a>
+</div>
+        </div>
+	    
+	    
+    </div><!--end: topics 文章、评论容器-->
+</div>
+<script>
+    var cb_entryId = 17324600, cb_entryCreatedDate = '2023-04-17 01:48', cb_postType = 1, cb_postTitle = '【领域专家系列】风控安全产品系统设计的一些思考';
+    var allowComments = true, cb_blogId = 230515, cb_blogApp = 'boycelee', cb_blogUserGuid = 'c43ddcb8-a50a-e511-b908-9dcfd8948a71';
+    mermaidRender.render()
+    markdown_highlight()
+    zoomManager.apply("#cnblogs_post_body img:not(.code_img_closed):not(.code_img_opened)");    
+</script>
+<a id="!comments"></a>
+<div id="blog-comments-placeholder"></div>
+<div id="comment_form" class="commentform">
+    <a name="commentform"></a>
+    <div id="divCommentShow"></div>
+    <div id="comment_nav">
+            <a class="comment-nav-left forpc" href="https://cnblogs.vip/" target="_blank">会员力量，点亮园子希望</a>
+        <div class="comment-nav-right">
+            <span id="span_refresh_tips"></span><a href="#" onclick="return RefreshPage();">刷新页面</a><a href="#top">返回顶部</a>
+        </div>
+    </div>
+    <div id="comment_form_container"></div>
+    <div class="ad_text_commentbox" id="ad_text_under_commentbox"></div>
+        <div id="cnblogs_ch"></div>
+    <div id="opt_under_post"></div>
+        <div id="cnblogs_c1" class="under-post-card">
+            <a href="https://www.finclip.com?channel=cnblog2024" rel="nofollow" target="_blank" onclick="countCreativeClicks('C1-凡泰极客')">
+                <img src="https://img2024.cnblogs.com/blog/35695/202405/35695-20240517155930267-114888508.jpg" onload="countCreativeImpressions('C1-凡泰极客')" alt="" />
+                <span id="c1_impression" style="display:none"></span>
+            </a>
+        </div>
+    <div id="under_post_card1"></div>
+    <div id="under_post_card2"></div>
+    <div id="HistoryToday" class="under-post-card"></div>
+    <script type="text/javascript">
+        var commentManager = new blogCommentManager();
+        commentManager.renderComments(0);
+        fixPostBody();
+        window.footnoteTipManager.generateFootnoteTips();
+
+            window.tocManager.displayDisableTocTips = false;
+            window.tocManager.generateToc();
+            
+                setTimeout(function() { countViews(cb_blogId, cb_entryId); }, 50);
+            
+            deliverT2();
+            deliverC1C2();
+            loadNewsAndKb();
+            
+                LoadPostCategoriesTags(cb_blogId, cb_entryId);
+            
+            LoadPostInfoBlock(cb_blogId, cb_entryId, cb_blogApp, cb_blogUserGuid);
+            GetPrevNextPost(cb_entryId, cb_blogId, cb_entryCreatedDate, cb_postType);
+            loadOptUnderPost();
+            GetHistoryToday(cb_blogId, cb_blogApp, cb_entryCreatedDate);
+                </script>
+</div>
+
+	</div><!--end: forFlow -->
+	</div><!--end: mainContent 主体内容容器-->
+	<div id="sideBar">
+		<div id="sideBarMain">
+			<div id="sidebar_news" class="newsItem">
+    <h3 class="catListTitle">公告</h3>
+<div id="blog-news">    
+    <div id="sidebar_news_content">
+    </div>
+</div>
+<script>loadBlogNews();</script>
+
+ 
+</div>
+<div id="sidebar_c3"></div>
+			<div id="blog-calendar" style="display:none"></div><script>loadBlogDefaultCalendar();</script>			
+			<div id="leftcontentcontainer">
+				<div id="blog-sidecolumn"></div>
+                    <script>loadBlogSideColumn();</script>
+			</div>			
+		</div><!--end: sideBarMain -->
+	</div><!--end: sideBar 侧边栏容器 -->
+	<div class="clear"></div>
+	</div><!--end: main -->
+	<div class="clear"></div>
+	<div id="footer">
+		<!--done-->
+Copyright &copy; 2024 码头工人
+<br /><span id="poweredby">Powered by .NET 8.0 on Kubernetes</span>
+
+
+
+	</div><!--end: footer -->
+</div><!--end: home 自定义的最大容器 -->
+
+
+
+    
+
+    <input type="hidden" id="antiforgery_token" value="CfDJ8ONv0caE5GtEh3YJ5j088knAqtNgRTtsDoLU3WFr4g4NKlb2gRX3Mok6WXx7Y-H5mbXDIQ_Y5Rz_dC-ruhRYSN1StTKCGMefyWNCOUUV4NXiapeY1KMsOJRS11mRiIMrMg3gd5td0vjmNn5MVyX8qgI" />
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-M95P3TTWJZ"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-M95P3TTWJZ');
+</script>
+<script defer src="https://hm.baidu.com/hm.js?866c9be12d4a814454792b1fd0fed295"></script>
+</body>
+</html>
